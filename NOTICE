@@ -1,0 +1,17 @@
+Bedrock Connected Textures
+Copyright (C) 2026 Icehunter
+
+The engine and the converter are licensed under the GNU General Public License,
+version 3 (LICENSE), with one additional permission (LICENSE-EXCEPTION.md):
+
+  Files the converter writes into a converted pack may be distributed under any
+  terms, including closed-source and paid, even though some of them (such as the
+  publisher script) are copied from this program.
+
+Changes to the engine or the converter themselves stay under the GPL.
+
+The exception gives no rights in anyone's pack. Convert packs you are allowed to
+use; share a converted pack only if you are its author or have the author's
+permission.
+
+Third-party notices: THIRD-PARTY-NOTICES.md.

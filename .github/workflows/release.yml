@@ -1,0 +1,46 @@
+name: release
+
+# Runs only when a version tag (v1.0.0, ...) is pushed: tests, then the engine
+# add-on and the converter ZIP are attached to a GitHub release for that tag.
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    env:
+      BEDROCK_SAMPLES: ${{ github.workspace }}/bedrock-samples
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: Mojang/bedrock-samples
+          path: bedrock-samples
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /metadata/
+            /resource_pack/
+            /behavior_pack/biomes/
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: python -m pip install -r requirements.txt
+      - run: python -m unittest discover -s tests -p "test_*.py"
+      - run: node --test tests/*.mjs
+      - name: The tag must match the engine version
+        run: |
+          version=$(python -c "import json; print('.'.join(map(str, json.load(open('engine/identity.json'))['version'])))")
+          test "v$version" = "${GITHUB_REF_NAME}" || { echo "Tag ${GITHUB_REF_NAME} does not match engine version $version"; exit 1; }
+      - run: python converter/engine_package.py --output dist
+      - run: python converter/package_converter.py
+      - name: Publish the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "${GITHUB_REF_NAME}" dist/*.mcaddon dist/*.zip --title "${GITHUB_REF_NAME}" --notes-file CHANGELOG.md

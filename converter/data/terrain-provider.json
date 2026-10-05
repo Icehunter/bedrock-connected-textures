@@ -1,0 +1,239 @@
+{
+  "format_version": 1,
+  "id": "terrain",
+  "effects": {
+    "grass": {
+      "kind": "surface",
+      "entity": "bct:grass",
+      "material": "grass_top",
+      "generator": "neighbor_overlay",
+      "biome_tint": "grass",
+      "native_block": "bct:grass_surface",
+      "layer": 2,
+      "native_material": 1,
+      "priority": 5,
+      "height_pixels": 1
+    },
+    "sand": {
+      "kind": "surface",
+      "entity": "bct:sand",
+      "material": "sand",
+      "generator": "neighbor_overlay",
+      "layer": 1,
+      "native_block": "bct:grass_surface",
+      "native_material": 2,
+      "priority": 4,
+      "height_pixels": 1
+    },
+    "red_sand": {
+      "kind": "surface",
+      "entity": "bct:red_sand",
+      "material": "red_sand",
+      "generator": "neighbor_overlay",
+      "layer": 0,
+      "native_block": "bct:grass_surface",
+      "native_material": 3,
+      "priority": 3,
+      "height_pixels": 1
+    },
+    "suspicious_sand": {
+      "kind": "surface",
+      "entity": "bct:suspicious_sand",
+      "material": "suspicious_sand_0",
+      "generator": "neighbor_overlay",
+      "layer": 0,
+      "native_block": "bct:extra_sand_surface",
+      "native_material": 1,
+      "native_offset": 2,
+      "priority": 2,
+      "entity_surface": true,
+      "height_tuning": true,
+      "height_pixels": 1
+    },
+    "soul_sand": {
+      "kind": "surface",
+      "entity": "bct:soul_sand",
+      "material": "soul_sand",
+      "generator": "neighbor_overlay",
+      "layer": 0,
+      "native_block": "bct:extra_sand_surface",
+      "native_material": 2,
+      "priority": 1,
+      "entity_surface": true,
+      "height_tuning": true,
+      "native_offset": 2,
+      "height_pixels": 1
+    }
+  },
+  "rules": [
+    {
+      "id": "grass_over_surfaces",
+      "targets": [
+        "minecraft:dirt",
+        "minecraft:cobblestone",
+        "minecraft:stone_bricks",
+        "minecraft:stonebrick",
+        "minecraft:brick_block",
+        "minecraft:bricks",
+        "minecraft:oak_planks",
+        "minecraft:spruce_planks",
+        "minecraft:birch_planks",
+        "minecraft:dark_oak_planks",
+        "minecraft:sand",
+        "minecraft:red_sand",
+        "minecraft:stone",
+        "minecraft:suspicious_sand",
+        "minecraft:soul_sand"
+      ],
+      "neighbors": [
+        "minecraft:grass_block",
+        "minecraft:grass"
+      ],
+      "contacts": [
+        "north",
+        "east",
+        "south",
+        "west"
+      ],
+      "faces": [
+        "up"
+      ],
+      "selection": "neighbor_overlay",
+      "effect": "grass",
+      "biome_tint": "grass",
+      "corner_policy": "path_corner"
+    },
+    {
+      "id": "sand_over_surfaces",
+      "targets": [
+        "minecraft:dirt",
+        "minecraft:cobblestone",
+        "minecraft:stone_bricks",
+        "minecraft:stonebrick",
+        "minecraft:brick_block",
+        "minecraft:bricks",
+        "minecraft:oak_planks",
+        "minecraft:spruce_planks",
+        "minecraft:birch_planks",
+        "minecraft:dark_oak_planks",
+        "minecraft:stone",
+        "minecraft:suspicious_sand",
+        "minecraft:red_sand",
+        "minecraft:soul_sand"
+      ],
+      "neighbors": [
+        "minecraft:sand"
+      ],
+      "contacts": [
+        "north",
+        "east",
+        "south",
+        "west"
+      ],
+      "faces": [
+        "up"
+      ],
+      "selection": "neighbor_overlay",
+      "effect": "sand",
+      "corner_policy": "path_corner"
+    },
+    {
+      "id": "red_sand_over_surfaces",
+      "targets": [
+        "minecraft:dirt",
+        "minecraft:cobblestone",
+        "minecraft:stone_bricks",
+        "minecraft:stonebrick",
+        "minecraft:brick_block",
+        "minecraft:bricks",
+        "minecraft:oak_planks",
+        "minecraft:spruce_planks",
+        "minecraft:birch_planks",
+        "minecraft:dark_oak_planks",
+        "minecraft:stone",
+        "minecraft:soul_sand"
+      ],
+      "neighbors": [
+        "minecraft:red_sand"
+      ],
+      "contacts": [
+        "north",
+        "east",
+        "south",
+        "west"
+      ],
+      "faces": [
+        "up"
+      ],
+      "selection": "neighbor_overlay",
+      "effect": "red_sand",
+      "corner_policy": "path_corner"
+    },
+    {
+      "id": "suspicious_sand_over_surfaces",
+      "targets": [
+        "minecraft:dirt",
+        "minecraft:cobblestone",
+        "minecraft:stone_bricks",
+        "minecraft:stonebrick",
+        "minecraft:brick_block",
+        "minecraft:bricks",
+        "minecraft:oak_planks",
+        "minecraft:spruce_planks",
+        "minecraft:birch_planks",
+        "minecraft:dark_oak_planks",
+        "minecraft:stone",
+        "minecraft:red_sand",
+        "minecraft:soul_sand"
+      ],
+      "neighbors": [
+        "minecraft:suspicious_sand"
+      ],
+      "contacts": [
+        "north",
+        "east",
+        "south",
+        "west"
+      ],
+      "faces": [
+        "up"
+      ],
+      "selection": "neighbor_overlay",
+      "effect": "suspicious_sand",
+      "corner_policy": "path_corner"
+    },
+    {
+      "id": "soul_sand_over_surfaces",
+      "targets": [
+        "minecraft:dirt",
+        "minecraft:cobblestone",
+        "minecraft:stone_bricks",
+        "minecraft:stonebrick",
+        "minecraft:brick_block",
+        "minecraft:bricks",
+        "minecraft:oak_planks",
+        "minecraft:spruce_planks",
+        "minecraft:birch_planks",
+        "minecraft:dark_oak_planks",
+        "minecraft:stone"
+      ],
+      "neighbors": [
+        "minecraft:soul_sand"
+      ],
+      "contacts": [
+        "north",
+        "east",
+        "south",
+        "west"
+      ],
+      "faces": [
+        "up"
+      ],
+      "selection": "neighbor_overlay",
+      "effect": "soul_sand",
+      "corner_policy": "path_corner"
+    }
+  ],
+  "biome_colors_source": "client_grass",
+  "exclusive_quarters": true
+}

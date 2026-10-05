@@ -1,0 +1,1347 @@
+{
+  "format_version": 1,
+  "max_permutations": 4096,
+  "carrier_fallback": [
+    {
+      "blocks": [
+        "minecraft:infested_*"
+      ],
+      "reason": "Infested blocks release silverfish when broken or blown up. These rules stay on entity carriers."
+    },
+    {
+      "blocks": [
+        "minecraft:chiseled_bookshelf"
+      ],
+      "reason": "Chiseled bookshelves hold books and show them per slot. These rules stay on entity carriers."
+    }
+  ],
+  "behaviors": [
+    {
+      "blocks": [
+        "minecraft:*_log",
+        "minecraft:*_wood",
+        "minecraft:crimson_stem",
+        "minecraft:warped_stem",
+        "minecraft:stripped_*_stem",
+        "minecraft:*_hyphae"
+      ],
+      "leaf_guard": {
+        "radius": 6,
+        "leaves": [
+          "minecraft:*_leaves",
+          "minecraft:azalea_leaves_flowered"
+        ]
+      },
+      "cost": 8,
+      "reason": "Leaves only check for logs while update_bit is set, and a block change next to them sets it. Logs stay vanilla while a nearby leaf has a check pending; after a swap, update_bit is cleared again on leaves that had it clear before. An axe strips a replaced log (bct:strip) like vanilla.",
+      "strip": true
+    }
+  ],
+  "panes": {
+    "blocks": [
+      "minecraft:glass_pane",
+      "minecraft:*_stained_glass_pane",
+      "minecraft:iron_bars"
+    ],
+    "connect": [
+      "minecraft:*glass_pane",
+      "minecraft:*_bars",
+      "minecraft:*_wall",
+      "minecraft:glass",
+      "minecraft:*_stained_glass",
+      "minecraft:tinted_glass"
+    ],
+    "reason": "Panes and bars connect to other panes and bars, walls and full blocks; the engine reads the vanilla connection states on swap-in and works them out again when a neighbor changes."
+  },
+  "open_blocks": [
+    "minecraft:air",
+    "minecraft:water",
+    "minecraft:flowing_water",
+    "minecraft:lava",
+    "minecraft:flowing_lava",
+    "minecraft:glass",
+    "minecraft:tinted_glass",
+    "*_stained_glass",
+    "*glass_pane",
+    "*_leaves",
+    "minecraft:azalea_leaves_flowered",
+    "minecraft:iron_bars",
+    "*copper_bars",
+    "minecraft:ice"
+  ],
+  "colors": {
+    "dye": {
+      "white": "#FFFFFF",
+      "orange": "#D87F33",
+      "magenta": "#B24CD8",
+      "light_blue": "#6699D8",
+      "yellow": "#E5E533",
+      "lime": "#7FCC19",
+      "pink": "#F27FA5",
+      "gray": "#4C4C4C",
+      "light_gray": "#999999",
+      "cyan": "#4C7F99",
+      "purple": "#7F3FB2",
+      "blue": "#334CB2",
+      "brown": "#664C33",
+      "green": "#667F33",
+      "red": "#993333",
+      "black": "#191919"
+    },
+    "wood": {
+      "oak": "#8F7748",
+      "spruce": "#815631",
+      "birch": "#F7E9A3",
+      "jungle": "#976D4D",
+      "acacia": "#D87F33",
+      "dark_oak": "#664C33",
+      "mangrove": "#993333",
+      "cherry": "#D1B1A1",
+      "bamboo": "#E5E533",
+      "pale_oak": "#FFFCF5",
+      "crimson": "#943F61",
+      "warped": "#3A8E8C"
+    },
+    "terracotta": {
+      "white": "#D1B1A1",
+      "orange": "#A05325",
+      "magenta": "#95576C",
+      "light_blue": "#706C8A",
+      "yellow": "#BA8524",
+      "lime": "#677535",
+      "pink": "#A04D4E",
+      "gray": "#392923",
+      "light_gray": "#876B62",
+      "cyan": "#575C5C",
+      "purple": "#7A4958",
+      "blue": "#4C3E5C",
+      "brown": "#4C3223",
+      "green": "#4C522A",
+      "red": "#8E3C2E",
+      "black": "#251610"
+    }
+  },
+  "profiles": [
+    {
+      "blocks": [
+        "minecraft:glass_pane",
+        "minecraft:*_stained_glass_pane"
+      ],
+      "destroy": 0.3,
+      "resistance": 0.3,
+      "map_color": null,
+      "loot": [],
+      "transparent": true,
+      "light_dampening": 0,
+      "instrument": "note.hat"
+    },
+    {
+      "blocks": [
+        "minecraft:iron_bars"
+      ],
+      "destroy": 5,
+      "resistance": 6,
+      "map_color": "#A7A7A7",
+      "tool": "pickaxe",
+      "loot": "self",
+      "transparent": true,
+      "light_dampening": 0,
+      "requires_tool": true
+    },
+    {
+      "blocks": [
+        "minecraft:crimson_stem",
+        "minecraft:warped_stem",
+        "minecraft:crimson_hyphae",
+        "minecraft:warped_hyphae",
+        "minecraft:stripped_crimson_*",
+        "minecraft:stripped_warped_*"
+      ],
+      "destroy": 2,
+      "resistance": 2,
+      "map_color": "wood",
+      "tool": "axe",
+      "loot": "self",
+      "instrument": "note.bassattack"
+    },
+    {
+      "blocks": [
+        "minecraft:*_log",
+        "minecraft:*_wood"
+      ],
+      "destroy": 2,
+      "resistance": 2,
+      "map_color": "wood",
+      "tool": "axe",
+      "loot": "self",
+      "flammable": [
+        5,
+        5
+      ],
+      "instrument": "note.bassattack",
+      "ignited_by_lava": true
+    },
+    {
+      "blocks": [
+        "minecraft:dead_*_coral_block"
+      ],
+      "destroy": 1.5,
+      "resistance": 6,
+      "map_color": "#4C4C4C",
+      "tool": "pickaxe",
+      "loot": "self",
+      "instrument": "note.bd",
+      "requires_tool": true
+    },
+    {
+      "blocks": [
+        "minecraft:*_glazed_terracotta"
+      ],
+      "destroy": 1.4,
+      "resistance": 1.4,
+      "map_color": "dye",
+      "tool": "pickaxe",
+      "loot": "self",
+      "requires_tool": true,
+      "instrument": "note.bd",
+      "movable": "push"
+    },
+    {
+      "blocks": [
+        "minecraft:glass",
+        "minecraft:*_stained_glass"
+      ],
+      "destroy": 0.3,
+      "resistance": 0.3,
+      "map_color": null,
+      "loot": [],
+      "transparent": true,
+      "light_dampening": 0,
+      "instrument": "note.hat"
+    },
+    {
+      "blocks": [
+        "minecraft:crimson_planks",
+        "minecraft:warped_planks"
+      ],
+      "destroy": 2,
+      "resistance": 3,
+      "map_color": "wood",
+      "tool": "axe",
+      "loot": "self",
+      "instrument": "note.bassattack"
+    },
+    {
+      "blocks": [
+        "minecraft:*_planks"
+      ],
+      "destroy": 2,
+      "resistance": 3,
+      "map_color": "wood",
+      "tool": "axe",
+      "loot": "self",
+      "flammable": [
+        5,
+        20
+      ],
+      "instrument": "note.bassattack",
+      "ignited_by_lava": true
+    },
+    {
+      "blocks": [
+        "minecraft:brick_block"
+      ],
+      "destroy": 2,
+      "resistance": 6,
+      "map_color": "#993333",
+      "tool": "pickaxe",
+      "loot": "self",
+      "requires_tool": true,
+      "instrument": "note.bd"
+    },
+    {
+      "blocks": [
+        "minecraft:cobblestone",
+        "minecraft:mossy_cobblestone"
+      ],
+      "destroy": 2,
+      "resistance": 6,
+      "map_color": "#707070",
+      "tool": "pickaxe",
+      "loot": "self",
+      "requires_tool": true,
+      "instrument": "note.bd"
+    },
+    {
+      "blocks": [
+        "minecraft:stone_bricks",
+        "minecraft:mossy_stone_bricks",
+        "minecraft:cracked_stone_bricks",
+        "minecraft:chiseled_stone_bricks"
+      ],
+      "destroy": 1.5,
+      "resistance": 6,
+      "map_color": "#707070",
+      "tool": "pickaxe",
+      "loot": "self",
+      "requires_tool": true,
+      "instrument": "note.bd"
+    },
+    {
+      "blocks": [
+        "minecraft:cracked_nether_bricks",
+        "minecraft:chiseled_nether_bricks"
+      ],
+      "destroy": 2,
+      "resistance": 6,
+      "map_color": "#700200",
+      "tool": "pickaxe",
+      "loot": "self",
+      "requires_tool": true,
+      "instrument": "note.bd"
+    },
+    {
+      "blocks": [
+        "minecraft:sandstone",
+        "minecraft:cut_sandstone",
+        "minecraft:chiseled_sandstone"
+      ],
+      "destroy": 0.8,
+      "resistance": 0.8,
+      "map_color": "#F7E9A3",
+      "tool": "pickaxe",
+      "loot": "self",
+      "requires_tool": true,
+      "instrument": "note.bd"
+    },
+    {
+      "blocks": [
+        "minecraft:red_sandstone",
+        "minecraft:cut_red_sandstone",
+        "minecraft:chiseled_red_sandstone"
+      ],
+      "destroy": 0.8,
+      "resistance": 0.8,
+      "map_color": "#D87F33",
+      "tool": "pickaxe",
+      "loot": "self",
+      "requires_tool": true,
+      "instrument": "note.bd"
+    },
+    {
+      "blocks": [
+        "minecraft:quartz_block",
+        "minecraft:chiseled_quartz_block",
+        "minecraft:quartz_pillar"
+      ],
+      "destroy": 0.8,
+      "resistance": 0.8,
+      "map_color": "#FFFCF5",
+      "tool": "pickaxe",
+      "loot": "self",
+      "requires_tool": true,
+      "instrument": "note.bd"
+    },
+    {
+      "blocks": [
+        "minecraft:resin_bricks",
+        "minecraft:chiseled_resin_bricks"
+      ],
+      "destroy": 1.5,
+      "resistance": 6,
+      "map_color": "#D87F33",
+      "tool": "pickaxe",
+      "loot": "self",
+      "requires_tool": true,
+      "instrument": "note.bd"
+    },
+    {
+      "blocks": [
+        "minecraft:stone"
+      ],
+      "destroy": 1.5,
+      "resistance": 6,
+      "map_color": "#707070",
+      "tool": "pickaxe",
+      "loot": [
+        {
+          "item": "minecraft:cobblestone"
+        }
+      ],
+      "requires_tool": true,
+      "instrument": "note.bd"
+    },
+    {
+      "blocks": [
+        "minecraft:diorite"
+      ],
+      "destroy": 1.5,
+      "resistance": 6,
+      "map_color": "#FFFCF5",
+      "tool": "pickaxe",
+      "loot": "self",
+      "requires_tool": true,
+      "instrument": "note.bd"
+    },
+    {
+      "blocks": [
+        "minecraft:granite"
+      ],
+      "destroy": 1.5,
+      "resistance": 6,
+      "map_color": "#976D4D",
+      "tool": "pickaxe",
+      "loot": "self",
+      "requires_tool": true,
+      "instrument": "note.bd"
+    },
+    {
+      "blocks": [
+        "minecraft:andesite"
+      ],
+      "destroy": 1.5,
+      "resistance": 6,
+      "map_color": "#707070",
+      "tool": "pickaxe",
+      "loot": "self",
+      "requires_tool": true,
+      "instrument": "note.bd"
+    },
+    {
+      "blocks": [
+        "minecraft:tuff"
+      ],
+      "destroy": 1.5,
+      "resistance": 6,
+      "map_color": "#392923",
+      "tool": "pickaxe",
+      "loot": "self",
+      "requires_tool": true,
+      "instrument": "note.bd"
+    },
+    {
+      "blocks": [
+        "minecraft:calcite"
+      ],
+      "destroy": 0.75,
+      "resistance": 0.75,
+      "map_color": "#D1B1A1",
+      "tool": "pickaxe",
+      "loot": "self",
+      "requires_tool": true,
+      "instrument": "note.bd"
+    },
+    {
+      "blocks": [
+        "minecraft:deepslate"
+      ],
+      "destroy": 3,
+      "resistance": 6,
+      "map_color": "#646464",
+      "tool": "pickaxe",
+      "loot": [
+        {
+          "item": "minecraft:cobbled_deepslate"
+        }
+      ],
+      "requires_tool": true,
+      "instrument": "note.bd"
+    },
+    {
+      "blocks": [
+        "minecraft:basalt",
+        "minecraft:polished_basalt"
+      ],
+      "destroy": 1.25,
+      "resistance": 4.2,
+      "map_color": "#191919",
+      "tool": "pickaxe",
+      "loot": "self",
+      "requires_tool": true,
+      "instrument": "note.bd"
+    },
+    {
+      "blocks": [
+        "minecraft:smooth_quartz"
+      ],
+      "destroy": 2,
+      "resistance": 6,
+      "map_color": "#FFFCF5",
+      "tool": "pickaxe",
+      "loot": "self",
+      "requires_tool": true,
+      "instrument": "note.bd"
+    },
+    {
+      "blocks": [
+        "minecraft:blackstone"
+      ],
+      "destroy": 1.5,
+      "resistance": 6,
+      "map_color": "#191919",
+      "tool": "pickaxe",
+      "loot": "self",
+      "requires_tool": true,
+      "instrument": "note.bd"
+    },
+    {
+      "blocks": [
+        "minecraft:end_stone"
+      ],
+      "destroy": 3,
+      "resistance": 9,
+      "map_color": "#F7E9A3",
+      "tool": "pickaxe",
+      "loot": "self",
+      "requires_tool": true,
+      "instrument": "note.bd"
+    },
+    {
+      "blocks": [
+        "minecraft:nether_brick"
+      ],
+      "destroy": 2,
+      "resistance": 6,
+      "map_color": "#700200",
+      "tool": "pickaxe",
+      "loot": "self",
+      "requires_tool": true,
+      "instrument": "note.bd"
+    },
+    {
+      "blocks": [
+        "minecraft:red_nether_brick"
+      ],
+      "destroy": 2,
+      "resistance": 6,
+      "map_color": "#700200",
+      "tool": "pickaxe",
+      "loot": "self",
+      "requires_tool": true,
+      "instrument": "note.bd"
+    },
+    {
+      "blocks": [
+        "minecraft:packed_mud"
+      ],
+      "destroy": 1,
+      "resistance": 3,
+      "map_color": "#976D4D",
+      "tool": "pickaxe",
+      "loot": "self"
+    },
+    {
+      "blocks": [
+        "minecraft:resin_block"
+      ],
+      "destroy": 0,
+      "resistance": 0,
+      "map_color": "#D87F33",
+      "loot": "self",
+      "instrument": "note.bd"
+    },
+    {
+      "blocks": [
+        "minecraft:coal_ore"
+      ],
+      "destroy": 3,
+      "resistance": 3,
+      "map_color": "#707070",
+      "tool": "pickaxe",
+      "loot": [
+        {
+          "item": "minecraft:coal"
+        }
+      ],
+      "requires_tool": true,
+      "xp": [
+        0,
+        2
+      ],
+      "fortune": "ore",
+      "instrument": "note.bd"
+    },
+    {
+      "blocks": [
+        "minecraft:deepslate_coal_ore"
+      ],
+      "destroy": 4.5,
+      "resistance": 3,
+      "map_color": "#646464",
+      "tool": "pickaxe",
+      "loot": [
+        {
+          "item": "minecraft:coal"
+        }
+      ],
+      "requires_tool": true,
+      "xp": [
+        0,
+        2
+      ],
+      "fortune": "ore",
+      "instrument": "note.bd"
+    },
+    {
+      "blocks": [
+        "minecraft:copper_ore"
+      ],
+      "destroy": 3,
+      "resistance": 3,
+      "map_color": "#707070",
+      "tool": "pickaxe",
+      "loot": [
+        {
+          "item": "minecraft:raw_copper",
+          "min": 2,
+          "max": 5
+        }
+      ],
+      "requires_tool": true,
+      "tier": "stone",
+      "fortune": "ore",
+      "instrument": "note.bd"
+    },
+    {
+      "blocks": [
+        "minecraft:deepslate_copper_ore"
+      ],
+      "destroy": 4.5,
+      "resistance": 3,
+      "map_color": "#646464",
+      "tool": "pickaxe",
+      "loot": [
+        {
+          "item": "minecraft:raw_copper",
+          "min": 2,
+          "max": 5
+        }
+      ],
+      "requires_tool": true,
+      "tier": "stone",
+      "fortune": "ore",
+      "instrument": "note.bd"
+    },
+    {
+      "blocks": [
+        "minecraft:iron_ore"
+      ],
+      "destroy": 3,
+      "resistance": 3,
+      "map_color": "#707070",
+      "tool": "pickaxe",
+      "loot": [
+        {
+          "item": "minecraft:raw_iron"
+        }
+      ],
+      "requires_tool": true,
+      "tier": "stone",
+      "fortune": "ore",
+      "instrument": "note.bd"
+    },
+    {
+      "blocks": [
+        "minecraft:deepslate_iron_ore"
+      ],
+      "destroy": 4.5,
+      "resistance": 3,
+      "map_color": "#646464",
+      "tool": "pickaxe",
+      "loot": [
+        {
+          "item": "minecraft:raw_iron"
+        }
+      ],
+      "requires_tool": true,
+      "tier": "stone",
+      "fortune": "ore",
+      "instrument": "note.bd"
+    },
+    {
+      "blocks": [
+        "minecraft:gold_ore"
+      ],
+      "destroy": 3,
+      "resistance": 3,
+      "map_color": "#707070",
+      "tool": "pickaxe",
+      "loot": [
+        {
+          "item": "minecraft:raw_gold"
+        }
+      ],
+      "requires_tool": true,
+      "tier": "iron",
+      "fortune": "ore",
+      "instrument": "note.bd"
+    },
+    {
+      "blocks": [
+        "minecraft:deepslate_gold_ore"
+      ],
+      "destroy": 4.5,
+      "resistance": 3,
+      "map_color": "#646464",
+      "tool": "pickaxe",
+      "loot": [
+        {
+          "item": "minecraft:raw_gold"
+        }
+      ],
+      "requires_tool": true,
+      "tier": "iron",
+      "fortune": "ore",
+      "instrument": "note.bd"
+    },
+    {
+      "blocks": [
+        "minecraft:diamond_ore"
+      ],
+      "destroy": 3,
+      "resistance": 3,
+      "map_color": "#707070",
+      "tool": "pickaxe",
+      "loot": [
+        {
+          "item": "minecraft:diamond"
+        }
+      ],
+      "requires_tool": true,
+      "tier": "iron",
+      "xp": [
+        3,
+        7
+      ],
+      "fortune": "ore",
+      "instrument": "note.bd"
+    },
+    {
+      "blocks": [
+        "minecraft:deepslate_diamond_ore"
+      ],
+      "destroy": 4.5,
+      "resistance": 3,
+      "map_color": "#646464",
+      "tool": "pickaxe",
+      "loot": [
+        {
+          "item": "minecraft:diamond"
+        }
+      ],
+      "requires_tool": true,
+      "tier": "iron",
+      "xp": [
+        3,
+        7
+      ],
+      "fortune": "ore",
+      "instrument": "note.bd"
+    },
+    {
+      "blocks": [
+        "minecraft:emerald_ore"
+      ],
+      "destroy": 3,
+      "resistance": 3,
+      "map_color": "#707070",
+      "tool": "pickaxe",
+      "loot": [
+        {
+          "item": "minecraft:emerald"
+        }
+      ],
+      "requires_tool": true,
+      "tier": "iron",
+      "xp": [
+        3,
+        7
+      ],
+      "fortune": "ore",
+      "instrument": "note.bd"
+    },
+    {
+      "blocks": [
+        "minecraft:deepslate_emerald_ore"
+      ],
+      "destroy": 4.5,
+      "resistance": 3,
+      "map_color": "#646464",
+      "tool": "pickaxe",
+      "loot": [
+        {
+          "item": "minecraft:emerald"
+        }
+      ],
+      "requires_tool": true,
+      "tier": "iron",
+      "xp": [
+        3,
+        7
+      ],
+      "fortune": "ore",
+      "instrument": "note.bd"
+    },
+    {
+      "blocks": [
+        "minecraft:lapis_ore"
+      ],
+      "destroy": 3,
+      "resistance": 3,
+      "map_color": "#707070",
+      "tool": "pickaxe",
+      "loot": [
+        {
+          "item": "minecraft:lapis_lazuli",
+          "min": 4,
+          "max": 9
+        }
+      ],
+      "requires_tool": true,
+      "tier": "stone",
+      "xp": [
+        2,
+        5
+      ],
+      "fortune": "ore",
+      "instrument": "note.bd"
+    },
+    {
+      "blocks": [
+        "minecraft:deepslate_lapis_ore"
+      ],
+      "destroy": 4.5,
+      "resistance": 3,
+      "map_color": "#646464",
+      "tool": "pickaxe",
+      "loot": [
+        {
+          "item": "minecraft:lapis_lazuli",
+          "min": 4,
+          "max": 9
+        }
+      ],
+      "requires_tool": true,
+      "tier": "stone",
+      "xp": [
+        2,
+        5
+      ],
+      "fortune": "ore",
+      "instrument": "note.bd"
+    },
+    {
+      "blocks": [
+        "minecraft:*_concrete"
+      ],
+      "destroy": 1.8,
+      "resistance": 1.8,
+      "map_color": "dye",
+      "tool": "pickaxe",
+      "loot": "self",
+      "requires_tool": true,
+      "instrument": "note.bd"
+    },
+    {
+      "blocks": [
+        "minecraft:hardened_clay"
+      ],
+      "destroy": 1.25,
+      "resistance": 4.2,
+      "map_color": "#D87F33",
+      "tool": "pickaxe",
+      "loot": "self",
+      "requires_tool": true,
+      "instrument": "note.bd"
+    },
+    {
+      "blocks": [
+        "minecraft:*_terracotta"
+      ],
+      "destroy": 1.25,
+      "resistance": 4.2,
+      "map_color": "terracotta",
+      "tool": "pickaxe",
+      "loot": "self",
+      "requires_tool": true,
+      "instrument": "note.bd"
+    },
+    {
+      "blocks": [
+        "minecraft:*_wool"
+      ],
+      "destroy": 0.8,
+      "resistance": 0.8,
+      "map_color": "dye",
+      "tool": "shears",
+      "loot": "self",
+      "flammable": [
+        30,
+        60
+      ],
+      "instrument": "note.guitar",
+      "ignited_by_lava": true
+    },
+    {
+      "blocks": [
+        "minecraft:packed_ice"
+      ],
+      "destroy": 0.5,
+      "resistance": 0.5,
+      "map_color": "#A0A0FF",
+      "tool": "pickaxe",
+      "loot": [],
+      "friction": 0.02,
+      "instrument": "note.chime"
+    },
+    {
+      "blocks": [
+        "minecraft:snow"
+      ],
+      "destroy": 0.2,
+      "resistance": 0.2,
+      "map_color": "#FFFFFF",
+      "tool": "shovel",
+      "loot": [
+        {
+          "item": "minecraft:snowball",
+          "min": 4,
+          "max": 4
+        }
+      ],
+      "requires_tool": true
+    }
+  ],
+  "model_blocks": [
+    {
+      "blocks": [
+        "minecraft:*_leaves",
+        "minecraft:azalea_leaves_flowered"
+      ],
+      "behavior": "leaves",
+      "reason": "Leaves whose Java blockstate shows models beyond a full cube become custom blocks with the author's models. The engine swaps every leaf in loaded chunks near players and keeps vanilla drops and decay.",
+      "destroy": 0.2,
+      "resistance": 0.2,
+      "flammable": [
+        30,
+        60
+      ],
+      "light_dampening": 1,
+      "tags": [
+        "minecraft:is_hoe_item_destructible",
+        "minecraft:leaves"
+      ],
+      "item_speeds": [
+        {
+          "item": "minecraft:shears",
+          "speed": 15
+        },
+        {
+          "item": {
+            "tags": "q.any_tag('minecraft:is_sword')"
+          },
+          "speed": 1.5
+        }
+      ],
+      "map_color": "#007C00",
+      "map_colors": {
+        "minecraft:cherry_leaves": "#F27FA5",
+        "minecraft:pale_oak_leaves": "#A7A7A7"
+      },
+      "tint_methods": {
+        "minecraft:birch_leaves": "birch_foliage",
+        "minecraft:spruce_leaves": "evergreen_foliage"
+      },
+      "decay": {
+        "bedrock_distance": 4,
+        "java_distance": 6,
+        "log_update_radius": 4,
+        "leaf_update_radius": 1,
+        "logs": [
+          "minecraft:*_log",
+          "minecraft:*_wood",
+          "minecraft:crimson_stem",
+          "minecraft:warped_stem",
+          "minecraft:stripped_*_stem",
+          "minecraft:*_hyphae"
+        ],
+        "leaves": [
+          "minecraft:*_leaves",
+          "minecraft:azalea_leaves_flowered"
+        ]
+      },
+      "ignited_by_lava": true
+    }
+  ],
+  "keep_vanilla": [
+    {
+      "blocks": [
+        "minecraft:grass_block",
+        "minecraft:mycelium",
+        "minecraft:crimson_nylium",
+        "minecraft:warped_nylium",
+        "minecraft:dirt",
+        "minecraft:coarse_dirt",
+        "minecraft:podzol",
+        "minecraft:dirt_with_roots",
+        "minecraft:moss_block",
+        "minecraft:pale_moss_block",
+        "minecraft:mud",
+        "minecraft:netherrack"
+      ],
+      "reason": "Grass, mycelium and nylium spread and die by random tick, plants and saplings are placed only on these exact blocks, and hoes, shovels and bone meal change them. A custom block cannot do any of this, so they stay vanilla."
+    },
+    {
+      "blocks": [
+        "minecraft:sand",
+        "minecraft:red_sand",
+        "minecraft:gravel",
+        "minecraft:suspicious_sand",
+        "minecraft:suspicious_gravel",
+        "minecraft:*_concrete_powder"
+      ],
+      "reason": "These fall when nothing holds them, cactus, sugar cane and dead bushes grow only on them, and concrete powder hardens in water. A custom block does none of this, so they stay vanilla."
+    },
+    {
+      "blocks": [
+        "minecraft:ice",
+        "minecraft:frosted_ice"
+      ],
+      "reason": "Ice melts into water by random tick; a custom block does not."
+    },
+    {
+      "blocks": [
+        "minecraft:tube_coral_block",
+        "minecraft:brain_coral_block",
+        "minecraft:bubble_coral_block",
+        "minecraft:fire_coral_block",
+        "minecraft:horn_coral_block"
+      ],
+      "reason": "Living coral blocks die out of water by scheduled tick; a custom block does not."
+    },
+    {
+      "blocks": [
+        "minecraft:redstone_ore",
+        "minecraft:lit_redstone_ore",
+        "minecraft:deepslate_redstone_ore",
+        "minecraft:lit_deepslate_redstone_ore"
+      ],
+      "reason": "Redstone ore lights up when touched or walked on and fades again; a custom block does not."
+    },
+    {
+      "blocks": [
+        "minecraft:soul_sand",
+        "minecraft:soul_soil",
+        "minecraft:magma"
+      ],
+      "reason": "Soul sand slows and feeds bubble columns, soul soil carries Soul Speed and soul fire, magma burns and pulls bubble columns down. A custom block does none of this."
+    },
+    {
+      "blocks": [
+        "minecraft:bookshelf"
+      ],
+      "reason": "Enchanting tables count bookshelves by block type; no custom block component counts."
+    },
+    {
+      "blocks": [
+        "minecraft:dripstone_block"
+      ],
+      "reason": "Pointed dripstone grows and drips only under a dripstone block."
+    }
+  ],
+  "needs_vanilla": [
+    {
+      "blocks": [
+        "minecraft:cocoa"
+      ],
+      "needs": [
+        "minecraft:jungle_log",
+        "minecraft:jungle_wood",
+        "minecraft:stripped_jungle_log",
+        "minecraft:stripped_jungle_wood"
+      ],
+      "side": "side",
+      "reason": "Cocoa hangs on the side of jungle logs and jungle wood and drops from any other block."
+    },
+    {
+      "blocks": [
+        "minecraft:chorus_plant",
+        "minecraft:chorus_flower"
+      ],
+      "needs": [
+        "minecraft:end_stone"
+      ],
+      "side": "below",
+      "reason": "Chorus plants and flowers stand on end stone (or on another chorus plant) and break on any other block."
+    },
+    {
+      "blocks": [
+        "minecraft:deadbush",
+        "minecraft:short_dry_grass",
+        "minecraft:tall_dry_grass"
+      ],
+      "needs": [
+        "minecraft:hardened_clay",
+        "minecraft:white_terracotta",
+        "minecraft:orange_terracotta",
+        "minecraft:magenta_terracotta",
+        "minecraft:light_blue_terracotta",
+        "minecraft:yellow_terracotta",
+        "minecraft:lime_terracotta",
+        "minecraft:pink_terracotta",
+        "minecraft:gray_terracotta",
+        "minecraft:light_gray_terracotta",
+        "minecraft:cyan_terracotta",
+        "minecraft:purple_terracotta",
+        "minecraft:blue_terracotta",
+        "minecraft:brown_terracotta",
+        "minecraft:green_terracotta",
+        "minecraft:red_terracotta",
+        "minecraft:black_terracotta",
+        "minecraft:sand",
+        "minecraft:red_sand",
+        "minecraft:suspicious_sand",
+        "minecraft:grass_block",
+        "minecraft:dirt",
+        "minecraft:coarse_dirt",
+        "minecraft:dirt_with_roots",
+        "minecraft:podzol",
+        "minecraft:mycelium",
+        "minecraft:moss_block",
+        "minecraft:pale_moss_block",
+        "minecraft:mud",
+        "minecraft:muddy_mangrove_roots"
+      ],
+      "side": "below",
+      "reason": "Dead bushes and dry grass stand on terracotta, sand and dirt only and break on any other block."
+    },
+    {
+      "blocks": [
+        "minecraft:bamboo",
+        "minecraft:bamboo_sapling"
+      ],
+      "needs": [
+        "minecraft:grass_block",
+        "minecraft:dirt",
+        "minecraft:coarse_dirt",
+        "minecraft:dirt_with_roots",
+        "minecraft:podzol",
+        "minecraft:mycelium",
+        "minecraft:moss_block",
+        "minecraft:pale_moss_block",
+        "minecraft:mud",
+        "minecraft:muddy_mangrove_roots",
+        "minecraft:sand",
+        "minecraft:red_sand",
+        "minecraft:suspicious_sand",
+        "minecraft:gravel",
+        "minecraft:suspicious_gravel"
+      ],
+      "side": "below",
+      "reason": "Bamboo grows only on its soils (grass, dirt, mud, moss, sand and gravel). They are never replaced (keep_vanilla); this keeps them vanilla under bamboo should that change."
+    },
+    {
+      "blocks": [
+        "minecraft:creaking_heart"
+      ],
+      "needs": [
+        "minecraft:pale_oak_log",
+        "minecraft:pale_oak_wood",
+        "minecraft:stripped_pale_oak_log",
+        "minecraft:stripped_pale_oak_wood"
+      ],
+      "side": "any",
+      "reason": "A creaking heart stays active only between pale oak logs along its axis."
+    },
+    {
+      "blocks": [
+        "minecraft:portal"
+      ],
+      "needs": [
+        "minecraft:obsidian"
+      ],
+      "side": "any",
+      "reason": "A nether portal breaks when a block of its obsidian frame changes."
+    }
+  ],
+  "attachments": [
+    {
+      "blocks": [
+        "minecraft:torch",
+        "minecraft:soul_torch",
+        "minecraft:copper_torch",
+        "minecraft:underwater_torch",
+        "minecraft:colored_torch_*",
+        "minecraft:redstone_torch",
+        "minecraft:unlit_redstone_torch",
+        "minecraft:lantern",
+        "minecraft:soul_lantern",
+        "minecraft:*copper_lantern",
+        "minecraft:lever",
+        "minecraft:*_button",
+        "minecraft:*rail",
+        "minecraft:*_carpet",
+        "minecraft:*_pressure_plate",
+        "minecraft:*_slab",
+        "minecraft:*_stairs",
+        "minecraft:snow_layer",
+        "minecraft:ladder",
+        "minecraft:vine",
+        "minecraft:glow_lichen",
+        "minecraft:*_sign",
+        "minecraft:standing_banner",
+        "minecraft:wall_banner",
+        "minecraft:bell",
+        "minecraft:frame",
+        "minecraft:glow_frame",
+        "minecraft:redstone_wire",
+        "minecraft:*_repeater",
+        "minecraft:*_comparator",
+        "minecraft:tripwire_hook",
+        "minecraft:*_door",
+        "minecraft:*trapdoor",
+        "minecraft:*candle",
+        "minecraft:flower_pot",
+        "minecraft:pointed_dripstone",
+        "minecraft:*amethyst_bud",
+        "minecraft:amethyst_cluster"
+      ],
+      "reason": "These only need a solid or sturdy face, which a full-cube replacement block has (so do paintings, which are entities), so they never keep the block they stand on, hang from or lean on vanilla."
+    },
+    {
+      "blocks": [
+        "minecraft:brown_mushroom",
+        "minecraft:red_mushroom"
+      ],
+      "reason": "Mushrooms stand on any solid block in low light; in bright light only on mycelium, podzol and nylium, which are never replaced."
+    }
+  ],
+  "vanilla_tags": {
+    "reason": "A replacement block carries the vanilla Bedrock tags of the block it stands for, so game code and other add-ons that read tags treat it alike: vanilla leaves count blocks tagged log as logs, cactus and sugar cane accept blocks tagged sand. Logs and wood all get log and wood, and all planks get wood. Tool and tier tags come from the profile instead (block_gameplay.py works out mining times and drops).",
+    "source": "Vanilla block tags as Microsoft Learn (Vanilla Block Tags) and the Minecraft Wiki (Block tag, Bedrock Edition) list them.",
+    "known": [
+      "acacia",
+      "birch",
+      "dark_oak",
+      "diamond_pick_diggable",
+      "dirt",
+      "fertilize_area",
+      "grass",
+      "gravel",
+      "gold_pick_diggable",
+      "iron_pick_diggable",
+      "jungle",
+      "log",
+      "metal",
+      "minecraft:crop",
+      "minecraft:diamond_tier_destructible",
+      "minecraft:iron_tier_destructible",
+      "minecraft:is_axe_item_destructible",
+      "minecraft:is_hatchet_item_destructible",
+      "minecraft:is_hoe_item_destructible",
+      "minecraft:is_item_tier_destructible",
+      "minecraft:is_mace_item_destructible",
+      "minecraft:is_pickaxe_item_destructible",
+      "minecraft:is_shears_item_destructible",
+      "minecraft:is_shovel_item_destructible",
+      "minecraft:is_sword_item_destructible",
+      "minecraft:netherite_tier_destructible",
+      "minecraft:stone_tier_destructible",
+      "mob_spawner",
+      "not_feature_replaceable",
+      "oak",
+      "one_way_collidable",
+      "plant",
+      "pumpkin",
+      "rail",
+      "sand",
+      "snow",
+      "spruce",
+      "stone",
+      "stone_pick_diggable",
+      "text_sign",
+      "trapdoors",
+      "water",
+      "wood",
+      "wood_pick_diggable"
+    ],
+    "tags": {
+      "log": [
+        "minecraft:*_log",
+        "minecraft:*_wood"
+      ],
+      "wood": [
+        "minecraft:*_log",
+        "minecraft:*_wood",
+        "minecraft:*_planks"
+      ],
+      "acacia": [
+        "minecraft:acacia_log"
+      ],
+      "birch": [
+        "minecraft:birch_log"
+      ],
+      "dark_oak": [
+        "minecraft:dark_oak_log"
+      ],
+      "jungle": [
+        "minecraft:jungle_log"
+      ],
+      "oak": [
+        "minecraft:oak_log"
+      ],
+      "spruce": [
+        "minecraft:spruce_log"
+      ],
+      "stone": [
+        "minecraft:stone",
+        "minecraft:cobblestone",
+        "minecraft:mossy_cobblestone",
+        "minecraft:andesite",
+        "minecraft:diorite",
+        "minecraft:granite",
+        "minecraft:polished_andesite",
+        "minecraft:polished_diorite",
+        "minecraft:polished_granite",
+        "minecraft:brick_block",
+        "minecraft:dripstone_block"
+      ],
+      "metal": [
+        "minecraft:iron_block",
+        "minecraft:gold_block",
+        "minecraft:iron_bars",
+        "minecraft:*copper_bars"
+      ],
+      "dirt": [
+        "minecraft:grass_block",
+        "minecraft:dirt",
+        "minecraft:coarse_dirt",
+        "minecraft:dirt_with_roots",
+        "minecraft:podzol",
+        "minecraft:mycelium",
+        "minecraft:moss_block",
+        "minecraft:mud",
+        "minecraft:muddy_mangrove_roots"
+      ],
+      "grass": [
+        "minecraft:grass_block",
+        "minecraft:dirt",
+        "minecraft:coarse_dirt"
+      ],
+      "sand": [
+        "minecraft:sand",
+        "minecraft:red_sand",
+        "minecraft:suspicious_sand"
+      ],
+      "gravel": [
+        "minecraft:gravel",
+        "minecraft:suspicious_gravel"
+      ],
+      "pumpkin": [
+        "minecraft:pumpkin",
+        "minecraft:carved_pumpkin",
+        "minecraft:lit_pumpkin"
+      ]
+    }
+  }
+}

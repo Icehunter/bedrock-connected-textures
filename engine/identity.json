@@ -1,0 +1,10 @@
+{
+  "name": "Bedrock Connected Textures",
+  "version": [1, 0, 0],
+  "min_engine_version": [1, 26, 50],
+  "header_uuid": "2286eae6-39b3-5e23-9a2d-919e4da1bcaa",
+  "data_module_uuid": "d767177c-c5a5-5879-8165-7a0e31804fdd",
+  "script_module_uuid": "7405b7ea-d03d-5dbf-ae5f-15be7fd05953",
+  "server_version": "2.10.0",
+  "server_ui_version": "2.2.0"
+}

@@ -1,0 +1,375 @@
+{
+ "baseTextures": {
+  "minecraft:acacia_planks": {
+   "down": "assets/minecraft/textures/block/acacia_planks.png",
+   "east": "assets/minecraft/textures/block/acacia_planks.png",
+   "north": "assets/minecraft/textures/block/acacia_planks.png",
+   "south": "assets/minecraft/textures/block/acacia_planks.png",
+   "up": "assets/minecraft/textures/block/acacia_planks.png",
+   "west": "assets/minecraft/textures/block/acacia_planks.png"
+  },
+  "minecraft:birch_planks": {
+   "down": "assets/minecraft/textures/block/birch_planks.png",
+   "east": "assets/minecraft/textures/block/birch_planks.png",
+   "north": "assets/minecraft/textures/block/birch_planks.png",
+   "south": "assets/minecraft/textures/block/birch_planks.png",
+   "up": "assets/minecraft/textures/block/birch_planks.png",
+   "west": "assets/minecraft/textures/block/birch_planks.png"
+  },
+  "minecraft:brick_block": {
+   "down": "assets/minecraft/textures/block/bricks.png",
+   "east": "assets/minecraft/textures/block/bricks.png",
+   "north": "assets/minecraft/textures/block/bricks.png",
+   "south": "assets/minecraft/textures/block/bricks.png",
+   "up": "assets/minecraft/textures/block/bricks.png",
+   "west": "assets/minecraft/textures/block/bricks.png"
+  },
+  "minecraft:dark_oak_planks": {
+   "down": "assets/minecraft/textures/block/dark_oak_planks.png",
+   "east": "assets/minecraft/textures/block/dark_oak_planks.png",
+   "north": "assets/minecraft/textures/block/dark_oak_planks.png",
+   "south": "assets/minecraft/textures/block/dark_oak_planks.png",
+   "up": "assets/minecraft/textures/block/dark_oak_planks.png",
+   "west": "assets/minecraft/textures/block/dark_oak_planks.png"
+  },
+  "minecraft:end_stone": {
+   "down": "assets/minecraft/textures/block/end_stone.png",
+   "east": "assets/minecraft/textures/block/end_stone.png",
+   "north": "assets/minecraft/textures/block/end_stone.png",
+   "south": "assets/minecraft/textures/block/end_stone.png",
+   "up": "assets/minecraft/textures/block/end_stone.png",
+   "west": "assets/minecraft/textures/block/end_stone.png"
+  },
+  "minecraft:jungle_planks": {
+   "down": "assets/minecraft/textures/block/jungle_planks.png",
+   "east": "assets/minecraft/textures/block/jungle_planks.png",
+   "north": "assets/minecraft/textures/block/jungle_planks.png",
+   "south": "assets/minecraft/textures/block/jungle_planks.png",
+   "up": "assets/minecraft/textures/block/jungle_planks.png",
+   "west": "assets/minecraft/textures/block/jungle_planks.png"
+  },
+  "minecraft:mossy_cobblestone": {
+   "down": "assets/minecraft/textures/block/mossy_cobblestone.png",
+   "east": "assets/minecraft/textures/block/mossy_cobblestone.png",
+   "north": "assets/minecraft/textures/block/mossy_cobblestone.png",
+   "south": "assets/minecraft/textures/block/mossy_cobblestone.png",
+   "up": "assets/minecraft/textures/block/mossy_cobblestone.png",
+   "west": "assets/minecraft/textures/block/mossy_cobblestone.png"
+  },
+  "minecraft:oak_planks": {
+   "down": "assets/minecraft/textures/block/oak_planks.png",
+   "east": "assets/minecraft/textures/block/oak_planks.png",
+   "north": "assets/minecraft/textures/block/oak_planks.png",
+   "south": "assets/minecraft/textures/block/oak_planks.png",
+   "up": "assets/minecraft/textures/block/oak_planks.png",
+   "west": "assets/minecraft/textures/block/oak_planks.png"
+  },
+  "minecraft:spruce_planks": {
+   "down": "assets/minecraft/textures/block/spruce_planks.png",
+   "east": "assets/minecraft/textures/block/spruce_planks.png",
+   "north": "assets/minecraft/textures/block/spruce_planks.png",
+   "south": "assets/minecraft/textures/block/spruce_planks.png",
+   "up": "assets/minecraft/textures/block/spruce_planks.png",
+   "west": "assets/minecraft/textures/block/spruce_planks.png"
+  },
+  "minecraft:white_wool": {
+   "down": "assets/minecraft/textures/block/white_wool.png",
+   "east": "assets/minecraft/textures/block/white_wool.png",
+   "north": "assets/minecraft/textures/block/white_wool.png",
+   "south": "assets/minecraft/textures/block/white_wool.png",
+   "up": "assets/minecraft/textures/block/white_wool.png",
+   "west": "assets/minecraft/textures/block/white_wool.png"
+  }
+ },
+ "rules": [
+  {
+   "blocks": [
+    "minecraft:white_wool"
+   ],
+   "faces": [
+    "north",
+    "east",
+    "south",
+    "west",
+    "up",
+    "down"
+   ],
+   "filename": "assets/minecraft/optifine/ctm/board/ctm/ctm.properties",
+   "id": "java_0",
+   "method": "ctm",
+   "tiles": [
+    "assets/minecraft/optifine/ctm/board/ctm/0.png",
+    "assets/minecraft/optifine/ctm/board/ctm/1.png",
+    "assets/minecraft/optifine/ctm/board/ctm/2.png",
+    "assets/minecraft/optifine/ctm/board/ctm/3.png",
+    "assets/minecraft/optifine/ctm/board/ctm/4.png",
+    "assets/minecraft/optifine/ctm/board/ctm/5.png",
+    "assets/minecraft/optifine/ctm/board/ctm/6.png",
+    "assets/minecraft/optifine/ctm/board/ctm/7.png",
+    "assets/minecraft/optifine/ctm/board/ctm/8.png",
+    "assets/minecraft/optifine/ctm/board/ctm/9.png",
+    "assets/minecraft/optifine/ctm/board/ctm/10.png",
+    "assets/minecraft/optifine/ctm/board/ctm/11.png",
+    "assets/minecraft/optifine/ctm/board/ctm/12.png",
+    "assets/minecraft/optifine/ctm/board/ctm/13.png",
+    "assets/minecraft/optifine/ctm/board/ctm/14.png",
+    "assets/minecraft/optifine/ctm/board/ctm/15.png",
+    "assets/minecraft/optifine/ctm/board/ctm/16.png",
+    "assets/minecraft/optifine/ctm/board/ctm/17.png",
+    "assets/minecraft/optifine/ctm/board/ctm/18.png",
+    "assets/minecraft/optifine/ctm/board/ctm/19.png",
+    "assets/minecraft/optifine/ctm/board/ctm/20.png",
+    "assets/minecraft/optifine/ctm/board/ctm/21.png",
+    "assets/minecraft/optifine/ctm/board/ctm/22.png",
+    "assets/minecraft/optifine/ctm/board/ctm/23.png",
+    "assets/minecraft/optifine/ctm/board/ctm/24.png",
+    "assets/minecraft/optifine/ctm/board/ctm/25.png",
+    "assets/minecraft/optifine/ctm/board/ctm/26.png",
+    "assets/minecraft/optifine/ctm/board/ctm/27.png",
+    "assets/minecraft/optifine/ctm/board/ctm/28.png",
+    "assets/minecraft/optifine/ctm/board/ctm/29.png",
+    "assets/minecraft/optifine/ctm/board/ctm/30.png",
+    "assets/minecraft/optifine/ctm/board/ctm/31.png",
+    "assets/minecraft/optifine/ctm/board/ctm/32.png",
+    "assets/minecraft/optifine/ctm/board/ctm/33.png",
+    "assets/minecraft/optifine/ctm/board/ctm/34.png",
+    "assets/minecraft/optifine/ctm/board/ctm/35.png",
+    "assets/minecraft/optifine/ctm/board/ctm/36.png",
+    "assets/minecraft/optifine/ctm/board/ctm/37.png",
+    "assets/minecraft/optifine/ctm/board/ctm/38.png",
+    "assets/minecraft/optifine/ctm/board/ctm/39.png",
+    "assets/minecraft/optifine/ctm/board/ctm/40.png",
+    "assets/minecraft/optifine/ctm/board/ctm/41.png",
+    "assets/minecraft/optifine/ctm/board/ctm/42.png",
+    "assets/minecraft/optifine/ctm/board/ctm/43.png",
+    "assets/minecraft/optifine/ctm/board/ctm/44.png",
+    "assets/minecraft/optifine/ctm/board/ctm/45.png",
+    "assets/minecraft/optifine/ctm/board/ctm/46.png"
+   ]
+  },
+  {
+   "blocks": [
+    "minecraft:dark_oak_planks"
+   ],
+   "faces": [
+    "north",
+    "east",
+    "south",
+    "west",
+    "up",
+    "down"
+   ],
+   "filename": "assets/minecraft/optifine/ctm/board/fixed/fixed.properties",
+   "id": "java_1",
+   "method": "fixed",
+   "tiles": [
+    "assets/minecraft/optifine/ctm/board/fixed/0.png"
+   ]
+  },
+  {
+   "blocks": [
+    "minecraft:oak_planks"
+   ],
+   "faces": [
+    "north",
+    "east",
+    "south",
+    "west",
+    "up",
+    "down"
+   ],
+   "filename": "assets/minecraft/optifine/ctm/board/horizontal/horizontal.properties",
+   "id": "java_2",
+   "method": "horizontal",
+   "tiles": [
+    "assets/minecraft/optifine/ctm/board/horizontal/0.png",
+    "assets/minecraft/optifine/ctm/board/horizontal/1.png",
+    "assets/minecraft/optifine/ctm/board/horizontal/2.png",
+    "assets/minecraft/optifine/ctm/board/horizontal/3.png"
+   ]
+  },
+  {
+   "blocks": [
+    "minecraft:birch_planks"
+   ],
+   "faces": [
+    "north",
+    "east",
+    "south",
+    "west",
+    "up",
+    "down"
+   ],
+   "filename": "assets/minecraft/optifine/ctm/board/horizontal_vertical/horizontal_vertical.properties",
+   "id": "java_3",
+   "method": "horizontal+vertical",
+   "tiles": [
+    "assets/minecraft/optifine/ctm/board/horizontal_vertical/0.png",
+    "assets/minecraft/optifine/ctm/board/horizontal_vertical/1.png",
+    "assets/minecraft/optifine/ctm/board/horizontal_vertical/2.png",
+    "assets/minecraft/optifine/ctm/board/horizontal_vertical/3.png",
+    "assets/minecraft/optifine/ctm/board/horizontal_vertical/4.png",
+    "assets/minecraft/optifine/ctm/board/horizontal_vertical/5.png",
+    "assets/minecraft/optifine/ctm/board/horizontal_vertical/6.png"
+   ]
+  },
+  {
+   "blocks": [
+    "minecraft:mossy_cobblestone"
+   ],
+   "connectBlocks": [
+    "minecraft:gravel"
+   ],
+   "faces": [
+    "north",
+    "east",
+    "south",
+    "west",
+    "up",
+    "down"
+   ],
+   "filename": "assets/minecraft/optifine/ctm/board/overlay/overlay.properties",
+   "id": "java_4",
+   "method": "overlay",
+   "tiles": [
+    "assets/minecraft/optifine/ctm/board/overlay/0.png",
+    "assets/minecraft/optifine/ctm/board/overlay/1.png",
+    "assets/minecraft/optifine/ctm/board/overlay/2.png",
+    "assets/minecraft/optifine/ctm/board/overlay/3.png",
+    "assets/minecraft/optifine/ctm/board/overlay/4.png",
+    "assets/minecraft/optifine/ctm/board/overlay/5.png",
+    "assets/minecraft/optifine/ctm/board/overlay/6.png",
+    "assets/minecraft/optifine/ctm/board/overlay/7.png",
+    "assets/minecraft/optifine/ctm/board/overlay/8.png",
+    "assets/minecraft/optifine/ctm/board/overlay/9.png",
+    "assets/minecraft/optifine/ctm/board/overlay/10.png",
+    "assets/minecraft/optifine/ctm/board/overlay/11.png",
+    "assets/minecraft/optifine/ctm/board/overlay/12.png",
+    "assets/minecraft/optifine/ctm/board/overlay/13.png",
+    "assets/minecraft/optifine/ctm/board/overlay/14.png",
+    "assets/minecraft/optifine/ctm/board/overlay/15.png",
+    "assets/minecraft/optifine/ctm/board/overlay/16.png"
+   ]
+  },
+  {
+   "blocks": [
+    "minecraft:end_stone"
+   ],
+   "faces": [
+    "north",
+    "east",
+    "south",
+    "west",
+    "up",
+    "down"
+   ],
+   "filename": "assets/minecraft/optifine/ctm/board/random/random.properties",
+   "id": "java_5",
+   "method": "random",
+   "tiles": [
+    "assets/minecraft/optifine/ctm/board/random/0.png",
+    "assets/minecraft/optifine/ctm/board/random/1.png",
+    "assets/minecraft/optifine/ctm/board/random/2.png",
+    "assets/minecraft/optifine/ctm/board/random/3.png"
+   ],
+   "weights": [
+    1,
+    2,
+    1,
+    3
+   ]
+  },
+  {
+   "blocks": [
+    "minecraft:brick_block"
+   ],
+   "faces": [
+    "north",
+    "east",
+    "south",
+    "west",
+    "up",
+    "down"
+   ],
+   "filename": "assets/minecraft/optifine/ctm/board/repeat/repeat.properties",
+   "height": 2,
+   "id": "java_6",
+   "method": "repeat",
+   "tiles": [
+    "assets/minecraft/optifine/ctm/board/repeat/0.png",
+    "assets/minecraft/optifine/ctm/board/repeat/1.png",
+    "assets/minecraft/optifine/ctm/board/repeat/2.png",
+    "assets/minecraft/optifine/ctm/board/repeat/3.png",
+    "assets/minecraft/optifine/ctm/board/repeat/4.png",
+    "assets/minecraft/optifine/ctm/board/repeat/5.png"
+   ],
+   "width": 3
+  },
+  {
+   "blocks": [
+    "minecraft:acacia_planks"
+   ],
+   "faces": [
+    "north",
+    "east",
+    "south",
+    "west",
+    "up",
+    "down"
+   ],
+   "filename": "assets/minecraft/optifine/ctm/board/top/top.properties",
+   "id": "java_7",
+   "method": "top",
+   "tiles": [
+    "assets/minecraft/optifine/ctm/board/top/0.png"
+   ]
+  },
+  {
+   "blocks": [
+    "minecraft:spruce_planks"
+   ],
+   "faces": [
+    "north",
+    "east",
+    "south",
+    "west",
+    "up",
+    "down"
+   ],
+   "filename": "assets/minecraft/optifine/ctm/board/vertical/vertical.properties",
+   "id": "java_8",
+   "method": "vertical",
+   "tiles": [
+    "assets/minecraft/optifine/ctm/board/vertical/0.png",
+    "assets/minecraft/optifine/ctm/board/vertical/1.png",
+    "assets/minecraft/optifine/ctm/board/vertical/2.png",
+    "assets/minecraft/optifine/ctm/board/vertical/3.png"
+   ]
+  },
+  {
+   "blocks": [
+    "minecraft:jungle_planks"
+   ],
+   "faces": [
+    "north",
+    "east",
+    "south",
+    "west",
+    "up",
+    "down"
+   ],
+   "filename": "assets/minecraft/optifine/ctm/board/vertical_horizontal/vertical_horizontal.properties",
+   "id": "java_9",
+   "method": "vertical+horizontal",
+   "tiles": [
+    "assets/minecraft/optifine/ctm/board/vertical_horizontal/0.png",
+    "assets/minecraft/optifine/ctm/board/vertical_horizontal/1.png",
+    "assets/minecraft/optifine/ctm/board/vertical_horizontal/2.png",
+    "assets/minecraft/optifine/ctm/board/vertical_horizontal/3.png",
+    "assets/minecraft/optifine/ctm/board/vertical_horizontal/4.png",
+    "assets/minecraft/optifine/ctm/board/vertical_horizontal/5.png",
+    "assets/minecraft/optifine/ctm/board/vertical_horizontal/6.png"
+   ]
+  }
+ ]
+}

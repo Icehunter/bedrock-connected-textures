@@ -1,0 +1,7 @@
+{
+  "note": "Java releases the converter can use as its vanilla reference, with the resource pack format each one reads (version.json pack_version in the client jar).",
+  "releases": [
+    {"version": "26.2", "resource": [88, 0]},
+    {"version": "26.3", "resource": [97, 1]}
+  ]
+}

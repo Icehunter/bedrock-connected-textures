@@ -1,0 +1,3786 @@
+{
+  "source": "https://github.com/PepperCode1/Continuity/blob/1.20.1/dev/src/main/java/me/pepperbell/continuity/client/util/MathUtil.java",
+  "reference_sha256": "509622d24b46b48493635518fcb136d4dd4341e1012337ca99051f4af84a4a79",
+  "vectors": [
+    {
+      "location": {
+        "x": -30000000,
+        "y": -64,
+        "z": -17
+      },
+      "face": "down",
+      "loops": 0,
+      "expected": 624331616
+    },
+    {
+      "location": {
+        "x": -30000000,
+        "y": -64,
+        "z": -17
+      },
+      "face": "down",
+      "loops": 1,
+      "expected": 221387010
+    },
+    {
+      "location": {
+        "x": -30000000,
+        "y": -64,
+        "z": -17
+      },
+      "face": "down",
+      "loops": 9,
+      "expected": 1168849403
+    },
+    {
+      "location": {
+        "x": -30000000,
+        "y": -64,
+        "z": -17
+      },
+      "face": "up",
+      "loops": 0,
+      "expected": 1079925784
+    },
+    {
+      "location": {
+        "x": -30000000,
+        "y": -64,
+        "z": -17
+      },
+      "face": "up",
+      "loops": 1,
+      "expected": 1399567554
+    },
+    {
+      "location": {
+        "x": -30000000,
+        "y": -64,
+        "z": -17
+      },
+      "face": "up",
+      "loops": 9,
+      "expected": 476984852
+    },
+    {
+      "location": {
+        "x": -30000000,
+        "y": -64,
+        "z": -17
+      },
+      "face": "north",
+      "loops": 0,
+      "expected": 1856150351
+    },
+    {
+      "location": {
+        "x": -30000000,
+        "y": -64,
+        "z": -17
+      },
+      "face": "north",
+      "loops": 1,
+      "expected": 1042437432
+    },
+    {
+      "location": {
+        "x": -30000000,
+        "y": -64,
+        "z": -17
+      },
+      "face": "north",
+      "loops": 9,
+      "expected": 1519424237
+    },
+    {
+      "location": {
+        "x": -30000000,
+        "y": -64,
+        "z": -17
+      },
+      "face": "south",
+      "loops": 0,
+      "expected": 947733968
+    },
+    {
+      "location": {
+        "x": -30000000,
+        "y": -64,
+        "z": -17
+      },
+      "face": "south",
+      "loops": 1,
+      "expected": 1748727349
+    },
+    {
+      "location": {
+        "x": -30000000,
+        "y": -64,
+        "z": -17
+      },
+      "face": "south",
+      "loops": 9,
+      "expected": 453159651
+    },
+    {
+      "location": {
+        "x": -30000000,
+        "y": -64,
+        "z": -17
+      },
+      "face": "west",
+      "loops": 0,
+      "expected": 472088628
+    },
+    {
+      "location": {
+        "x": -30000000,
+        "y": -64,
+        "z": -17
+      },
+      "face": "west",
+      "loops": 1,
+      "expected": 2012694298
+    },
+    {
+      "location": {
+        "x": -30000000,
+        "y": -64,
+        "z": -17
+      },
+      "face": "west",
+      "loops": 9,
+      "expected": 1986448583
+    },
+    {
+      "location": {
+        "x": -30000000,
+        "y": -64,
+        "z": -17
+      },
+      "face": "east",
+      "loops": 0,
+      "expected": 798181495
+    },
+    {
+      "location": {
+        "x": -30000000,
+        "y": -64,
+        "z": -17
+      },
+      "face": "east",
+      "loops": 1,
+      "expected": 356445362
+    },
+    {
+      "location": {
+        "x": -30000000,
+        "y": -64,
+        "z": -17
+      },
+      "face": "east",
+      "loops": 9,
+      "expected": 1837596156
+    },
+    {
+      "location": {
+        "x": -30000000,
+        "y": 0,
+        "z": 0
+      },
+      "face": "down",
+      "loops": 0,
+      "expected": 278978855
+    },
+    {
+      "location": {
+        "x": -30000000,
+        "y": 0,
+        "z": 0
+      },
+      "face": "down",
+      "loops": 1,
+      "expected": 1326332782
+    },
+    {
+      "location": {
+        "x": -30000000,
+        "y": 0,
+        "z": 0
+      },
+      "face": "down",
+      "loops": 9,
+      "expected": 1686889139
+    },
+    {
+      "location": {
+        "x": -30000000,
+        "y": 0,
+        "z": 0
+      },
+      "face": "up",
+      "loops": 0,
+      "expected": 1231851008
+    },
+    {
+      "location": {
+        "x": -30000000,
+        "y": 0,
+        "z": 0
+      },
+      "face": "up",
+      "loops": 1,
+      "expected": 396120901
+    },
+    {
+      "location": {
+        "x": -30000000,
+        "y": 0,
+        "z": 0
+      },
+      "face": "up",
+      "loops": 9,
+      "expected": 724678992
+    },
+    {
+      "location": {
+        "x": -30000000,
+        "y": 0,
+        "z": 0
+      },
+      "face": "north",
+      "loops": 0,
+      "expected": 531163780
+    },
+    {
+      "location": {
+        "x": -30000000,
+        "y": 0,
+        "z": 0
+      },
+      "face": "north",
+      "loops": 1,
+      "expected": 1351825648
+    },
+    {
+      "location": {
+        "x": -30000000,
+        "y": 0,
+        "z": 0
+      },
+      "face": "north",
+      "loops": 9,
+      "expected": 1026795897
+    },
+    {
+      "location": {
+        "x": -30000000,
+        "y": 0,
+        "z": 0
+      },
+      "face": "south",
+      "loops": 0,
+      "expected": 851349404
+    },
+    {
+      "location": {
+        "x": -30000000,
+        "y": 0,
+        "z": 0
+      },
+      "face": "south",
+      "loops": 1,
+      "expected": 903798180
+    },
+    {
+      "location": {
+        "x": -30000000,
+        "y": 0,
+        "z": 0
+      },
+      "face": "south",
+      "loops": 9,
+      "expected": 1777048460
+    },
+    {
+      "location": {
+        "x": -30000000,
+        "y": 0,
+        "z": 0
+      },
+      "face": "west",
+      "loops": 0,
+      "expected": 1645299215
+    },
+    {
+      "location": {
+        "x": -30000000,
+        "y": 0,
+        "z": 0
+      },
+      "face": "west",
+      "loops": 1,
+      "expected": 1719685461
+    },
+    {
+      "location": {
+        "x": -30000000,
+        "y": 0,
+        "z": 0
+      },
+      "face": "west",
+      "loops": 9,
+      "expected": 1105144818
+    },
+    {
+      "location": {
+        "x": -30000000,
+        "y": 0,
+        "z": 0
+      },
+      "face": "east",
+      "loops": 0,
+      "expected": 1716931373
+    },
+    {
+      "location": {
+        "x": -30000000,
+        "y": 0,
+        "z": 0
+      },
+      "face": "east",
+      "loops": 1,
+      "expected": 1169215434
+    },
+    {
+      "location": {
+        "x": -30000000,
+        "y": 0,
+        "z": 0
+      },
+      "face": "east",
+      "loops": 9,
+      "expected": 802973231
+    },
+    {
+      "location": {
+        "x": -30000000,
+        "y": 319,
+        "z": 16
+      },
+      "face": "down",
+      "loops": 0,
+      "expected": 149445594
+    },
+    {
+      "location": {
+        "x": -30000000,
+        "y": 319,
+        "z": 16
+      },
+      "face": "down",
+      "loops": 1,
+      "expected": 2012084499
+    },
+    {
+      "location": {
+        "x": -30000000,
+        "y": 319,
+        "z": 16
+      },
+      "face": "down",
+      "loops": 9,
+      "expected": 1305559195
+    },
+    {
+      "location": {
+        "x": -30000000,
+        "y": 319,
+        "z": 16
+      },
+      "face": "up",
+      "loops": 0,
+      "expected": 1315652439
+    },
+    {
+      "location": {
+        "x": -30000000,
+        "y": 319,
+        "z": 16
+      },
+      "face": "up",
+      "loops": 1,
+      "expected": 1970969672
+    },
+    {
+      "location": {
+        "x": -30000000,
+        "y": 319,
+        "z": 16
+      },
+      "face": "up",
+      "loops": 9,
+      "expected": 513536271
+    },
+    {
+      "location": {
+        "x": -30000000,
+        "y": 319,
+        "z": 16
+      },
+      "face": "north",
+      "loops": 0,
+      "expected": 1141115305
+    },
+    {
+      "location": {
+        "x": -30000000,
+        "y": 319,
+        "z": 16
+      },
+      "face": "north",
+      "loops": 1,
+      "expected": 1093758765
+    },
+    {
+      "location": {
+        "x": -30000000,
+        "y": 319,
+        "z": 16
+      },
+      "face": "north",
+      "loops": 9,
+      "expected": 1267788649
+    },
+    {
+      "location": {
+        "x": -30000000,
+        "y": 319,
+        "z": 16
+      },
+      "face": "south",
+      "loops": 0,
+      "expected": 2035167255
+    },
+    {
+      "location": {
+        "x": -30000000,
+        "y": 319,
+        "z": 16
+      },
+      "face": "south",
+      "loops": 1,
+      "expected": 1185250192
+    },
+    {
+      "location": {
+        "x": -30000000,
+        "y": 319,
+        "z": 16
+      },
+      "face": "south",
+      "loops": 9,
+      "expected": 103180157
+    },
+    {
+      "location": {
+        "x": -30000000,
+        "y": 319,
+        "z": 16
+      },
+      "face": "west",
+      "loops": 0,
+      "expected": 725321737
+    },
+    {
+      "location": {
+        "x": -30000000,
+        "y": 319,
+        "z": 16
+      },
+      "face": "west",
+      "loops": 1,
+      "expected": 236030119
+    },
+    {
+      "location": {
+        "x": -30000000,
+        "y": 319,
+        "z": 16
+      },
+      "face": "west",
+      "loops": 9,
+      "expected": 931845270
+    },
+    {
+      "location": {
+        "x": -30000000,
+        "y": 319,
+        "z": 16
+      },
+      "face": "east",
+      "loops": 0,
+      "expected": 1983790956
+    },
+    {
+      "location": {
+        "x": -30000000,
+        "y": 319,
+        "z": 16
+      },
+      "face": "east",
+      "loops": 1,
+      "expected": 1393687839
+    },
+    {
+      "location": {
+        "x": -30000000,
+        "y": 319,
+        "z": 16
+      },
+      "face": "east",
+      "loops": 9,
+      "expected": 74641339
+    },
+    {
+      "location": {
+        "x": -17,
+        "y": -64,
+        "z": -17
+      },
+      "face": "down",
+      "loops": 0,
+      "expected": 1380768205
+    },
+    {
+      "location": {
+        "x": -17,
+        "y": -64,
+        "z": -17
+      },
+      "face": "down",
+      "loops": 1,
+      "expected": 1311254138
+    },
+    {
+      "location": {
+        "x": -17,
+        "y": -64,
+        "z": -17
+      },
+      "face": "down",
+      "loops": 9,
+      "expected": 1674697971
+    },
+    {
+      "location": {
+        "x": -17,
+        "y": -64,
+        "z": -17
+      },
+      "face": "up",
+      "loops": 0,
+      "expected": 824077511
+    },
+    {
+      "location": {
+        "x": -17,
+        "y": -64,
+        "z": -17
+      },
+      "face": "up",
+      "loops": 1,
+      "expected": 998635178
+    },
+    {
+      "location": {
+        "x": -17,
+        "y": -64,
+        "z": -17
+      },
+      "face": "up",
+      "loops": 9,
+      "expected": 487062161
+    },
+    {
+      "location": {
+        "x": -17,
+        "y": -64,
+        "z": -17
+      },
+      "face": "north",
+      "loops": 0,
+      "expected": 1440579762
+    },
+    {
+      "location": {
+        "x": -17,
+        "y": -64,
+        "z": -17
+      },
+      "face": "north",
+      "loops": 1,
+      "expected": 913079298
+    },
+    {
+      "location": {
+        "x": -17,
+        "y": -64,
+        "z": -17
+      },
+      "face": "north",
+      "loops": 9,
+      "expected": 352523300
+    },
+    {
+      "location": {
+        "x": -17,
+        "y": -64,
+        "z": -17
+      },
+      "face": "south",
+      "loops": 0,
+      "expected": 892622532
+    },
+    {
+      "location": {
+        "x": -17,
+        "y": -64,
+        "z": -17
+      },
+      "face": "south",
+      "loops": 1,
+      "expected": 685427451
+    },
+    {
+      "location": {
+        "x": -17,
+        "y": -64,
+        "z": -17
+      },
+      "face": "south",
+      "loops": 9,
+      "expected": 1001186742
+    },
+    {
+      "location": {
+        "x": -17,
+        "y": -64,
+        "z": -17
+      },
+      "face": "west",
+      "loops": 0,
+      "expected": 1986978815
+    },
+    {
+      "location": {
+        "x": -17,
+        "y": -64,
+        "z": -17
+      },
+      "face": "west",
+      "loops": 1,
+      "expected": 15027459
+    },
+    {
+      "location": {
+        "x": -17,
+        "y": -64,
+        "z": -17
+      },
+      "face": "west",
+      "loops": 9,
+      "expected": 459951189
+    },
+    {
+      "location": {
+        "x": -17,
+        "y": -64,
+        "z": -17
+      },
+      "face": "east",
+      "loops": 0,
+      "expected": 2121460992
+    },
+    {
+      "location": {
+        "x": -17,
+        "y": -64,
+        "z": -17
+      },
+      "face": "east",
+      "loops": 1,
+      "expected": 532555574
+    },
+    {
+      "location": {
+        "x": -17,
+        "y": -64,
+        "z": -17
+      },
+      "face": "east",
+      "loops": 9,
+      "expected": 1084708741
+    },
+    {
+      "location": {
+        "x": -17,
+        "y": 0,
+        "z": 0
+      },
+      "face": "down",
+      "loops": 0,
+      "expected": 201349775
+    },
+    {
+      "location": {
+        "x": -17,
+        "y": 0,
+        "z": 0
+      },
+      "face": "down",
+      "loops": 1,
+      "expected": 698843167
+    },
+    {
+      "location": {
+        "x": -17,
+        "y": 0,
+        "z": 0
+      },
+      "face": "down",
+      "loops": 9,
+      "expected": 1941246909
+    },
+    {
+      "location": {
+        "x": -17,
+        "y": 0,
+        "z": 0
+      },
+      "face": "up",
+      "loops": 0,
+      "expected": 509756810
+    },
+    {
+      "location": {
+        "x": -17,
+        "y": 0,
+        "z": 0
+      },
+      "face": "up",
+      "loops": 1,
+      "expected": 2033553712
+    },
+    {
+      "location": {
+        "x": -17,
+        "y": 0,
+        "z": 0
+      },
+      "face": "up",
+      "loops": 9,
+      "expected": 569199497
+    },
+    {
+      "location": {
+        "x": -17,
+        "y": 0,
+        "z": 0
+      },
+      "face": "north",
+      "loops": 0,
+      "expected": 753614929
+    },
+    {
+      "location": {
+        "x": -17,
+        "y": 0,
+        "z": 0
+      },
+      "face": "north",
+      "loops": 1,
+      "expected": 1594842930
+    },
+    {
+      "location": {
+        "x": -17,
+        "y": 0,
+        "z": 0
+      },
+      "face": "north",
+      "loops": 9,
+      "expected": 1943009498
+    },
+    {
+      "location": {
+        "x": -17,
+        "y": 0,
+        "z": 0
+      },
+      "face": "south",
+      "loops": 0,
+      "expected": 203849526
+    },
+    {
+      "location": {
+        "x": -17,
+        "y": 0,
+        "z": 0
+      },
+      "face": "south",
+      "loops": 1,
+      "expected": 194631372
+    },
+    {
+      "location": {
+        "x": -17,
+        "y": 0,
+        "z": 0
+      },
+      "face": "south",
+      "loops": 9,
+      "expected": 706276420
+    },
+    {
+      "location": {
+        "x": -17,
+        "y": 0,
+        "z": 0
+      },
+      "face": "west",
+      "loops": 0,
+      "expected": 361224278
+    },
+    {
+      "location": {
+        "x": -17,
+        "y": 0,
+        "z": 0
+      },
+      "face": "west",
+      "loops": 1,
+      "expected": 665087307
+    },
+    {
+      "location": {
+        "x": -17,
+        "y": 0,
+        "z": 0
+      },
+      "face": "west",
+      "loops": 9,
+      "expected": 1973787823
+    },
+    {
+      "location": {
+        "x": -17,
+        "y": 0,
+        "z": 0
+      },
+      "face": "east",
+      "loops": 0,
+      "expected": 1367150532
+    },
+    {
+      "location": {
+        "x": -17,
+        "y": 0,
+        "z": 0
+      },
+      "face": "east",
+      "loops": 1,
+      "expected": 1382567366
+    },
+    {
+      "location": {
+        "x": -17,
+        "y": 0,
+        "z": 0
+      },
+      "face": "east",
+      "loops": 9,
+      "expected": 698622818
+    },
+    {
+      "location": {
+        "x": -17,
+        "y": 319,
+        "z": 16
+      },
+      "face": "down",
+      "loops": 0,
+      "expected": 1089763678
+    },
+    {
+      "location": {
+        "x": -17,
+        "y": 319,
+        "z": 16
+      },
+      "face": "down",
+      "loops": 1,
+      "expected": 1084753380
+    },
+    {
+      "location": {
+        "x": -17,
+        "y": 319,
+        "z": 16
+      },
+      "face": "down",
+      "loops": 9,
+      "expected": 2002765108
+    },
+    {
+      "location": {
+        "x": -17,
+        "y": 319,
+        "z": 16
+      },
+      "face": "up",
+      "loops": 0,
+      "expected": 866427039
+    },
+    {
+      "location": {
+        "x": -17,
+        "y": 319,
+        "z": 16
+      },
+      "face": "up",
+      "loops": 1,
+      "expected": 182709574
+    },
+    {
+      "location": {
+        "x": -17,
+        "y": 319,
+        "z": 16
+      },
+      "face": "up",
+      "loops": 9,
+      "expected": 1752028858
+    },
+    {
+      "location": {
+        "x": -17,
+        "y": 319,
+        "z": 16
+      },
+      "face": "north",
+      "loops": 0,
+      "expected": 1162875222
+    },
+    {
+      "location": {
+        "x": -17,
+        "y": 319,
+        "z": 16
+      },
+      "face": "north",
+      "loops": 1,
+      "expected": 1155729362
+    },
+    {
+      "location": {
+        "x": -17,
+        "y": 319,
+        "z": 16
+      },
+      "face": "north",
+      "loops": 9,
+      "expected": 1981606831
+    },
+    {
+      "location": {
+        "x": -17,
+        "y": 319,
+        "z": 16
+      },
+      "face": "south",
+      "loops": 0,
+      "expected": 761830441
+    },
+    {
+      "location": {
+        "x": -17,
+        "y": 319,
+        "z": 16
+      },
+      "face": "south",
+      "loops": 1,
+      "expected": 479006795
+    },
+    {
+      "location": {
+        "x": -17,
+        "y": 319,
+        "z": 16
+      },
+      "face": "south",
+      "loops": 9,
+      "expected": 1762929766
+    },
+    {
+      "location": {
+        "x": -17,
+        "y": 319,
+        "z": 16
+      },
+      "face": "west",
+      "loops": 0,
+      "expected": 1713074374
+    },
+    {
+      "location": {
+        "x": -17,
+        "y": 319,
+        "z": 16
+      },
+      "face": "west",
+      "loops": 1,
+      "expected": 1313270037
+    },
+    {
+      "location": {
+        "x": -17,
+        "y": 319,
+        "z": 16
+      },
+      "face": "west",
+      "loops": 9,
+      "expected": 1300204486
+    },
+    {
+      "location": {
+        "x": -17,
+        "y": 319,
+        "z": 16
+      },
+      "face": "east",
+      "loops": 0,
+      "expected": 1749986262
+    },
+    {
+      "location": {
+        "x": -17,
+        "y": 319,
+        "z": 16
+      },
+      "face": "east",
+      "loops": 1,
+      "expected": 427522015
+    },
+    {
+      "location": {
+        "x": -17,
+        "y": 319,
+        "z": 16
+      },
+      "face": "east",
+      "loops": 9,
+      "expected": 335496800
+    },
+    {
+      "location": {
+        "x": -1,
+        "y": -64,
+        "z": -17
+      },
+      "face": "down",
+      "loops": 0,
+      "expected": 705105318
+    },
+    {
+      "location": {
+        "x": -1,
+        "y": -64,
+        "z": -17
+      },
+      "face": "down",
+      "loops": 1,
+      "expected": 1869084499
+    },
+    {
+      "location": {
+        "x": -1,
+        "y": -64,
+        "z": -17
+      },
+      "face": "down",
+      "loops": 9,
+      "expected": 1100201959
+    },
+    {
+      "location": {
+        "x": -1,
+        "y": -64,
+        "z": -17
+      },
+      "face": "up",
+      "loops": 0,
+      "expected": 600738216
+    },
+    {
+      "location": {
+        "x": -1,
+        "y": -64,
+        "z": -17
+      },
+      "face": "up",
+      "loops": 1,
+      "expected": 927113570
+    },
+    {
+      "location": {
+        "x": -1,
+        "y": -64,
+        "z": -17
+      },
+      "face": "up",
+      "loops": 9,
+      "expected": 756413045
+    },
+    {
+      "location": {
+        "x": -1,
+        "y": -64,
+        "z": -17
+      },
+      "face": "north",
+      "loops": 0,
+      "expected": 1585964825
+    },
+    {
+      "location": {
+        "x": -1,
+        "y": -64,
+        "z": -17
+      },
+      "face": "north",
+      "loops": 1,
+      "expected": 1460913153
+    },
+    {
+      "location": {
+        "x": -1,
+        "y": -64,
+        "z": -17
+      },
+      "face": "north",
+      "loops": 9,
+      "expected": 658850367
+    },
+    {
+      "location": {
+        "x": -1,
+        "y": -64,
+        "z": -17
+      },
+      "face": "south",
+      "loops": 0,
+      "expected": 484826684
+    },
+    {
+      "location": {
+        "x": -1,
+        "y": -64,
+        "z": -17
+      },
+      "face": "south",
+      "loops": 1,
+      "expected": 1060749798
+    },
+    {
+      "location": {
+        "x": -1,
+        "y": -64,
+        "z": -17
+      },
+      "face": "south",
+      "loops": 9,
+      "expected": 841454562
+    },
+    {
+      "location": {
+        "x": -1,
+        "y": -64,
+        "z": -17
+      },
+      "face": "west",
+      "loops": 0,
+      "expected": 1273805643
+    },
+    {
+      "location": {
+        "x": -1,
+        "y": -64,
+        "z": -17
+      },
+      "face": "west",
+      "loops": 1,
+      "expected": 464859492
+    },
+    {
+      "location": {
+        "x": -1,
+        "y": -64,
+        "z": -17
+      },
+      "face": "west",
+      "loops": 9,
+      "expected": 662740069
+    },
+    {
+      "location": {
+        "x": -1,
+        "y": -64,
+        "z": -17
+      },
+      "face": "east",
+      "loops": 0,
+      "expected": 1029084454
+    },
+    {
+      "location": {
+        "x": -1,
+        "y": -64,
+        "z": -17
+      },
+      "face": "east",
+      "loops": 1,
+      "expected": 237964645
+    },
+    {
+      "location": {
+        "x": -1,
+        "y": -64,
+        "z": -17
+      },
+      "face": "east",
+      "loops": 9,
+      "expected": 327130869
+    },
+    {
+      "location": {
+        "x": -1,
+        "y": 0,
+        "z": 0
+      },
+      "face": "down",
+      "loops": 0,
+      "expected": 3327960
+    },
+    {
+      "location": {
+        "x": -1,
+        "y": 0,
+        "z": 0
+      },
+      "face": "down",
+      "loops": 1,
+      "expected": 1494431705
+    },
+    {
+      "location": {
+        "x": -1,
+        "y": 0,
+        "z": 0
+      },
+      "face": "down",
+      "loops": 9,
+      "expected": 2041055046
+    },
+    {
+      "location": {
+        "x": -1,
+        "y": 0,
+        "z": 0
+      },
+      "face": "up",
+      "loops": 0,
+      "expected": 120371431
+    },
+    {
+      "location": {
+        "x": -1,
+        "y": 0,
+        "z": 0
+      },
+      "face": "up",
+      "loops": 1,
+      "expected": 694051333
+    },
+    {
+      "location": {
+        "x": -1,
+        "y": 0,
+        "z": 0
+      },
+      "face": "up",
+      "loops": 9,
+      "expected": 1948776346
+    },
+    {
+      "location": {
+        "x": -1,
+        "y": 0,
+        "z": 0
+      },
+      "face": "north",
+      "loops": 0,
+      "expected": 999137848
+    },
+    {
+      "location": {
+        "x": -1,
+        "y": 0,
+        "z": 0
+      },
+      "face": "north",
+      "loops": 1,
+      "expected": 374880156
+    },
+    {
+      "location": {
+        "x": -1,
+        "y": 0,
+        "z": 0
+      },
+      "face": "north",
+      "loops": 9,
+      "expected": 979343222
+    },
+    {
+      "location": {
+        "x": -1,
+        "y": 0,
+        "z": 0
+      },
+      "face": "south",
+      "loops": 0,
+      "expected": 32132768
+    },
+    {
+      "location": {
+        "x": -1,
+        "y": 0,
+        "z": 0
+      },
+      "face": "south",
+      "loops": 1,
+      "expected": 950560590
+    },
+    {
+      "location": {
+        "x": -1,
+        "y": 0,
+        "z": 0
+      },
+      "face": "south",
+      "loops": 9,
+      "expected": 77799890
+    },
+    {
+      "location": {
+        "x": -1,
+        "y": 0,
+        "z": 0
+      },
+      "face": "west",
+      "loops": 0,
+      "expected": 445828626
+    },
+    {
+      "location": {
+        "x": -1,
+        "y": 0,
+        "z": 0
+      },
+      "face": "west",
+      "loops": 1,
+      "expected": 1543531123
+    },
+    {
+      "location": {
+        "x": -1,
+        "y": 0,
+        "z": 0
+      },
+      "face": "west",
+      "loops": 9,
+      "expected": 796897759
+    },
+    {
+      "location": {
+        "x": -1,
+        "y": 0,
+        "z": 0
+      },
+      "face": "east",
+      "loops": 0,
+      "expected": 1387283999
+    },
+    {
+      "location": {
+        "x": -1,
+        "y": 0,
+        "z": 0
+      },
+      "face": "east",
+      "loops": 1,
+      "expected": 1993464358
+    },
+    {
+      "location": {
+        "x": -1,
+        "y": 0,
+        "z": 0
+      },
+      "face": "east",
+      "loops": 9,
+      "expected": 1187125573
+    },
+    {
+      "location": {
+        "x": -1,
+        "y": 319,
+        "z": 16
+      },
+      "face": "down",
+      "loops": 0,
+      "expected": 1035474330
+    },
+    {
+      "location": {
+        "x": -1,
+        "y": 319,
+        "z": 16
+      },
+      "face": "down",
+      "loops": 1,
+      "expected": 2070375893
+    },
+    {
+      "location": {
+        "x": -1,
+        "y": 319,
+        "z": 16
+      },
+      "face": "down",
+      "loops": 9,
+      "expected": 24440650
+    },
+    {
+      "location": {
+        "x": -1,
+        "y": 319,
+        "z": 16
+      },
+      "face": "up",
+      "loops": 0,
+      "expected": 664060952
+    },
+    {
+      "location": {
+        "x": -1,
+        "y": 319,
+        "z": 16
+      },
+      "face": "up",
+      "loops": 1,
+      "expected": 1208243039
+    },
+    {
+      "location": {
+        "x": -1,
+        "y": 319,
+        "z": 16
+      },
+      "face": "up",
+      "loops": 9,
+      "expected": 1821538704
+    },
+    {
+      "location": {
+        "x": -1,
+        "y": 319,
+        "z": 16
+      },
+      "face": "north",
+      "loops": 0,
+      "expected": 237839630
+    },
+    {
+      "location": {
+        "x": -1,
+        "y": 319,
+        "z": 16
+      },
+      "face": "north",
+      "loops": 1,
+      "expected": 1095335502
+    },
+    {
+      "location": {
+        "x": -1,
+        "y": 319,
+        "z": 16
+      },
+      "face": "north",
+      "loops": 9,
+      "expected": 1076037696
+    },
+    {
+      "location": {
+        "x": -1,
+        "y": 319,
+        "z": 16
+      },
+      "face": "south",
+      "loops": 0,
+      "expected": 133895337
+    },
+    {
+      "location": {
+        "x": -1,
+        "y": 319,
+        "z": 16
+      },
+      "face": "south",
+      "loops": 1,
+      "expected": 799932793
+    },
+    {
+      "location": {
+        "x": -1,
+        "y": 319,
+        "z": 16
+      },
+      "face": "south",
+      "loops": 9,
+      "expected": 524281283
+    },
+    {
+      "location": {
+        "x": -1,
+        "y": 319,
+        "z": 16
+      },
+      "face": "west",
+      "loops": 0,
+      "expected": 1324691022
+    },
+    {
+      "location": {
+        "x": -1,
+        "y": 319,
+        "z": 16
+      },
+      "face": "west",
+      "loops": 1,
+      "expected": 94721303
+    },
+    {
+      "location": {
+        "x": -1,
+        "y": 319,
+        "z": 16
+      },
+      "face": "west",
+      "loops": 9,
+      "expected": 258319878
+    },
+    {
+      "location": {
+        "x": -1,
+        "y": 319,
+        "z": 16
+      },
+      "face": "east",
+      "loops": 0,
+      "expected": 1504174605
+    },
+    {
+      "location": {
+        "x": -1,
+        "y": 319,
+        "z": 16
+      },
+      "face": "east",
+      "loops": 1,
+      "expected": 737461717
+    },
+    {
+      "location": {
+        "x": -1,
+        "y": 319,
+        "z": 16
+      },
+      "face": "east",
+      "loops": 9,
+      "expected": 2040285168
+    },
+    {
+      "location": {
+        "x": 0,
+        "y": -64,
+        "z": -17
+      },
+      "face": "down",
+      "loops": 0,
+      "expected": 2092302611
+    },
+    {
+      "location": {
+        "x": 0,
+        "y": -64,
+        "z": -17
+      },
+      "face": "down",
+      "loops": 1,
+      "expected": 980224251
+    },
+    {
+      "location": {
+        "x": 0,
+        "y": -64,
+        "z": -17
+      },
+      "face": "down",
+      "loops": 9,
+      "expected": 1330427527
+    },
+    {
+      "location": {
+        "x": 0,
+        "y": -64,
+        "z": -17
+      },
+      "face": "up",
+      "loops": 0,
+      "expected": 2080872240
+    },
+    {
+      "location": {
+        "x": 0,
+        "y": -64,
+        "z": -17
+      },
+      "face": "up",
+      "loops": 1,
+      "expected": 1973760179
+    },
+    {
+      "location": {
+        "x": 0,
+        "y": -64,
+        "z": -17
+      },
+      "face": "up",
+      "loops": 9,
+      "expected": 416483416
+    },
+    {
+      "location": {
+        "x": 0,
+        "y": -64,
+        "z": -17
+      },
+      "face": "north",
+      "loops": 0,
+      "expected": 67028917
+    },
+    {
+      "location": {
+        "x": 0,
+        "y": -64,
+        "z": -17
+      },
+      "face": "north",
+      "loops": 1,
+      "expected": 1300119283
+    },
+    {
+      "location": {
+        "x": 0,
+        "y": -64,
+        "z": -17
+      },
+      "face": "north",
+      "loops": 9,
+      "expected": 797625566
+    },
+    {
+      "location": {
+        "x": 0,
+        "y": -64,
+        "z": -17
+      },
+      "face": "south",
+      "loops": 0,
+      "expected": 871275582
+    },
+    {
+      "location": {
+        "x": 0,
+        "y": -64,
+        "z": -17
+      },
+      "face": "south",
+      "loops": 1,
+      "expected": 580027
+    },
+    {
+      "location": {
+        "x": 0,
+        "y": -64,
+        "z": -17
+      },
+      "face": "south",
+      "loops": 9,
+      "expected": 848655738
+    },
+    {
+      "location": {
+        "x": 0,
+        "y": -64,
+        "z": -17
+      },
+      "face": "west",
+      "loops": 0,
+      "expected": 2129980353
+    },
+    {
+      "location": {
+        "x": 0,
+        "y": -64,
+        "z": -17
+      },
+      "face": "west",
+      "loops": 1,
+      "expected": 579777346
+    },
+    {
+      "location": {
+        "x": 0,
+        "y": -64,
+        "z": -17
+      },
+      "face": "west",
+      "loops": 9,
+      "expected": 139830638
+    },
+    {
+      "location": {
+        "x": 0,
+        "y": -64,
+        "z": -17
+      },
+      "face": "east",
+      "loops": 0,
+      "expected": 1511411227
+    },
+    {
+      "location": {
+        "x": 0,
+        "y": -64,
+        "z": -17
+      },
+      "face": "east",
+      "loops": 1,
+      "expected": 1495682580
+    },
+    {
+      "location": {
+        "x": 0,
+        "y": -64,
+        "z": -17
+      },
+      "face": "east",
+      "loops": 9,
+      "expected": 1303040737
+    },
+    {
+      "location": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "face": "down",
+      "loops": 0,
+      "expected": 984951887
+    },
+    {
+      "location": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "face": "down",
+      "loops": 1,
+      "expected": 447356668
+    },
+    {
+      "location": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "face": "down",
+      "loops": 9,
+      "expected": 1950595211
+    },
+    {
+      "location": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "face": "up",
+      "loops": 0,
+      "expected": 1784543296
+    },
+    {
+      "location": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "face": "up",
+      "loops": 1,
+      "expected": 530025331
+    },
+    {
+      "location": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "face": "up",
+      "loops": 9,
+      "expected": 572897406
+    },
+    {
+      "location": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "face": "north",
+      "loops": 0,
+      "expected": 1420605038
+    },
+    {
+      "location": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "face": "north",
+      "loops": 1,
+      "expected": 1758518604
+    },
+    {
+      "location": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "face": "north",
+      "loops": 9,
+      "expected": 1274164453
+    },
+    {
+      "location": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "face": "south",
+      "loops": 0,
+      "expected": 270435608
+    },
+    {
+      "location": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "face": "south",
+      "loops": 1,
+      "expected": 616900804
+    },
+    {
+      "location": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "face": "south",
+      "loops": 9,
+      "expected": 1096914462
+    },
+    {
+      "location": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "face": "west",
+      "loops": 0,
+      "expected": 1304251000
+    },
+    {
+      "location": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "face": "west",
+      "loops": 1,
+      "expected": 1344106164
+    },
+    {
+      "location": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "face": "west",
+      "loops": 9,
+      "expected": 1605969518
+    },
+    {
+      "location": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "face": "east",
+      "loops": 0,
+      "expected": 1726962071
+    },
+    {
+      "location": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "face": "east",
+      "loops": 1,
+      "expected": 1973639602
+    },
+    {
+      "location": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "face": "east",
+      "loops": 9,
+      "expected": 779895915
+    },
+    {
+      "location": {
+        "x": 0,
+        "y": 319,
+        "z": 16
+      },
+      "face": "down",
+      "loops": 0,
+      "expected": 2087916584
+    },
+    {
+      "location": {
+        "x": 0,
+        "y": 319,
+        "z": 16
+      },
+      "face": "down",
+      "loops": 1,
+      "expected": 635025402
+    },
+    {
+      "location": {
+        "x": 0,
+        "y": 319,
+        "z": 16
+      },
+      "face": "down",
+      "loops": 9,
+      "expected": 441848196
+    },
+    {
+      "location": {
+        "x": 0,
+        "y": 319,
+        "z": 16
+      },
+      "face": "up",
+      "loops": 0,
+      "expected": 724381569
+    },
+    {
+      "location": {
+        "x": 0,
+        "y": 319,
+        "z": 16
+      },
+      "face": "up",
+      "loops": 1,
+      "expected": 1874267976
+    },
+    {
+      "location": {
+        "x": 0,
+        "y": 319,
+        "z": 16
+      },
+      "face": "up",
+      "loops": 9,
+      "expected": 1513834251
+    },
+    {
+      "location": {
+        "x": 0,
+        "y": 319,
+        "z": 16
+      },
+      "face": "north",
+      "loops": 0,
+      "expected": 1830069873
+    },
+    {
+      "location": {
+        "x": 0,
+        "y": 319,
+        "z": 16
+      },
+      "face": "north",
+      "loops": 1,
+      "expected": 1379555770
+    },
+    {
+      "location": {
+        "x": 0,
+        "y": 319,
+        "z": 16
+      },
+      "face": "north",
+      "loops": 9,
+      "expected": 880061453
+    },
+    {
+      "location": {
+        "x": 0,
+        "y": 319,
+        "z": 16
+      },
+      "face": "south",
+      "loops": 0,
+      "expected": 599024923
+    },
+    {
+      "location": {
+        "x": 0,
+        "y": 319,
+        "z": 16
+      },
+      "face": "south",
+      "loops": 1,
+      "expected": 145603258
+    },
+    {
+      "location": {
+        "x": 0,
+        "y": 319,
+        "z": 16
+      },
+      "face": "south",
+      "loops": 9,
+      "expected": 1467193014
+    },
+    {
+      "location": {
+        "x": 0,
+        "y": 319,
+        "z": 16
+      },
+      "face": "west",
+      "loops": 0,
+      "expected": 486281665
+    },
+    {
+      "location": {
+        "x": 0,
+        "y": 319,
+        "z": 16
+      },
+      "face": "west",
+      "loops": 1,
+      "expected": 1249030778
+    },
+    {
+      "location": {
+        "x": 0,
+        "y": 319,
+        "z": 16
+      },
+      "face": "west",
+      "loops": 9,
+      "expected": 2019795842
+    },
+    {
+      "location": {
+        "x": 0,
+        "y": 319,
+        "z": 16
+      },
+      "face": "east",
+      "loops": 0,
+      "expected": 417379184
+    },
+    {
+      "location": {
+        "x": 0,
+        "y": 319,
+        "z": 16
+      },
+      "face": "east",
+      "loops": 1,
+      "expected": 2116082532
+    },
+    {
+      "location": {
+        "x": 0,
+        "y": 319,
+        "z": 16
+      },
+      "face": "east",
+      "loops": 9,
+      "expected": 684177945
+    },
+    {
+      "location": {
+        "x": 1,
+        "y": -64,
+        "z": -17
+      },
+      "face": "down",
+      "loops": 0,
+      "expected": 1000171152
+    },
+    {
+      "location": {
+        "x": 1,
+        "y": -64,
+        "z": -17
+      },
+      "face": "down",
+      "loops": 1,
+      "expected": 57945482
+    },
+    {
+      "location": {
+        "x": 1,
+        "y": -64,
+        "z": -17
+      },
+      "face": "down",
+      "loops": 9,
+      "expected": 800152962
+    },
+    {
+      "location": {
+        "x": 1,
+        "y": -64,
+        "z": -17
+      },
+      "face": "up",
+      "loops": 0,
+      "expected": 1576008442
+    },
+    {
+      "location": {
+        "x": 1,
+        "y": -64,
+        "z": -17
+      },
+      "face": "up",
+      "loops": 1,
+      "expected": 1929576936
+    },
+    {
+      "location": {
+        "x": 1,
+        "y": -64,
+        "z": -17
+      },
+      "face": "up",
+      "loops": 9,
+      "expected": 1556220894
+    },
+    {
+      "location": {
+        "x": 1,
+        "y": -64,
+        "z": -17
+      },
+      "face": "north",
+      "loops": 0,
+      "expected": 142214299
+    },
+    {
+      "location": {
+        "x": 1,
+        "y": -64,
+        "z": -17
+      },
+      "face": "north",
+      "loops": 1,
+      "expected": 338616982
+    },
+    {
+      "location": {
+        "x": 1,
+        "y": -64,
+        "z": -17
+      },
+      "face": "north",
+      "loops": 9,
+      "expected": 1513401244
+    },
+    {
+      "location": {
+        "x": 1,
+        "y": -64,
+        "z": -17
+      },
+      "face": "south",
+      "loops": 0,
+      "expected": 752400349
+    },
+    {
+      "location": {
+        "x": 1,
+        "y": -64,
+        "z": -17
+      },
+      "face": "south",
+      "loops": 1,
+      "expected": 1106405306
+    },
+    {
+      "location": {
+        "x": 1,
+        "y": -64,
+        "z": -17
+      },
+      "face": "south",
+      "loops": 9,
+      "expected": 1107154171
+    },
+    {
+      "location": {
+        "x": 1,
+        "y": -64,
+        "z": -17
+      },
+      "face": "west",
+      "loops": 0,
+      "expected": 178398627
+    },
+    {
+      "location": {
+        "x": 1,
+        "y": -64,
+        "z": -17
+      },
+      "face": "west",
+      "loops": 1,
+      "expected": 999769427
+    },
+    {
+      "location": {
+        "x": 1,
+        "y": -64,
+        "z": -17
+      },
+      "face": "west",
+      "loops": 9,
+      "expected": 1513534726
+    },
+    {
+      "location": {
+        "x": 1,
+        "y": -64,
+        "z": -17
+      },
+      "face": "east",
+      "loops": 0,
+      "expected": 1003846181
+    },
+    {
+      "location": {
+        "x": 1,
+        "y": -64,
+        "z": -17
+      },
+      "face": "east",
+      "loops": 1,
+      "expected": 1226982254
+    },
+    {
+      "location": {
+        "x": 1,
+        "y": -64,
+        "z": -17
+      },
+      "face": "east",
+      "loops": 9,
+      "expected": 942247943
+    },
+    {
+      "location": {
+        "x": 1,
+        "y": 0,
+        "z": 0
+      },
+      "face": "down",
+      "loops": 0,
+      "expected": 2025624629
+    },
+    {
+      "location": {
+        "x": 1,
+        "y": 0,
+        "z": 0
+      },
+      "face": "down",
+      "loops": 1,
+      "expected": 117925745
+    },
+    {
+      "location": {
+        "x": 1,
+        "y": 0,
+        "z": 0
+      },
+      "face": "down",
+      "loops": 9,
+      "expected": 170321707
+    },
+    {
+      "location": {
+        "x": 1,
+        "y": 0,
+        "z": 0
+      },
+      "face": "up",
+      "loops": 0,
+      "expected": 1851979524
+    },
+    {
+      "location": {
+        "x": 1,
+        "y": 0,
+        "z": 0
+      },
+      "face": "up",
+      "loops": 1,
+      "expected": 702772972
+    },
+    {
+      "location": {
+        "x": 1,
+        "y": 0,
+        "z": 0
+      },
+      "face": "up",
+      "loops": 9,
+      "expected": 817176819
+    },
+    {
+      "location": {
+        "x": 1,
+        "y": 0,
+        "z": 0
+      },
+      "face": "north",
+      "loops": 0,
+      "expected": 1390563717
+    },
+    {
+      "location": {
+        "x": 1,
+        "y": 0,
+        "z": 0
+      },
+      "face": "north",
+      "loops": 1,
+      "expected": 883196387
+    },
+    {
+      "location": {
+        "x": 1,
+        "y": 0,
+        "z": 0
+      },
+      "face": "north",
+      "loops": 9,
+      "expected": 539662321
+    },
+    {
+      "location": {
+        "x": 1,
+        "y": 0,
+        "z": 0
+      },
+      "face": "south",
+      "loops": 0,
+      "expected": 170528250
+    },
+    {
+      "location": {
+        "x": 1,
+        "y": 0,
+        "z": 0
+      },
+      "face": "south",
+      "loops": 1,
+      "expected": 1928846831
+    },
+    {
+      "location": {
+        "x": 1,
+        "y": 0,
+        "z": 0
+      },
+      "face": "south",
+      "loops": 9,
+      "expected": 1988708336
+    },
+    {
+      "location": {
+        "x": 1,
+        "y": 0,
+        "z": 0
+      },
+      "face": "west",
+      "loops": 0,
+      "expected": 1066733235
+    },
+    {
+      "location": {
+        "x": 1,
+        "y": 0,
+        "z": 0
+      },
+      "face": "west",
+      "loops": 1,
+      "expected": 893090470
+    },
+    {
+      "location": {
+        "x": 1,
+        "y": 0,
+        "z": 0
+      },
+      "face": "west",
+      "loops": 9,
+      "expected": 498047138
+    },
+    {
+      "location": {
+        "x": 1,
+        "y": 0,
+        "z": 0
+      },
+      "face": "east",
+      "loops": 0,
+      "expected": 1161229289
+    },
+    {
+      "location": {
+        "x": 1,
+        "y": 0,
+        "z": 0
+      },
+      "face": "east",
+      "loops": 1,
+      "expected": 252311818
+    },
+    {
+      "location": {
+        "x": 1,
+        "y": 0,
+        "z": 0
+      },
+      "face": "east",
+      "loops": 9,
+      "expected": 1236484047
+    },
+    {
+      "location": {
+        "x": 1,
+        "y": 319,
+        "z": 16
+      },
+      "face": "down",
+      "loops": 0,
+      "expected": 330058425
+    },
+    {
+      "location": {
+        "x": 1,
+        "y": 319,
+        "z": 16
+      },
+      "face": "down",
+      "loops": 1,
+      "expected": 1619342826
+    },
+    {
+      "location": {
+        "x": 1,
+        "y": 319,
+        "z": 16
+      },
+      "face": "down",
+      "loops": 9,
+      "expected": 589851376
+    },
+    {
+      "location": {
+        "x": 1,
+        "y": 319,
+        "z": 16
+      },
+      "face": "up",
+      "loops": 0,
+      "expected": 269974087
+    },
+    {
+      "location": {
+        "x": 1,
+        "y": 319,
+        "z": 16
+      },
+      "face": "up",
+      "loops": 1,
+      "expected": 417151398
+    },
+    {
+      "location": {
+        "x": 1,
+        "y": 319,
+        "z": 16
+      },
+      "face": "up",
+      "loops": 9,
+      "expected": 1147049932
+    },
+    {
+      "location": {
+        "x": 1,
+        "y": 319,
+        "z": 16
+      },
+      "face": "north",
+      "loops": 0,
+      "expected": 934417231
+    },
+    {
+      "location": {
+        "x": 1,
+        "y": 319,
+        "z": 16
+      },
+      "face": "north",
+      "loops": 1,
+      "expected": 1648985947
+    },
+    {
+      "location": {
+        "x": 1,
+        "y": 319,
+        "z": 16
+      },
+      "face": "north",
+      "loops": 9,
+      "expected": 605558465
+    },
+    {
+      "location": {
+        "x": 1,
+        "y": 319,
+        "z": 16
+      },
+      "face": "south",
+      "loops": 0,
+      "expected": 1773861893
+    },
+    {
+      "location": {
+        "x": 1,
+        "y": 319,
+        "z": 16
+      },
+      "face": "south",
+      "loops": 1,
+      "expected": 1125401230
+    },
+    {
+      "location": {
+        "x": 1,
+        "y": 319,
+        "z": 16
+      },
+      "face": "south",
+      "loops": 9,
+      "expected": 1621607798
+    },
+    {
+      "location": {
+        "x": 1,
+        "y": 319,
+        "z": 16
+      },
+      "face": "west",
+      "loops": 0,
+      "expected": 1611699046
+    },
+    {
+      "location": {
+        "x": 1,
+        "y": 319,
+        "z": 16
+      },
+      "face": "west",
+      "loops": 1,
+      "expected": 63416384
+    },
+    {
+      "location": {
+        "x": 1,
+        "y": 319,
+        "z": 16
+      },
+      "face": "west",
+      "loops": 9,
+      "expected": 2003767542
+    },
+    {
+      "location": {
+        "x": 1,
+        "y": 319,
+        "z": 16
+      },
+      "face": "east",
+      "loops": 0,
+      "expected": 2128778448
+    },
+    {
+      "location": {
+        "x": 1,
+        "y": 319,
+        "z": 16
+      },
+      "face": "east",
+      "loops": 1,
+      "expected": 315652408
+    },
+    {
+      "location": {
+        "x": 1,
+        "y": 319,
+        "z": 16
+      },
+      "face": "east",
+      "loops": 9,
+      "expected": 1876746939
+    },
+    {
+      "location": {
+        "x": 16,
+        "y": -64,
+        "z": -17
+      },
+      "face": "down",
+      "loops": 0,
+      "expected": 1702651352
+    },
+    {
+      "location": {
+        "x": 16,
+        "y": -64,
+        "z": -17
+      },
+      "face": "down",
+      "loops": 1,
+      "expected": 1124990958
+    },
+    {
+      "location": {
+        "x": 16,
+        "y": -64,
+        "z": -17
+      },
+      "face": "down",
+      "loops": 9,
+      "expected": 1112321068
+    },
+    {
+      "location": {
+        "x": 16,
+        "y": -64,
+        "z": -17
+      },
+      "face": "up",
+      "loops": 0,
+      "expected": 1558986017
+    },
+    {
+      "location": {
+        "x": 16,
+        "y": -64,
+        "z": -17
+      },
+      "face": "up",
+      "loops": 1,
+      "expected": 1242275847
+    },
+    {
+      "location": {
+        "x": 16,
+        "y": -64,
+        "z": -17
+      },
+      "face": "up",
+      "loops": 9,
+      "expected": 661694915
+    },
+    {
+      "location": {
+        "x": 16,
+        "y": -64,
+        "z": -17
+      },
+      "face": "north",
+      "loops": 0,
+      "expected": 1776272901
+    },
+    {
+      "location": {
+        "x": 16,
+        "y": -64,
+        "z": -17
+      },
+      "face": "north",
+      "loops": 1,
+      "expected": 99774844
+    },
+    {
+      "location": {
+        "x": 16,
+        "y": -64,
+        "z": -17
+      },
+      "face": "north",
+      "loops": 9,
+      "expected": 204327716
+    },
+    {
+      "location": {
+        "x": 16,
+        "y": -64,
+        "z": -17
+      },
+      "face": "south",
+      "loops": 0,
+      "expected": 330659548
+    },
+    {
+      "location": {
+        "x": 16,
+        "y": -64,
+        "z": -17
+      },
+      "face": "south",
+      "loops": 1,
+      "expected": 1894331140
+    },
+    {
+      "location": {
+        "x": 16,
+        "y": -64,
+        "z": -17
+      },
+      "face": "south",
+      "loops": 9,
+      "expected": 1176004178
+    },
+    {
+      "location": {
+        "x": 16,
+        "y": -64,
+        "z": -17
+      },
+      "face": "west",
+      "loops": 0,
+      "expected": 1027907521
+    },
+    {
+      "location": {
+        "x": 16,
+        "y": -64,
+        "z": -17
+      },
+      "face": "west",
+      "loops": 1,
+      "expected": 2068853069
+    },
+    {
+      "location": {
+        "x": 16,
+        "y": -64,
+        "z": -17
+      },
+      "face": "west",
+      "loops": 9,
+      "expected": 118900489
+    },
+    {
+      "location": {
+        "x": 16,
+        "y": -64,
+        "z": -17
+      },
+      "face": "east",
+      "loops": 0,
+      "expected": 244677292
+    },
+    {
+      "location": {
+        "x": 16,
+        "y": -64,
+        "z": -17
+      },
+      "face": "east",
+      "loops": 1,
+      "expected": 365535308
+    },
+    {
+      "location": {
+        "x": 16,
+        "y": -64,
+        "z": -17
+      },
+      "face": "east",
+      "loops": 9,
+      "expected": 1089048886
+    },
+    {
+      "location": {
+        "x": 16,
+        "y": 0,
+        "z": 0
+      },
+      "face": "down",
+      "loops": 0,
+      "expected": 1441930400
+    },
+    {
+      "location": {
+        "x": 16,
+        "y": 0,
+        "z": 0
+      },
+      "face": "down",
+      "loops": 1,
+      "expected": 338158849
+    },
+    {
+      "location": {
+        "x": 16,
+        "y": 0,
+        "z": 0
+      },
+      "face": "down",
+      "loops": 9,
+      "expected": 1559629941
+    },
+    {
+      "location": {
+        "x": 16,
+        "y": 0,
+        "z": 0
+      },
+      "face": "up",
+      "loops": 0,
+      "expected": 1060991281
+    },
+    {
+      "location": {
+        "x": 16,
+        "y": 0,
+        "z": 0
+      },
+      "face": "up",
+      "loops": 1,
+      "expected": 854766919
+    },
+    {
+      "location": {
+        "x": 16,
+        "y": 0,
+        "z": 0
+      },
+      "face": "up",
+      "loops": 9,
+      "expected": 1276731712
+    },
+    {
+      "location": {
+        "x": 16,
+        "y": 0,
+        "z": 0
+      },
+      "face": "north",
+      "loops": 0,
+      "expected": 1443548300
+    },
+    {
+      "location": {
+        "x": 16,
+        "y": 0,
+        "z": 0
+      },
+      "face": "north",
+      "loops": 1,
+      "expected": 571051146
+    },
+    {
+      "location": {
+        "x": 16,
+        "y": 0,
+        "z": 0
+      },
+      "face": "north",
+      "loops": 9,
+      "expected": 2084828965
+    },
+    {
+      "location": {
+        "x": 16,
+        "y": 0,
+        "z": 0
+      },
+      "face": "south",
+      "loops": 0,
+      "expected": 775891495
+    },
+    {
+      "location": {
+        "x": 16,
+        "y": 0,
+        "z": 0
+      },
+      "face": "south",
+      "loops": 1,
+      "expected": 1890460258
+    },
+    {
+      "location": {
+        "x": 16,
+        "y": 0,
+        "z": 0
+      },
+      "face": "south",
+      "loops": 9,
+      "expected": 175030542
+    },
+    {
+      "location": {
+        "x": 16,
+        "y": 0,
+        "z": 0
+      },
+      "face": "west",
+      "loops": 0,
+      "expected": 235260283
+    },
+    {
+      "location": {
+        "x": 16,
+        "y": 0,
+        "z": 0
+      },
+      "face": "west",
+      "loops": 1,
+      "expected": 484710980
+    },
+    {
+      "location": {
+        "x": 16,
+        "y": 0,
+        "z": 0
+      },
+      "face": "west",
+      "loops": 9,
+      "expected": 1492451551
+    },
+    {
+      "location": {
+        "x": 16,
+        "y": 0,
+        "z": 0
+      },
+      "face": "east",
+      "loops": 0,
+      "expected": 1666848949
+    },
+    {
+      "location": {
+        "x": 16,
+        "y": 0,
+        "z": 0
+      },
+      "face": "east",
+      "loops": 1,
+      "expected": 1271593260
+    },
+    {
+      "location": {
+        "x": 16,
+        "y": 0,
+        "z": 0
+      },
+      "face": "east",
+      "loops": 9,
+      "expected": 442523153
+    },
+    {
+      "location": {
+        "x": 16,
+        "y": 319,
+        "z": 16
+      },
+      "face": "down",
+      "loops": 0,
+      "expected": 1660379169
+    },
+    {
+      "location": {
+        "x": 16,
+        "y": 319,
+        "z": 16
+      },
+      "face": "down",
+      "loops": 1,
+      "expected": 1236845103
+    },
+    {
+      "location": {
+        "x": 16,
+        "y": 319,
+        "z": 16
+      },
+      "face": "down",
+      "loops": 9,
+      "expected": 1400075785
+    },
+    {
+      "location": {
+        "x": 16,
+        "y": 319,
+        "z": 16
+      },
+      "face": "up",
+      "loops": 0,
+      "expected": 1019523864
+    },
+    {
+      "location": {
+        "x": 16,
+        "y": 319,
+        "z": 16
+      },
+      "face": "up",
+      "loops": 1,
+      "expected": 1310134581
+    },
+    {
+      "location": {
+        "x": 16,
+        "y": 319,
+        "z": 16
+      },
+      "face": "up",
+      "loops": 9,
+      "expected": 259708685
+    },
+    {
+      "location": {
+        "x": 16,
+        "y": 319,
+        "z": 16
+      },
+      "face": "north",
+      "loops": 0,
+      "expected": 36314454
+    },
+    {
+      "location": {
+        "x": 16,
+        "y": 319,
+        "z": 16
+      },
+      "face": "north",
+      "loops": 1,
+      "expected": 1626647032
+    },
+    {
+      "location": {
+        "x": 16,
+        "y": 319,
+        "z": 16
+      },
+      "face": "north",
+      "loops": 9,
+      "expected": 1754038653
+    },
+    {
+      "location": {
+        "x": 16,
+        "y": 319,
+        "z": 16
+      },
+      "face": "south",
+      "loops": 0,
+      "expected": 1804450156
+    },
+    {
+      "location": {
+        "x": 16,
+        "y": 319,
+        "z": 16
+      },
+      "face": "south",
+      "loops": 1,
+      "expected": 2051208544
+    },
+    {
+      "location": {
+        "x": 16,
+        "y": 319,
+        "z": 16
+      },
+      "face": "south",
+      "loops": 9,
+      "expected": 1832312102
+    },
+    {
+      "location": {
+        "x": 16,
+        "y": 319,
+        "z": 16
+      },
+      "face": "west",
+      "loops": 0,
+      "expected": 1028119302
+    },
+    {
+      "location": {
+        "x": 16,
+        "y": 319,
+        "z": 16
+      },
+      "face": "west",
+      "loops": 1,
+      "expected": 327435157
+    },
+    {
+      "location": {
+        "x": 16,
+        "y": 319,
+        "z": 16
+      },
+      "face": "west",
+      "loops": 9,
+      "expected": 362327762
+    },
+    {
+      "location": {
+        "x": 16,
+        "y": 319,
+        "z": 16
+      },
+      "face": "east",
+      "loops": 0,
+      "expected": 715230721
+    },
+    {
+      "location": {
+        "x": 16,
+        "y": 319,
+        "z": 16
+      },
+      "face": "east",
+      "loops": 1,
+      "expected": 1932511964
+    },
+    {
+      "location": {
+        "x": 16,
+        "y": 319,
+        "z": 16
+      },
+      "face": "east",
+      "loops": 9,
+      "expected": 1985776151
+    },
+    {
+      "location": {
+        "x": 30000000,
+        "y": -64,
+        "z": -17
+      },
+      "face": "down",
+      "loops": 0,
+      "expected": 207999346
+    },
+    {
+      "location": {
+        "x": 30000000,
+        "y": -64,
+        "z": -17
+      },
+      "face": "down",
+      "loops": 1,
+      "expected": 480453154
+    },
+    {
+      "location": {
+        "x": 30000000,
+        "y": -64,
+        "z": -17
+      },
+      "face": "down",
+      "loops": 9,
+      "expected": 326552495
+    },
+    {
+      "location": {
+        "x": 30000000,
+        "y": -64,
+        "z": -17
+      },
+      "face": "up",
+      "loops": 0,
+      "expected": 513713589
+    },
+    {
+      "location": {
+        "x": 30000000,
+        "y": -64,
+        "z": -17
+      },
+      "face": "up",
+      "loops": 1,
+      "expected": 1842032911
+    },
+    {
+      "location": {
+        "x": 30000000,
+        "y": -64,
+        "z": -17
+      },
+      "face": "up",
+      "loops": 9,
+      "expected": 738081867
+    },
+    {
+      "location": {
+        "x": 30000000,
+        "y": -64,
+        "z": -17
+      },
+      "face": "north",
+      "loops": 0,
+      "expected": 1774897776
+    },
+    {
+      "location": {
+        "x": 30000000,
+        "y": -64,
+        "z": -17
+      },
+      "face": "north",
+      "loops": 1,
+      "expected": 1516685641
+    },
+    {
+      "location": {
+        "x": 30000000,
+        "y": -64,
+        "z": -17
+      },
+      "face": "north",
+      "loops": 9,
+      "expected": 476113378
+    },
+    {
+      "location": {
+        "x": 30000000,
+        "y": -64,
+        "z": -17
+      },
+      "face": "south",
+      "loops": 0,
+      "expected": 360563526
+    },
+    {
+      "location": {
+        "x": 30000000,
+        "y": -64,
+        "z": -17
+      },
+      "face": "south",
+      "loops": 1,
+      "expected": 1611222047
+    },
+    {
+      "location": {
+        "x": 30000000,
+        "y": -64,
+        "z": -17
+      },
+      "face": "south",
+      "loops": 9,
+      "expected": 137864433
+    },
+    {
+      "location": {
+        "x": 30000000,
+        "y": -64,
+        "z": -17
+      },
+      "face": "west",
+      "loops": 0,
+      "expected": 60028106
+    },
+    {
+      "location": {
+        "x": 30000000,
+        "y": -64,
+        "z": -17
+      },
+      "face": "west",
+      "loops": 1,
+      "expected": 154180833
+    },
+    {
+      "location": {
+        "x": 30000000,
+        "y": -64,
+        "z": -17
+      },
+      "face": "west",
+      "loops": 9,
+      "expected": 961864041
+    },
+    {
+      "location": {
+        "x": 30000000,
+        "y": -64,
+        "z": -17
+      },
+      "face": "east",
+      "loops": 0,
+      "expected": 942943432
+    },
+    {
+      "location": {
+        "x": 30000000,
+        "y": -64,
+        "z": -17
+      },
+      "face": "east",
+      "loops": 1,
+      "expected": 1524652245
+    },
+    {
+      "location": {
+        "x": 30000000,
+        "y": -64,
+        "z": -17
+      },
+      "face": "east",
+      "loops": 9,
+      "expected": 333308910
+    },
+    {
+      "location": {
+        "x": 30000000,
+        "y": 0,
+        "z": 0
+      },
+      "face": "down",
+      "loops": 0,
+      "expected": 2146116809
+    },
+    {
+      "location": {
+        "x": 30000000,
+        "y": 0,
+        "z": 0
+      },
+      "face": "down",
+      "loops": 1,
+      "expected": 1515840514
+    },
+    {
+      "location": {
+        "x": 30000000,
+        "y": 0,
+        "z": 0
+      },
+      "face": "down",
+      "loops": 9,
+      "expected": 352048682
+    },
+    {
+      "location": {
+        "x": 30000000,
+        "y": 0,
+        "z": 0
+      },
+      "face": "up",
+      "loops": 0,
+      "expected": 1167314461
+    },
+    {
+      "location": {
+        "x": 30000000,
+        "y": 0,
+        "z": 0
+      },
+      "face": "up",
+      "loops": 1,
+      "expected": 1056901063
+    },
+    {
+      "location": {
+        "x": 30000000,
+        "y": 0,
+        "z": 0
+      },
+      "face": "up",
+      "loops": 9,
+      "expected": 655545566
+    },
+    {
+      "location": {
+        "x": 30000000,
+        "y": 0,
+        "z": 0
+      },
+      "face": "north",
+      "loops": 0,
+      "expected": 1946091001
+    },
+    {
+      "location": {
+        "x": 30000000,
+        "y": 0,
+        "z": 0
+      },
+      "face": "north",
+      "loops": 1,
+      "expected": 669065718
+    },
+    {
+      "location": {
+        "x": 30000000,
+        "y": 0,
+        "z": 0
+      },
+      "face": "north",
+      "loops": 9,
+      "expected": 192236974
+    },
+    {
+      "location": {
+        "x": 30000000,
+        "y": 0,
+        "z": 0
+      },
+      "face": "south",
+      "loops": 0,
+      "expected": 1400994832
+    },
+    {
+      "location": {
+        "x": 30000000,
+        "y": 0,
+        "z": 0
+      },
+      "face": "south",
+      "loops": 1,
+      "expected": 737446641
+    },
+    {
+      "location": {
+        "x": 30000000,
+        "y": 0,
+        "z": 0
+      },
+      "face": "south",
+      "loops": 9,
+      "expected": 586184666
+    },
+    {
+      "location": {
+        "x": 30000000,
+        "y": 0,
+        "z": 0
+      },
+      "face": "west",
+      "loops": 0,
+      "expected": 1547158441
+    },
+    {
+      "location": {
+        "x": 30000000,
+        "y": 0,
+        "z": 0
+      },
+      "face": "west",
+      "loops": 1,
+      "expected": 1156194190
+    },
+    {
+      "location": {
+        "x": 30000000,
+        "y": 0,
+        "z": 0
+      },
+      "face": "west",
+      "loops": 9,
+      "expected": 1861386472
+    },
+    {
+      "location": {
+        "x": 30000000,
+        "y": 0,
+        "z": 0
+      },
+      "face": "east",
+      "loops": 0,
+      "expected": 1226534561
+    },
+    {
+      "location": {
+        "x": 30000000,
+        "y": 0,
+        "z": 0
+      },
+      "face": "east",
+      "loops": 1,
+      "expected": 844453488
+    },
+    {
+      "location": {
+        "x": 30000000,
+        "y": 0,
+        "z": 0
+      },
+      "face": "east",
+      "loops": 9,
+      "expected": 1222929778
+    },
+    {
+      "location": {
+        "x": 30000000,
+        "y": 319,
+        "z": 16
+      },
+      "face": "down",
+      "loops": 0,
+      "expected": 378983026
+    },
+    {
+      "location": {
+        "x": 30000000,
+        "y": 319,
+        "z": 16
+      },
+      "face": "down",
+      "loops": 1,
+      "expected": 609006347
+    },
+    {
+      "location": {
+        "x": 30000000,
+        "y": 319,
+        "z": 16
+      },
+      "face": "down",
+      "loops": 9,
+      "expected": 1647962305
+    },
+    {
+      "location": {
+        "x": 30000000,
+        "y": 319,
+        "z": 16
+      },
+      "face": "up",
+      "loops": 0,
+      "expected": 1971072769
+    },
+    {
+      "location": {
+        "x": 30000000,
+        "y": 319,
+        "z": 16
+      },
+      "face": "up",
+      "loops": 1,
+      "expected": 56856084
+    },
+    {
+      "location": {
+        "x": 30000000,
+        "y": 319,
+        "z": 16
+      },
+      "face": "up",
+      "loops": 9,
+      "expected": 541144132
+    },
+    {
+      "location": {
+        "x": 30000000,
+        "y": 319,
+        "z": 16
+      },
+      "face": "north",
+      "loops": 0,
+      "expected": 388996430
+    },
+    {
+      "location": {
+        "x": 30000000,
+        "y": 319,
+        "z": 16
+      },
+      "face": "north",
+      "loops": 1,
+      "expected": 688187191
+    },
+    {
+      "location": {
+        "x": 30000000,
+        "y": 319,
+        "z": 16
+      },
+      "face": "north",
+      "loops": 9,
+      "expected": 525317146
+    },
+    {
+      "location": {
+        "x": 30000000,
+        "y": 319,
+        "z": 16
+      },
+      "face": "south",
+      "loops": 0,
+      "expected": 322219986
+    },
+    {
+      "location": {
+        "x": 30000000,
+        "y": 319,
+        "z": 16
+      },
+      "face": "south",
+      "loops": 1,
+      "expected": 1031588772
+    },
+    {
+      "location": {
+        "x": 30000000,
+        "y": 319,
+        "z": 16
+      },
+      "face": "south",
+      "loops": 9,
+      "expected": 2058996964
+    },
+    {
+      "location": {
+        "x": 30000000,
+        "y": 319,
+        "z": 16
+      },
+      "face": "west",
+      "loops": 0,
+      "expected": 1644646175
+    },
+    {
+      "location": {
+        "x": 30000000,
+        "y": 319,
+        "z": 16
+      },
+      "face": "west",
+      "loops": 1,
+      "expected": 217719252
+    },
+    {
+      "location": {
+        "x": 30000000,
+        "y": 319,
+        "z": 16
+      },
+      "face": "west",
+      "loops": 9,
+      "expected": 912869546
+    },
+    {
+      "location": {
+        "x": 30000000,
+        "y": 319,
+        "z": 16
+      },
+      "face": "east",
+      "loops": 0,
+      "expected": 834256285
+    },
+    {
+      "location": {
+        "x": 30000000,
+        "y": 319,
+        "z": 16
+      },
+      "face": "east",
+      "loops": 1,
+      "expected": 1090868175
+    },
+    {
+      "location": {
+        "x": 30000000,
+        "y": 319,
+        "z": 16
+      },
+      "face": "east",
+      "loops": 9,
+      "expected": 1490488828
+    }
+  ]
+}

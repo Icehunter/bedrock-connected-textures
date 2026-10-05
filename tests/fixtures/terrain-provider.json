@@ -1,0 +1,27 @@
+{
+  "format_version": 1,
+  "id": "release",
+  "effects": {
+    "moss": {"kind": "surface", "entity": "bct:moss", "material": "moss_block", "generator": "moss_ground"},
+    "roots": {"kind": "model", "entity": "bct:roots", "material": "log_oak", "geometry": "oak_root_fan"}
+  },
+  "rules": [
+    {
+      "id": "moss_at_ground",
+      "targets": ["minecraft:oak_log", "minecraft:spruce_log", "minecraft:birch_log", "minecraft:dark_oak_log", "minecraft:jungle_log", "minecraft:acacia_log", "minecraft:mangrove_log", "minecraft:cherry_log", "minecraft:pale_oak_log"],
+      "neighbors": ["minecraft:grass_block", "minecraft:grass", "minecraft:moss_block", "minecraft:dirt", "minecraft:podzol"],
+      "contacts": ["down"],
+      "faces": ["north", "east", "south", "west"],
+      "effect": "moss"
+    },
+    {
+      "id": "oak_roots_on_grass",
+      "targets": ["minecraft:grass_block", "minecraft:grass", "minecraft:podzol"],
+      "neighbors": ["minecraft:oak_log", "minecraft:dark_oak_log"],
+      "contacts": ["north", "east", "south", "west"],
+      "neighbor_y": 1,
+      "air_above": true,
+      "effect": "roots"
+    }
+  ]
+}

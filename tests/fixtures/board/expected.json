@@ -1,0 +1,361 @@
+{
+ "edges": {
+  "10,0,11": {
+   "bct:quadrant0": 2,
+   "bct:quadrant1": 0,
+   "bct:quadrant2": 0,
+   "bct:quadrant3": 0
+  },
+  "10,0,5": {
+   "bct:quadrant0": 0,
+   "bct:quadrant1": 0,
+   "bct:quadrant2": 8,
+   "bct:quadrant3": 0
+  },
+  "10,0,6": {
+   "bct:quadrant0": 0,
+   "bct:quadrant1": 0,
+   "bct:quadrant2": 0,
+   "bct:quadrant3": 2
+  },
+  "10,0,7": {
+   "bct:quadrant0": 0,
+   "bct:quadrant1": 0,
+   "bct:quadrant2": 0,
+   "bct:quadrant3": 8
+  },
+  "10,0,9": {
+   "bct:quadrant0": 0,
+   "bct:quadrant1": 0,
+   "bct:quadrant2": 2,
+   "bct:quadrant3": 0
+  },
+  "11,0,10": {
+   "bct:quadrant0": 0,
+   "bct:quadrant1": 0,
+   "bct:quadrant2": 0,
+   "bct:quadrant3": 2
+  },
+  "11,0,11": {
+   "bct:quadrant0": 3,
+   "bct:quadrant1": 0,
+   "bct:quadrant2": 0,
+   "bct:quadrant3": 8
+  },
+  "11,0,9": {
+   "bct:quadrant0": 0,
+   "bct:quadrant1": 0,
+   "bct:quadrant2": 11,
+   "bct:quadrant3": 0
+  },
+  "12,0,10": {
+   "bct:quadrant0": 0,
+   "bct:quadrant1": 0,
+   "bct:quadrant2": 0,
+   "bct:quadrant3": 3
+  },
+  "12,0,11": {
+   "bct:quadrant0": 0,
+   "bct:quadrant1": 0,
+   "bct:quadrant2": 0,
+   "bct:quadrant3": 12
+  },
+  "12,0,9": {
+   "bct:quadrant0": 0,
+   "bct:quadrant1": 0,
+   "bct:quadrant2": 12,
+   "bct:quadrant3": 0
+  },
+  "14,0,5": {
+   "bct:quadrant0": 0,
+   "bct:quadrant1": 12,
+   "bct:quadrant2": 0,
+   "bct:quadrant3": 0
+  },
+  "14,0,6": {
+   "bct:quadrant0": 0,
+   "bct:quadrant1": 3,
+   "bct:quadrant2": 0,
+   "bct:quadrant3": 0
+  },
+  "14,0,7": {
+   "bct:quadrant0": 12,
+   "bct:quadrant1": 0,
+   "bct:quadrant2": 0,
+   "bct:quadrant3": 0
+  },
+  "15,0,5": {
+   "bct:quadrant0": 0,
+   "bct:quadrant1": 0,
+   "bct:quadrant2": 3,
+   "bct:quadrant3": 0
+  },
+  "15,0,7": {
+   "bct:quadrant0": 3,
+   "bct:quadrant1": 0,
+   "bct:quadrant2": 0,
+   "bct:quadrant3": 0
+  },
+  "16,0,5": {
+   "bct:quadrant0": 0,
+   "bct:quadrant1": 0,
+   "bct:quadrant2": 12,
+   "bct:quadrant3": 0
+  },
+  "16,0,6": {
+   "bct:quadrant0": 0,
+   "bct:quadrant1": 0,
+   "bct:quadrant2": 0,
+   "bct:quadrant3": 3
+  },
+  "16,0,7": {
+   "bct:quadrant0": 0,
+   "bct:quadrant1": 0,
+   "bct:quadrant2": 0,
+   "bct:quadrant3": 12
+  },
+  "2,0,5": {
+   "bct:quadrant0": 0,
+   "bct:quadrant1": 4,
+   "bct:quadrant2": 0,
+   "bct:quadrant3": 0
+  },
+  "2,0,6": {
+   "bct:quadrant0": 0,
+   "bct:quadrant1": 1,
+   "bct:quadrant2": 0,
+   "bct:quadrant3": 0
+  },
+  "2,0,7": {
+   "bct:quadrant0": 4,
+   "bct:quadrant1": 0,
+   "bct:quadrant2": 0,
+   "bct:quadrant3": 0
+  },
+  "3,0,10": {
+   "bct:quadrant0": 0,
+   "bct:quadrant1": 1,
+   "bct:quadrant2": 0,
+   "bct:quadrant3": 0
+  },
+  "3,0,11": {
+   "bct:quadrant0": 4,
+   "bct:quadrant1": 0,
+   "bct:quadrant2": 0,
+   "bct:quadrant3": 0
+  },
+  "3,0,5": {
+   "bct:quadrant0": 0,
+   "bct:quadrant1": 0,
+   "bct:quadrant2": 1,
+   "bct:quadrant3": 0
+  },
+  "3,0,7": {
+   "bct:quadrant0": 1,
+   "bct:quadrant1": 0,
+   "bct:quadrant2": 0,
+   "bct:quadrant3": 0
+  },
+  "3,0,9": {
+   "bct:quadrant0": 0,
+   "bct:quadrant1": 4,
+   "bct:quadrant2": 0,
+   "bct:quadrant3": 0
+  },
+  "4,0,11": {
+   "bct:quadrant0": 1,
+   "bct:quadrant1": 0,
+   "bct:quadrant2": 0,
+   "bct:quadrant3": 0
+  },
+  "4,0,5": {
+   "bct:quadrant0": 0,
+   "bct:quadrant1": 0,
+   "bct:quadrant2": 4,
+   "bct:quadrant3": 0
+  },
+  "4,0,6": {
+   "bct:quadrant0": 0,
+   "bct:quadrant1": 0,
+   "bct:quadrant2": 0,
+   "bct:quadrant3": 1
+  },
+  "4,0,7": {
+   "bct:quadrant0": 0,
+   "bct:quadrant1": 0,
+   "bct:quadrant2": 0,
+   "bct:quadrant3": 4
+  },
+  "4,0,9": {
+   "bct:quadrant0": 0,
+   "bct:quadrant1": 0,
+   "bct:quadrant2": 1,
+   "bct:quadrant3": 0
+  },
+  "5,0,10": {
+   "bct:quadrant0": 0,
+   "bct:quadrant1": 0,
+   "bct:quadrant2": 0,
+   "bct:quadrant3": 1
+  },
+  "5,0,11": {
+   "bct:quadrant0": 0,
+   "bct:quadrant1": 0,
+   "bct:quadrant2": 0,
+   "bct:quadrant3": 4
+  },
+  "5,0,9": {
+   "bct:quadrant0": 0,
+   "bct:quadrant1": 0,
+   "bct:quadrant2": 4,
+   "bct:quadrant3": 0
+  },
+  "8,0,5": {
+   "bct:quadrant0": 0,
+   "bct:quadrant1": 8,
+   "bct:quadrant2": 0,
+   "bct:quadrant3": 0
+  },
+  "8,0,6": {
+   "bct:quadrant0": 0,
+   "bct:quadrant1": 2,
+   "bct:quadrant2": 0,
+   "bct:quadrant3": 0
+  },
+  "8,0,7": {
+   "bct:quadrant0": 8,
+   "bct:quadrant1": 0,
+   "bct:quadrant2": 0,
+   "bct:quadrant3": 0
+  },
+  "9,0,10": {
+   "bct:quadrant0": 0,
+   "bct:quadrant1": 2,
+   "bct:quadrant2": 0,
+   "bct:quadrant3": 0
+  },
+  "9,0,11": {
+   "bct:quadrant0": 8,
+   "bct:quadrant1": 0,
+   "bct:quadrant2": 0,
+   "bct:quadrant3": 0
+  },
+  "9,0,5": {
+   "bct:quadrant0": 0,
+   "bct:quadrant1": 0,
+   "bct:quadrant2": 2,
+   "bct:quadrant3": 0
+  },
+  "9,0,7": {
+   "bct:quadrant0": 2,
+   "bct:quadrant1": 0,
+   "bct:quadrant2": 0,
+   "bct:quadrant3": 0
+  },
+  "9,0,9": {
+   "bct:quadrant0": 0,
+   "bct:quadrant1": 8,
+   "bct:quadrant2": 0,
+   "bct:quadrant3": 0
+  }
+ },
+ "tiles": {
+  "0,1,-6,south": 0,
+  "10,1,-6,south": 39,
+  "10,2,-6,south": 27,
+  "10,3,-6,south": 15,
+  "11,0,-2,up": [
+   15
+  ],
+  "12,2,-6,south": 1,
+  "13,1,-6,south": 36,
+  "13,2,-6,south": 46,
+  "13,3,-6,south": 12,
+  "14,2,-6,south": 3,
+  "15,0,-2,up": [
+   9
+  ],
+  "17,1,-6,south": 0,
+  "18,1,-6,south": 1,
+  "19,0,-2,up": [
+   1
+  ],
+  "19,1,-6,south": 2,
+  "2,0,-1,up": 2,
+  "2,0,-2,up": 1,
+  "2,0,-3,up": 2,
+  "2,0,-4,up": 1,
+  "2,1,-6,south": 1,
+  "21,1,-6,south": 3,
+  "23,0,-2,up": [],
+  "23,1,-6,south": 0,
+  "23,2,-6,south": 1,
+  "23,3,-6,south": 2,
+  "25,1,-6,south": 3,
+  "27,1,-6,south": 0,
+  "28,1,-6,south": 1,
+  "29,1,-6,south": 2,
+  "3,0,-1,up": 3,
+  "3,0,-2,up": 3,
+  "3,0,-3,up": 3,
+  "3,0,-4,up": 3,
+  "3,1,-6,south": 2,
+  "31,1,-6,south": 4,
+  "31,2,-6,south": 5,
+  "31,3,-6,south": 6,
+  "33,1,-6,south": 0,
+  "33,2,-6,south": 1,
+  "33,3,-6,south": 2,
+  "35,1,-6,south": 4,
+  "36,1,-6,south": 5,
+  "37,1,-6,south": 6,
+  "39,1,-6,south": 0,
+  "39,2,-6,south": null,
+  "4,0,-1,up": 3,
+  "4,0,-2,up": 1,
+  "4,0,-3,up": 1,
+  "4,0,-4,up": 2,
+  "4,1,-6,south": 3,
+  "41,1,-6,south": 0,
+  "43,1,-6,south": 4,
+  "43,2,-6,south": 1,
+  "43,3,-6,south": 4,
+  "43,4,-6,south": 1,
+  "44,1,-6,south": 5,
+  "44,2,-6,south": 2,
+  "44,3,-6,south": 5,
+  "44,4,-6,south": 2,
+  "45,1,-6,south": 3,
+  "45,2,-6,south": 0,
+  "45,3,-6,south": 3,
+  "45,4,-6,south": 0,
+  "46,1,-6,south": 4,
+  "46,2,-6,south": 1,
+  "46,3,-6,south": 4,
+  "46,4,-6,south": 1,
+  "47,1,-6,south": 5,
+  "47,2,-6,south": 2,
+  "47,3,-6,south": 5,
+  "47,4,-6,south": 2,
+  "48,1,-6,south": 3,
+  "48,2,-6,south": 0,
+  "48,3,-6,south": 3,
+  "48,4,-6,south": 0,
+  "5,0,-1,up": 3,
+  "5,0,-2,up": 0,
+  "5,0,-3,up": 3,
+  "5,0,-4,up": 0,
+  "6,1,-6,south": 36,
+  "6,2,-6,south": 24,
+  "6,3,-6,south": 12,
+  "7,0,-2,up": [
+   7
+  ],
+  "8,1,-6,south": 37,
+  "8,2,-6,south": 25,
+  "8,3,-6,south": 13,
+  "9,1,-6,south": 38,
+  "9,2,-6,south": 26,
+  "9,3,-6,south": 14
+ }
+}

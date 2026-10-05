@@ -1,0 +1,12432 @@
+{
+ "format": 1,
+ "about": "Model name to Bedrock client entity and geometry key; model part to the vanilla Bedrock bone it replaces (matched by vanilla geometry, then part names); vanilla Java part pivots (Java model space) and rest rotations in degrees; vanilla Java motion of parts that model expressions may read. A frame (scale, offset in Bedrock units) moves Java model space onto the Bedrock geometry where the Java renderer scales or offsets the model; it is measured from matching vanilla cubes.",
+ "models": {
+  "allay": {
+   "entity": "minecraft:allay",
+   "geometry": "default",
+   "bones": {
+    "head": "look_at",
+    "body": "body",
+    "right_arm": "right_arm",
+    "left_arm": "left_arm",
+    "left_wing": "left_wing",
+    "right_wing": "right_wing"
+   },
+   "java_parts": {
+    "head": {
+     "pivot": [
+      0,
+      18,
+      0
+     ]
+    },
+    "body": {
+     "pivot": [
+      0,
+      18,
+      0
+     ]
+    },
+    "right_arm": {
+     "pivot": [
+      -1.75,
+      18.5,
+      0
+     ]
+    },
+    "left_arm": {
+     "pivot": [
+      1.75,
+      18.5,
+      0
+     ]
+    },
+    "left_wing": {
+     "pivot": [
+      0.5,
+      18,
+      1
+     ]
+    },
+    "right_wing": {
+     "pivot": [
+      -0.5,
+      18,
+      1
+     ]
+    }
+   },
+   "family": "head"
+  },
+  "allay_baby": {
+   "entity": "minecraft:allay",
+   "geometry": "baby"
+  },
+  "armadillo": {
+   "entity": "minecraft:armadillo",
+   "geometry": "default",
+   "bones": {
+    "head": "head",
+    "left_ear_cube": "left_ear",
+    "right_ear_cube": "right_ear",
+    "body": "body",
+    "cube": "body_rolled_up",
+    "front_left_leg": "left_front_leg",
+    "front_right_leg": "right_front_leg",
+    "back_left_leg": "left_hind_leg",
+    "back_right_leg": "right_hind_leg",
+    "tail": "tail"
+   },
+   "java_parts": {
+    "head": {
+     "pivot": [
+      0,
+      19,
+      -7
+     ]
+    },
+    "left_ear_cube": {
+     "pivot": [
+      1.5,
+      18,
+      -7.6
+     ],
+     "rotation": [
+      10.8052,
+      22.1399,
+      4.114
+     ]
+    },
+    "right_ear_cube": {
+     "pivot": [
+      -1.5,
+      18,
+      -7.6
+     ],
+     "rotation": [
+      10.8052,
+      -22.1399,
+      -4.114
+     ]
+    },
+    "body": {
+     "pivot": [
+      0,
+      21,
+      4
+     ]
+    },
+    "cube": {
+     "pivot": [
+      0,
+      24,
+      0
+     ]
+    },
+    "front_left_leg": {
+     "pivot": [
+      2,
+      21,
+      -4
+     ]
+    },
+    "front_right_leg": {
+     "pivot": [
+      -2,
+      21,
+      -4
+     ]
+    },
+    "back_left_leg": {
+     "pivot": [
+      2,
+      21,
+      4
+     ]
+    },
+    "back_right_leg": {
+     "pivot": [
+      -2,
+      21,
+      4
+     ]
+    },
+    "tail": {
+     "pivot": [
+      0,
+      18,
+      5
+     ],
+     "rotation": [
+      29,
+      0,
+      0
+     ]
+    }
+   },
+   "family": "head"
+  },
+  "armadillo_baby": {
+   "entity": "minecraft:armadillo",
+   "geometry": "baby",
+   "bones": {
+    "head_cube": "head",
+    "left_ear": "left_ear",
+    "right_ear": "right_ear",
+    "body": "body",
+    "cube": "body_rolled_up",
+    "left_front_leg": "left_front_leg",
+    "right_front_leg": "right_front_leg",
+    "left_hind_leg": "left_hind_leg",
+    "right_hind_leg": "right_hind_leg",
+    "right_ear_cube": "tail"
+   },
+   "java_parts": {
+    "head_cube": {
+     "pivot": [
+      0,
+      20,
+      -2.7
+     ],
+     "rotation": [
+      42.5,
+      0,
+      0
+     ]
+    },
+    "left_ear": {
+     "pivot": [
+      1,
+      18.75,
+      -4.25
+     ],
+     "rotation": [
+      24.9981,
+      6.4973,
+      -3.0023
+     ]
+    },
+    "right_ear": {
+     "pivot": [
+      -1,
+      18.75,
+      -4.25
+     ],
+     "rotation": [
+      24.9981,
+      -6.4973,
+      3.0023
+     ]
+    },
+    "body": {
+     "pivot": [
+      0,
+      20,
+      0.5
+     ]
+    },
+    "cube": {
+     "pivot": [
+      0,
+      20.7,
+      0.5
+     ]
+    },
+    "left_front_leg": {
+     "pivot": [
+      -1.5,
+      22,
+      -1.5
+     ]
+    },
+    "right_front_leg": {
+     "pivot": [
+      1.5,
+      22,
+      -1.5
+     ]
+    },
+    "left_hind_leg": {
+     "pivot": [
+      1.5,
+      22,
+      2.5
+     ]
+    },
+    "right_hind_leg": {
+     "pivot": [
+      -1.5,
+      22,
+      2.5
+     ]
+    },
+    "right_ear_cube": {
+     "pivot": [
+      0,
+      21.5,
+      4.9
+     ]
+    }
+   }
+  },
+  "armor_stand": {
+   "entity": "minecraft:armor_stand",
+   "geometry": "default",
+   "bones": {
+    "head": "head",
+    "body": "body",
+    "left_arm": "leftarm",
+    "right_arm": "rightarm",
+    "left_leg": "leftleg",
+    "right_leg": "rightleg",
+    "waist": "waist",
+    "base": "baseplate"
+   },
+   "parts_without_bone": [
+    "right",
+    "left"
+   ],
+   "java_parts": {
+    "head": {
+     "pivot": [
+      0,
+      1,
+      0
+     ]
+    },
+    "body": {
+     "pivot": [
+      0,
+      0,
+      0
+     ]
+    },
+    "left_arm": {
+     "pivot": [
+      5,
+      2,
+      0
+     ]
+    },
+    "right_arm": {
+     "pivot": [
+      -5,
+      2,
+      0
+     ]
+    },
+    "left_leg": {
+     "pivot": [
+      1.85,
+      12,
+      0
+     ]
+    },
+    "right_leg": {
+     "pivot": [
+      -1.85,
+      12,
+      0
+     ]
+    },
+    "right": {
+     "pivot": [
+      0,
+      0,
+      0
+     ]
+    },
+    "left": {
+     "pivot": [
+      0,
+      0,
+      0
+     ]
+    },
+    "waist": {
+     "pivot": [
+      0,
+      0,
+      0
+     ]
+    },
+    "base": {
+     "pivot": [
+      0,
+      12,
+      0
+     ]
+    }
+   },
+   "family": "head"
+  },
+  "arrow": {
+   "entity": "minecraft:arrow",
+   "geometry": "default",
+   "bones": {},
+   "parts_without_bone": [
+    "back",
+    "cross_1",
+    "cross_2"
+   ],
+   "java_parts": {
+    "back": {
+     "pivot": [
+      0,
+      20.5,
+      7
+     ],
+     "rotation": [
+      -135,
+      90,
+      0
+     ]
+    },
+    "cross_1": {
+     "pivot": [
+      0,
+      20.5,
+      -4
+     ],
+     "rotation": [
+      -135,
+      90,
+      0
+     ]
+    },
+    "cross_2": {
+     "pivot": [
+      0,
+      20.5,
+      -4
+     ],
+     "rotation": [
+      -45,
+      90,
+      0
+     ]
+    }
+   }
+  },
+  "axolotl": {
+   "entity": "minecraft:axolotl",
+   "geometry": "default",
+   "bones": {
+    "head": "head",
+    "top_gills": "top_gills",
+    "left_gills": "left_gills",
+    "right_gills": "right_gills",
+    "body": "body",
+    "leg1": "right_leg",
+    "leg2": "left_leg",
+    "leg3": "right_arm",
+    "leg4": "left_arm",
+    "tail": "tail"
+   },
+   "java_parts": {
+    "head": {
+     "pivot": [
+      0,
+      18,
+      -5
+     ]
+    },
+    "top_gills": {
+     "pivot": [
+      0,
+      15,
+      -6
+     ]
+    },
+    "left_gills": {
+     "pivot": [
+      -4,
+      18,
+      -6
+     ]
+    },
+    "right_gills": {
+     "pivot": [
+      4,
+      18,
+      -6
+     ]
+    },
+    "body": {
+     "pivot": [
+      0,
+      18,
+      4
+     ]
+    },
+    "leg1": {
+     "pivot": [
+      -3.5,
+      19,
+      3
+     ]
+    },
+    "leg2": {
+     "pivot": [
+      3.5,
+      19,
+      3
+     ]
+    },
+    "leg3": {
+     "pivot": [
+      -3.5,
+      19,
+      -4
+     ]
+    },
+    "leg4": {
+     "pivot": [
+      3.5,
+      19,
+      -4
+     ]
+    },
+    "tail": {
+     "pivot": [
+      0,
+      18,
+      5
+     ]
+    }
+   },
+   "family": "head",
+   "frame": {
+    "offset": [
+     0,
+     -4,
+     0
+    ]
+   }
+  },
+  "axolotl_baby": {
+   "entity": "minecraft:axolotl",
+   "geometry": "baby",
+   "bones": {
+    "head": "head",
+    "top_gills": "top_gills",
+    "left_gills": "left_gills",
+    "right_gills": "right_gills",
+    "body": "body",
+    "leg1": "right_leg",
+    "leg2": "left_leg",
+    "leg3": "right_arm",
+    "leg4": "left_arm",
+    "tail": "tail"
+   },
+   "java_parts": {
+    "head": {
+     "pivot": [
+      0,
+      23,
+      -1
+     ]
+    },
+    "top_gills": {
+     "pivot": [
+      0,
+      21,
+      -3
+     ]
+    },
+    "left_gills": {
+     "pivot": [
+      3,
+      22.5,
+      -3
+     ]
+    },
+    "right_gills": {
+     "pivot": [
+      -3,
+      22.5,
+      -3
+     ]
+    },
+    "body": {
+     "pivot": [
+      0,
+      22.75,
+      1.75
+     ]
+    },
+    "leg1": {
+     "pivot": [
+      -2,
+      23,
+      3.5
+     ],
+     "rotation": [
+      0,
+      90,
+      90
+     ]
+    },
+    "leg2": {
+     "pivot": [
+      2,
+      23,
+      3.5
+     ]
+    },
+    "leg3": {
+     "pivot": [
+      -2,
+      23,
+      0.5
+     ]
+    },
+    "leg4": {
+     "pivot": [
+      2,
+      23,
+      0.5
+     ]
+    },
+    "tail": {
+     "pivot": [
+      0,
+      22.5,
+      5
+     ]
+    }
+   },
+   "family": "head"
+  },
+  "bat": {
+   "entity": "minecraft:bat",
+   "geometry": "default",
+   "bones": {
+    "head": "Head",
+    "body": "body",
+    "left_wing": "leftWing",
+    "outer_left_wing": "leftWingTip",
+    "right_wing": "rightWing",
+    "outer_right_wing": "rightWingTip",
+    "feet": "feet"
+   },
+   "java_parts": {
+    "head": {
+     "pivot": [
+      0,
+      17,
+      0
+     ]
+    },
+    "body": {
+     "pivot": [
+      0,
+      17,
+      0
+     ]
+    },
+    "left_wing": {
+     "pivot": [
+      1.5,
+      17,
+      0
+     ]
+    },
+    "outer_left_wing": {
+     "pivot": [
+      3.5,
+      17,
+      0
+     ]
+    },
+    "right_wing": {
+     "pivot": [
+      -1.5,
+      17,
+      0
+     ]
+    },
+    "outer_right_wing": {
+     "pivot": [
+      -3.5,
+      17,
+      0
+     ]
+    },
+    "feet": {
+     "pivot": [
+      0,
+      22,
+      0
+     ]
+    }
+   },
+   "family": "head"
+  },
+  "bee": {
+   "entity": "minecraft:bee",
+   "geometry": "default",
+   "bones": {
+    "torso": "body",
+    "left_antenna": "body",
+    "right_antenna": "body",
+    "left_wing": "leftwing_bone",
+    "right_wing": "rightwing_bone",
+    "front_legs": "leg_front",
+    "middle_legs": "leg_mid",
+    "back_legs": "leg_back",
+    "stinger": "stinger"
+   },
+   "java_parts": {
+    "torso": {
+     "pivot": [
+      0,
+      19,
+      0
+     ]
+    },
+    "left_antenna": {
+     "pivot": [
+      0,
+      17,
+      -5
+     ]
+    },
+    "right_antenna": {
+     "pivot": [
+      0,
+      17,
+      -5
+     ]
+    },
+    "left_wing": {
+     "pivot": [
+      1.5,
+      15,
+      -3
+     ]
+    },
+    "right_wing": {
+     "pivot": [
+      -1.5,
+      15,
+      -3
+     ]
+    },
+    "front_legs": {
+     "pivot": [
+      1.5,
+      22,
+      -2
+     ]
+    },
+    "middle_legs": {
+     "pivot": [
+      1.5,
+      22,
+      0
+     ]
+    },
+    "back_legs": {
+     "pivot": [
+      1.5,
+      22,
+      2
+     ]
+    },
+    "stinger": {
+     "pivot": [
+      0,
+      19,
+      0
+     ]
+    }
+   }
+  },
+  "bee_baby": {
+   "entity": "minecraft:bee",
+   "geometry": "baby",
+   "bones": {
+    "body": "body",
+    "torso": "body",
+    "stinger": "stinger",
+    "right_wing": "rightwing_bone",
+    "left_wing": "leftwing_bone",
+    "front_legs": "leg_front",
+    "middle_legs": "leg_mid",
+    "back_legs": "leg_back"
+   },
+   "java_parts": {
+    "body": {
+     "pivot": [
+      0,
+      19.6667,
+      -1.8567
+     ]
+    },
+    "torso": {
+     "pivot": [
+      0,
+      21,
+      0.5
+     ]
+    },
+    "stinger": {
+     "pivot": [
+      0,
+      21.5,
+      3
+     ]
+    },
+    "right_wing": {
+     "pivot": [
+      -1,
+      19,
+      -1
+     ]
+    },
+    "left_wing": {
+     "pivot": [
+      1,
+      19,
+      -1
+     ]
+    },
+    "front_legs": {
+     "pivot": [
+      0,
+      23,
+      0
+     ]
+    },
+    "middle_legs": {
+     "pivot": [
+      0,
+      23,
+      1
+     ]
+    },
+    "back_legs": {
+     "pivot": [
+      0,
+      23,
+      2
+     ]
+    }
+   }
+  },
+  "blaze": {
+   "entity": "minecraft:blaze",
+   "geometry": "default",
+   "bones": {
+    "head": "head",
+    "stick1": "upperBodyParts0",
+    "stick2": "upperBodyParts1",
+    "stick3": "upperBodyParts2",
+    "stick4": "upperBodyParts3",
+    "stick5": "upperBodyParts4",
+    "stick6": "upperBodyParts5",
+    "stick7": "upperBodyParts6",
+    "stick8": "upperBodyParts7",
+    "stick9": "upperBodyParts8",
+    "stick10": "upperBodyParts9",
+    "stick11": "upperBodyParts10",
+    "stick12": "upperBodyParts11"
+   },
+   "java_parts": {
+    "head": {
+     "pivot": [
+      0,
+      0,
+      0
+     ]
+    },
+    "stick1": {
+     "pivot": [
+      -7,
+      -2,
+      -7
+     ]
+    },
+    "stick2": {
+     "pivot": [
+      7,
+      -2,
+      -7
+     ]
+    },
+    "stick3": {
+     "pivot": [
+      7,
+      -2,
+      7
+     ]
+    },
+    "stick4": {
+     "pivot": [
+      -7,
+      -2,
+      7
+     ]
+    },
+    "stick5": {
+     "pivot": [
+      -5,
+      2,
+      -5
+     ]
+    },
+    "stick6": {
+     "pivot": [
+      5,
+      2,
+      -5
+     ]
+    },
+    "stick7": {
+     "pivot": [
+      5,
+      2,
+      5
+     ]
+    },
+    "stick8": {
+     "pivot": [
+      -5,
+      2,
+      5
+     ]
+    },
+    "stick9": {
+     "pivot": [
+      -3,
+      10,
+      -3
+     ]
+    },
+    "stick10": {
+     "pivot": [
+      3,
+      10,
+      -3
+     ]
+    },
+    "stick11": {
+     "pivot": [
+      3,
+      10,
+      3
+     ]
+    },
+    "stick12": {
+     "pivot": [
+      -3,
+      10,
+      3
+     ]
+    }
+   },
+   "family": "head"
+  },
+  "bogged": {
+   "entity": "minecraft:bogged",
+   "geometry": "default",
+   "bones": {
+    "head": "hat",
+    "mushrooms": "mushrooms",
+    "headwear": "head",
+    "body": "body",
+    "left_arm": "leftArm",
+    "right_arm": "rightArm",
+    "left_leg": "leftLeg",
+    "right_leg": "rightLeg"
+   },
+   "java_parts": {
+    "head": {
+     "pivot": [
+      0,
+      0,
+      0
+     ]
+    },
+    "mushrooms": {
+     "pivot": [
+      0,
+      0,
+      0
+     ]
+    },
+    "headwear": {
+     "pivot": [
+      0,
+      0,
+      0
+     ]
+    },
+    "body": {
+     "pivot": [
+      0,
+      0,
+      0
+     ]
+    },
+    "left_arm": {
+     "pivot": [
+      5,
+      2,
+      0
+     ]
+    },
+    "right_arm": {
+     "pivot": [
+      -5,
+      2,
+      0
+     ]
+    },
+    "left_leg": {
+     "pivot": [
+      2,
+      12,
+      0
+     ]
+    },
+    "right_leg": {
+     "pivot": [
+      -2,
+      12,
+      0
+     ]
+    }
+   },
+   "family": "biped"
+  },
+  "bogged_outer": {
+   "entity": "minecraft:bogged",
+   "geometry": "overlay",
+   "bones": {
+    "head": "hat",
+    "headwear": "head",
+    "body": "body",
+    "left_arm": "leftArm",
+    "right_arm": "rightArm",
+    "left_leg": "leftLeg",
+    "right_leg": "rightLeg"
+   },
+   "java_parts": {
+    "head": {
+     "pivot": [
+      0,
+      0,
+      0
+     ]
+    },
+    "headwear": {
+     "pivot": [
+      0,
+      0,
+      0
+     ]
+    },
+    "body": {
+     "pivot": [
+      0,
+      0,
+      0
+     ]
+    },
+    "left_arm": {
+     "pivot": [
+      5,
+      2,
+      0
+     ]
+    },
+    "right_arm": {
+     "pivot": [
+      -5,
+      2,
+      0
+     ]
+    },
+    "left_leg": {
+     "pivot": [
+      1.9,
+      12,
+      0
+     ]
+    },
+    "right_leg": {
+     "pivot": [
+      -1.9,
+      12,
+      0
+     ]
+    }
+   },
+   "family": "head"
+  },
+  "breeze": {
+   "entity": "minecraft:breeze",
+   "geometry": "default",
+   "bones": {
+    "head": "head",
+    "rods": "rods",
+    "body": "body"
+   },
+   "java_parts": {
+    "head": {
+     "pivot": [
+      0,
+      4,
+      0
+     ]
+    },
+    "rods": {
+     "pivot": [
+      0,
+      8,
+      0
+     ]
+    },
+    "body": {
+     "pivot": [
+      0,
+      24,
+      0
+     ]
+    }
+   },
+   "family": "head"
+  },
+  "breeze_wind_charge": {
+   "entity": "minecraft:breeze_wind_charge_projectile",
+   "geometry": "default",
+   "bones": {
+    "charge": "wind_charge",
+    "wind": "wind"
+   },
+   "java_parts": {
+    "charge": {
+     "pivot": [
+      0,
+      22,
+      0
+     ],
+     "rotation": [
+      180,
+      0,
+      0
+     ]
+    },
+    "wind": {
+     "pivot": [
+      0,
+      22,
+      0
+     ]
+    }
+   }
+  },
+  "camel": {
+   "entity": "minecraft:camel",
+   "geometry": "default",
+   "bones": {
+    "head": "head",
+    "left_ear": "left_ear",
+    "right_ear": "right_ear",
+    "body": "body",
+    "hump": "hump",
+    "front_left_leg": "left_front_leg",
+    "front_right_leg": "right_front_leg",
+    "back_left_leg": "left_hind_leg",
+    "back_right_leg": "right_hind_leg",
+    "tail": "tail"
+   },
+   "java_parts": {
+    "head": {
+     "pivot": [
+      0,
+      1,
+      -9
+     ]
+    },
+    "left_ear": {
+     "pivot": [
+      3,
+      -20,
+      -18.5
+     ],
+     "rotation": [
+      0,
+      0,
+      -45
+     ]
+    },
+    "right_ear": {
+     "pivot": [
+      -3,
+      -20,
+      -18.5
+     ],
+     "rotation": [
+      0,
+      0,
+      45
+     ]
+    },
+    "body": {
+     "pivot": [
+      0,
+      4,
+      10.5
+     ]
+    },
+    "hump": {
+     "pivot": [
+      0,
+      -8,
+      0.5
+     ]
+    },
+    "front_left_leg": {
+     "pivot": [
+      4.9,
+      1,
+      -10
+     ]
+    },
+    "front_right_leg": {
+     "pivot": [
+      -4.9,
+      1,
+      -9.5
+     ]
+    },
+    "back_left_leg": {
+     "pivot": [
+      4.9,
+      1,
+      10.5
+     ]
+    },
+    "back_right_leg": {
+     "pivot": [
+      -4.9,
+      1,
+      10.5
+     ]
+    },
+    "tail": {
+     "pivot": [
+      0,
+      -5,
+      14
+     ],
+     "rotation": [
+      5,
+      0,
+      0
+     ]
+    }
+   },
+   "family": "head"
+  },
+  "camel_baby": {
+   "entity": "minecraft:camel",
+   "geometry": "baby",
+   "bones": {
+    "body": "body",
+    "tail": "tail",
+    "head": "head",
+    "right_ear": "right_ear",
+    "left_ear": "left_ear",
+    "front_right_leg": "right_front_leg",
+    "front_left_leg": "left_front_leg",
+    "back_left_leg": "left_hind_leg",
+    "back_right_leg": "right_hind_leg"
+   },
+   "java_parts": {
+    "body": {
+     "pivot": [
+      0,
+      7,
+      0
+     ]
+    },
+    "tail": {
+     "pivot": [
+      0,
+      5.5,
+      8.05
+     ],
+     "rotation": [
+      5,
+      0,
+      0
+     ]
+    },
+    "head": {
+     "pivot": [
+      0,
+      8,
+      -7.5
+     ]
+    },
+    "right_ear": {
+     "pivot": [
+      -2.5,
+      -3,
+      -11.5
+     ],
+     "rotation": [
+      0,
+      0,
+      45
+     ]
+    },
+    "left_ear": {
+     "pivot": [
+      2.5,
+      -3,
+      -11.5
+     ],
+     "rotation": [
+      0,
+      0,
+      -45
+     ]
+    },
+    "front_right_leg": {
+     "pivot": [
+      -3,
+      11.5,
+      -5.5
+     ]
+    },
+    "front_left_leg": {
+     "pivot": [
+      3,
+      11.5,
+      -5.5
+     ]
+    },
+    "back_left_leg": {
+     "pivot": [
+      3,
+      11.5,
+      5.5
+     ]
+    },
+    "back_right_leg": {
+     "pivot": [
+      -3,
+      11.5,
+      5.5
+     ]
+    }
+   },
+   "family": "head"
+  },
+  "camel_husk": {
+   "entity": "minecraft:camel_husk",
+   "geometry": "default",
+   "bones": {
+    "head": "head",
+    "left_ear": "left_ear",
+    "right_ear": "right_ear",
+    "body": "body",
+    "hump": "hump",
+    "front_left_leg": "left_front_leg",
+    "front_right_leg": "right_front_leg",
+    "back_left_leg": "left_hind_leg",
+    "back_right_leg": "right_hind_leg",
+    "tail": "tail"
+   },
+   "java_parts": {
+    "head": {
+     "pivot": [
+      0,
+      1,
+      -9
+     ]
+    },
+    "left_ear": {
+     "pivot": [
+      3,
+      -20,
+      -18.5
+     ],
+     "rotation": [
+      0,
+      0,
+      -45
+     ]
+    },
+    "right_ear": {
+     "pivot": [
+      -3,
+      -20,
+      -18.5
+     ],
+     "rotation": [
+      0,
+      0,
+      45
+     ]
+    },
+    "body": {
+     "pivot": [
+      0,
+      4,
+      10.5
+     ]
+    },
+    "hump": {
+     "pivot": [
+      0,
+      -8,
+      0.5
+     ]
+    },
+    "front_left_leg": {
+     "pivot": [
+      4.9,
+      1,
+      -10
+     ]
+    },
+    "front_right_leg": {
+     "pivot": [
+      -4.9,
+      1,
+      -9.5
+     ]
+    },
+    "back_left_leg": {
+     "pivot": [
+      4.9,
+      1,
+      10.5
+     ]
+    },
+    "back_right_leg": {
+     "pivot": [
+      -4.9,
+      1,
+      10.5
+     ]
+    },
+    "tail": {
+     "pivot": [
+      0,
+      -5,
+      14
+     ],
+     "rotation": [
+      5,
+      0,
+      0
+     ]
+    }
+   },
+   "family": "head"
+  },
+  "cat": {
+   "entity": "minecraft:cat",
+   "geometry": "default",
+   "bones": {
+    "head": "head",
+    "body": "body",
+    "front_left_leg": "frontLegL",
+    "front_right_leg": "frontLegR",
+    "back_left_leg": "backLegL",
+    "back_right_leg": "backLegR",
+    "tail": "tail1",
+    "tail2": "tail2"
+   },
+   "java_parts": {
+    "head": {
+     "pivot": [
+      0,
+      15,
+      -9
+     ]
+    },
+    "body": {
+     "pivot": [
+      0,
+      12,
+      -10
+     ],
+     "rotation": [
+      90,
+      0,
+      0
+     ]
+    },
+    "front_left_leg": {
+     "pivot": [
+      1.1,
+      14.1,
+      -5
+     ]
+    },
+    "front_right_leg": {
+     "pivot": [
+      -1.1,
+      14.1,
+      -5
+     ]
+    },
+    "back_left_leg": {
+     "pivot": [
+      1.1,
+      18,
+      5
+     ]
+    },
+    "back_right_leg": {
+     "pivot": [
+      -1.1,
+      18,
+      5
+     ]
+    },
+    "tail": {
+     "pivot": [
+      0,
+      15.5,
+      8
+     ],
+     "rotation": [
+      90,
+      0,
+      0
+     ]
+    },
+    "tail2": {
+     "pivot": [
+      0,
+      15.5,
+      16
+     ],
+     "rotation": [
+      90,
+      0,
+      0
+     ]
+    }
+   },
+   "family": "feline"
+  },
+  "cat_baby": {
+   "entity": "minecraft:cat",
+   "geometry": "baby",
+   "bones": {
+    "head": "head",
+    "front_left_leg": "frontLegL",
+    "front_right_leg": "frontLegR",
+    "back_left_leg": "backLegL",
+    "body": "belly",
+    "back_right_leg": "backLegR",
+    "tail": "tail1"
+   },
+   "java_parts": {
+    "head": {
+     "pivot": [
+      0,
+      20,
+      -3.125
+     ]
+    },
+    "front_left_leg": {
+     "pivot": [
+      1,
+      22,
+      -1.5
+     ]
+    },
+    "front_right_leg": {
+     "pivot": [
+      -1,
+      22,
+      -1.5
+     ]
+    },
+    "back_left_leg": {
+     "pivot": [
+      1,
+      22,
+      2.5
+     ]
+    },
+    "body": {
+     "pivot": [
+      0,
+      20.5,
+      0.5
+     ]
+    },
+    "back_right_leg": {
+     "pivot": [
+      -1,
+      22,
+      2.5
+     ]
+    },
+    "tail": {
+     "pivot": [
+      0,
+      19.107,
+      3.9151
+     ],
+     "rotation": [
+      -32.5,
+      0,
+      0
+     ]
+    }
+   },
+   "family": "feline"
+  },
+  "cave_spider": {
+   "entity": "minecraft:cave_spider",
+   "geometry": "default",
+   "bones": {
+    "head": "head",
+    "neck": "body0",
+    "body": "body1",
+    "leg1": "leg0",
+    "leg2": "leg1",
+    "leg3": "leg2",
+    "leg4": "leg3",
+    "leg5": "leg4",
+    "leg6": "leg5",
+    "leg7": "leg6",
+    "leg8": "leg7"
+   },
+   "java_parts": {
+    "head": {
+     "pivot": [
+      0,
+      15,
+      -3
+     ]
+    },
+    "neck": {
+     "pivot": [
+      0,
+      15,
+      0
+     ]
+    },
+    "body": {
+     "pivot": [
+      0,
+      15,
+      9
+     ]
+    },
+    "leg1": {
+     "pivot": [
+      -4,
+      15,
+      4
+     ]
+    },
+    "leg2": {
+     "pivot": [
+      4,
+      15,
+      4
+     ]
+    },
+    "leg3": {
+     "pivot": [
+      -4,
+      15,
+      1
+     ]
+    },
+    "leg4": {
+     "pivot": [
+      4,
+      15,
+      1
+     ]
+    },
+    "leg5": {
+     "pivot": [
+      -4,
+      15,
+      -2
+     ]
+    },
+    "leg6": {
+     "pivot": [
+      4,
+      15,
+      -2
+     ]
+    },
+    "leg7": {
+     "pivot": [
+      -4,
+      15,
+      -5
+     ]
+    },
+    "leg8": {
+     "pivot": [
+      4,
+      15,
+      -5
+     ]
+    }
+   },
+   "family": "head"
+  },
+  "chest_minecart": {
+   "entity": "minecraft:chest_minecart",
+   "geometry": "default",
+   "bones": {
+    "front": "right",
+    "left": "left",
+    "right": "front",
+    "back": "back",
+    "bottom": "bottom"
+   },
+   "java_parts": {
+    "front": {
+     "pivot": [
+      0,
+      22,
+      -8
+     ],
+     "rotation": [
+      0,
+      180,
+      0
+     ]
+    },
+    "left": {
+     "pivot": [
+      -7,
+      22,
+      1
+     ],
+     "rotation": [
+      0,
+      -90,
+      0
+     ]
+    },
+    "right": {
+     "pivot": [
+      7,
+      22,
+      1
+     ],
+     "rotation": [
+      0,
+      90,
+      0
+     ]
+    },
+    "back": {
+     "pivot": [
+      0,
+      22,
+      10
+     ]
+    },
+    "bottom": {
+     "pivot": [
+      0,
+      22,
+      1
+     ],
+     "rotation": [
+      0,
+      -90,
+      90
+     ]
+    }
+   }
+  },
+  "chicken": {
+   "entity": "minecraft:chicken",
+   "geometry": "default",
+   "bones": {
+    "head": "head",
+    "bill": "beak",
+    "chin": "comb",
+    "body": "body",
+    "left_wing": "wing1",
+    "right_wing": "wing0",
+    "left_leg": "leg1",
+    "right_leg": "leg0"
+   },
+   "java_parts": {
+    "head": {
+     "pivot": [
+      0,
+      15,
+      -4
+     ]
+    },
+    "bill": {
+     "pivot": [
+      0,
+      15,
+      -4
+     ]
+    },
+    "chin": {
+     "pivot": [
+      0,
+      15,
+      -4
+     ]
+    },
+    "body": {
+     "pivot": [
+      0,
+      16,
+      0
+     ],
+     "rotation": [
+      90,
+      0,
+      0
+     ]
+    },
+    "left_wing": {
+     "pivot": [
+      4,
+      13,
+      0
+     ]
+    },
+    "right_wing": {
+     "pivot": [
+      -4,
+      13,
+      0
+     ]
+    },
+    "left_leg": {
+     "pivot": [
+      1,
+      19,
+      1
+     ]
+    },
+    "right_leg": {
+     "pivot": [
+      -2,
+      19,
+      1
+     ]
+    }
+   },
+   "family": "chicken"
+  },
+  "chicken_baby": {
+   "entity": "minecraft:chicken",
+   "geometry": "baby",
+   "bones": {
+    "body": "body",
+    "left_leg": "leg1",
+    "right_leg": "leg0",
+    "right_wing": "wing1",
+    "left_wing": "wing0"
+   },
+   "java_parts": {
+    "body": {
+     "pivot": [
+      0,
+      20.25,
+      -1.25
+     ]
+    },
+    "left_leg": {
+     "pivot": [
+      1,
+      22,
+      0.5
+     ]
+    },
+    "right_leg": {
+     "pivot": [
+      -1,
+      22,
+      0.5
+     ]
+    },
+    "right_wing": {
+     "pivot": [
+      2,
+      20,
+      0
+     ]
+    },
+    "left_wing": {
+     "pivot": [
+      -2,
+      20,
+      0
+     ]
+    }
+   }
+  },
+  "cod": {
+   "entity": "minecraft:cod",
+   "geometry": "default",
+   "bones": {
+    "body": "body",
+    "head": "head",
+    "nose": "head",
+    "fin_left": "leftFin",
+    "fin_right": "rightFin",
+    "fin_back": "body",
+    "tail": "tailfin"
+   },
+   "java_parts": {
+    "body": {
+     "pivot": [
+      0,
+      22,
+      0
+     ]
+    },
+    "head": {
+     "pivot": [
+      0,
+      22,
+      0
+     ]
+    },
+    "nose": {
+     "pivot": [
+      0,
+      22,
+      -3
+     ]
+    },
+    "fin_left": {
+     "pivot": [
+      0,
+      24,
+      0
+     ]
+    },
+    "fin_right": {
+     "pivot": [
+      0,
+      24,
+      0
+     ]
+    },
+    "fin_back": {
+     "pivot": [
+      0,
+      20,
+      0
+     ]
+    },
+    "tail": {
+     "pivot": [
+      0,
+      22,
+      7
+     ]
+    }
+   },
+   "family": "head"
+  },
+  "cold_chicken": {
+   "entity": "minecraft:chicken",
+   "geometry": "cold",
+   "bones": {
+    "head": "head",
+    "bill": "beak",
+    "chin": "comb",
+    "body": "body",
+    "left_wing": "wing1",
+    "right_wing": "wing0",
+    "left_leg": "leg1",
+    "right_leg": "leg0"
+   },
+   "java_parts": {
+    "head": {
+     "pivot": [
+      0,
+      15,
+      -4
+     ]
+    },
+    "bill": {
+     "pivot": [
+      0,
+      15,
+      -4
+     ]
+    },
+    "chin": {
+     "pivot": [
+      0,
+      15,
+      -4
+     ]
+    },
+    "body": {
+     "pivot": [
+      0,
+      16,
+      0
+     ],
+     "rotation": [
+      90,
+      0,
+      0
+     ]
+    },
+    "left_wing": {
+     "pivot": [
+      4,
+      13,
+      0
+     ]
+    },
+    "right_wing": {
+     "pivot": [
+      -4,
+      13,
+      0
+     ]
+    },
+    "left_leg": {
+     "pivot": [
+      1,
+      19,
+      1
+     ]
+    },
+    "right_leg": {
+     "pivot": [
+      -2,
+      19,
+      1
+     ]
+    }
+   },
+   "family": "chicken"
+  },
+  "cold_chicken_baby": {
+   "entity": "minecraft:chicken",
+   "geometry": "baby_cold",
+   "bones": {
+    "body": "body",
+    "left_leg": "leg1",
+    "right_leg": "leg0",
+    "right_wing": "wing1",
+    "left_wing": "wing0"
+   },
+   "java_parts": {
+    "body": {
+     "pivot": [
+      0,
+      20.25,
+      -1.25
+     ]
+    },
+    "left_leg": {
+     "pivot": [
+      1,
+      22,
+      0.5
+     ]
+    },
+    "right_leg": {
+     "pivot": [
+      -1,
+      22,
+      0.5
+     ]
+    },
+    "right_wing": {
+     "pivot": [
+      2,
+      20,
+      0
+     ]
+    },
+    "left_wing": {
+     "pivot": [
+      -2,
+      20,
+      0
+     ]
+    }
+   }
+  },
+  "cold_cow": {
+   "entity": "minecraft:cow",
+   "geometry": "cold",
+   "bones": {
+    "head": "head",
+    "body": "body",
+    "leg1": "leg0",
+    "leg2": "leg1",
+    "leg3": "leg2",
+    "leg4": "leg3"
+   },
+   "java_parts": {
+    "head": {
+     "pivot": [
+      0,
+      4,
+      -8
+     ]
+    },
+    "body": {
+     "pivot": [
+      0,
+      5,
+      2
+     ],
+     "rotation": [
+      90,
+      0,
+      0
+     ]
+    },
+    "leg1": {
+     "pivot": [
+      -4,
+      12,
+      7
+     ]
+    },
+    "leg2": {
+     "pivot": [
+      4,
+      12,
+      7
+     ]
+    },
+    "leg3": {
+     "pivot": [
+      -4,
+      12,
+      -6
+     ]
+    },
+    "leg4": {
+     "pivot": [
+      4,
+      12,
+      -6
+     ]
+    }
+   },
+   "family": "quadruped"
+  },
+  "cold_cow_baby": {
+   "entity": "minecraft:cow",
+   "geometry": "baby_cold",
+   "bones": {
+    "head": "head",
+    "body": "body",
+    "right_front_leg": "leg2",
+    "left_front_leg": "leg3",
+    "right_hind_leg": "leg0",
+    "left_hind_leg": "leg1"
+   },
+   "java_parts": {
+    "head": {
+     "pivot": [
+      0,
+      13.569,
+      -5.1667
+     ]
+    },
+    "body": {
+     "pivot": [
+      3,
+      19,
+      -5
+     ]
+    },
+    "right_front_leg": {
+     "pivot": [
+      -2.5,
+      18,
+      -3.5
+     ]
+    },
+    "left_front_leg": {
+     "pivot": [
+      2.5,
+      18,
+      -3.5
+     ]
+    },
+    "right_hind_leg": {
+     "pivot": [
+      -2.5,
+      18,
+      3.5
+     ]
+    },
+    "left_hind_leg": {
+     "pivot": [
+      2.5,
+      18,
+      3.5
+     ]
+    }
+   },
+   "family": "quadruped"
+  },
+  "cold_pig": {
+   "entity": "minecraft:pig",
+   "geometry": "cold",
+   "bones": {
+    "body": "body",
+    "head": "head",
+    "leg1": "leg0",
+    "leg2": "leg1",
+    "leg3": "leg2",
+    "leg4": "leg3"
+   },
+   "java_parts": {
+    "body": {
+     "pivot": [
+      0,
+      11,
+      2
+     ],
+     "rotation": [
+      90,
+      0,
+      0
+     ]
+    },
+    "head": {
+     "pivot": [
+      0,
+      12,
+      -6
+     ]
+    },
+    "leg1": {
+     "pivot": [
+      -3,
+      18,
+      7
+     ]
+    },
+    "leg2": {
+     "pivot": [
+      3,
+      18,
+      7
+     ]
+    },
+    "leg3": {
+     "pivot": [
+      -3,
+      18,
+      -5
+     ]
+    },
+    "leg4": {
+     "pivot": [
+      3,
+      18,
+      -5
+     ]
+    }
+   },
+   "family": "quadruped"
+  },
+  "cold_pig_baby": {
+   "entity": "minecraft:pig",
+   "geometry": "baby_cold",
+   "bones": {
+    "head": "head",
+    "body": "body",
+    "left_hind_leg": "leg1",
+    "right_hind_leg": "leg0",
+    "left_front_leg": "leg3",
+    "right_front_leg": "leg2"
+   },
+   "java_parts": {
+    "head": {
+     "pivot": [
+      0,
+      19,
+      -2
+     ]
+    },
+    "body": {
+     "pivot": [
+      0,
+      19,
+      0.5
+     ]
+    },
+    "left_hind_leg": {
+     "pivot": [
+      2.5,
+      22,
+      4
+     ]
+    },
+    "right_hind_leg": {
+     "pivot": [
+      -2.5,
+      22,
+      4
+     ]
+    },
+    "left_front_leg": {
+     "pivot": [
+      2.5,
+      22,
+      -3
+     ]
+    },
+    "right_front_leg": {
+     "pivot": [
+      -2.5,
+      22,
+      -3
+     ]
+    }
+   },
+   "family": "quadruped"
+  },
+  "command_block_minecart": {
+   "entity": "minecraft:command_block_minecart",
+   "geometry": "default",
+   "bones": {
+    "front": "right",
+    "left": "left",
+    "right": "front",
+    "back": "back",
+    "bottom": "bottom"
+   },
+   "java_parts": {
+    "front": {
+     "pivot": [
+      0,
+      22,
+      -8
+     ],
+     "rotation": [
+      0,
+      180,
+      0
+     ]
+    },
+    "left": {
+     "pivot": [
+      -7,
+      22,
+      1
+     ],
+     "rotation": [
+      0,
+      -90,
+      0
+     ]
+    },
+    "right": {
+     "pivot": [
+      7,
+      22,
+      1
+     ],
+     "rotation": [
+      0,
+      90,
+      0
+     ]
+    },
+    "back": {
+     "pivot": [
+      0,
+      22,
+      10
+     ]
+    },
+    "bottom": {
+     "pivot": [
+      0,
+      22,
+      1
+     ],
+     "rotation": [
+      0,
+      -90,
+      90
+     ]
+    }
+   }
+  },
+  "copper_golem": {
+   "entity": "minecraft:copper_golem",
+   "geometry": "default",
+   "bones": {
+    "head": "head",
+    "body": "body",
+    "left_arm": "left_arm",
+    "right_arm": "right_arm",
+    "left_leg": "left_leg",
+    "right_leg": "right_leg"
+   },
+   "java_parts": {
+    "head": {
+     "pivot": [
+      0,
+      13,
+      0
+     ]
+    },
+    "body": {
+     "pivot": [
+      0,
+      19,
+      0
+     ]
+    },
+    "left_arm": {
+     "pivot": [
+      4,
+      13,
+      0
+     ]
+    },
+    "right_arm": {
+     "pivot": [
+      -4,
+      13,
+      0
+     ]
+    },
+    "left_leg": {
+     "pivot": [
+      0,
+      19,
+      0
+     ]
+    },
+    "right_leg": {
+     "pivot": [
+      0,
+      19,
+      0
+     ]
+    }
+   },
+   "family": "head"
+  },
+  "cow": {
+   "entity": "minecraft:cow",
+   "geometry": "default",
+   "bones": {
+    "head": "head",
+    "body": "body",
+    "leg1": "leg0",
+    "leg2": "leg1",
+    "leg3": "leg2",
+    "leg4": "leg3"
+   },
+   "java_parts": {
+    "head": {
+     "pivot": [
+      0,
+      4,
+      -8
+     ]
+    },
+    "body": {
+     "pivot": [
+      0,
+      5,
+      2
+     ],
+     "rotation": [
+      90,
+      0,
+      0
+     ]
+    },
+    "leg1": {
+     "pivot": [
+      -4,
+      12,
+      7
+     ]
+    },
+    "leg2": {
+     "pivot": [
+      4,
+      12,
+      7
+     ]
+    },
+    "leg3": {
+     "pivot": [
+      -4,
+      12,
+      -6
+     ]
+    },
+    "leg4": {
+     "pivot": [
+      4,
+      12,
+      -6
+     ]
+    }
+   },
+   "family": "quadruped"
+  },
+  "cow_baby": {
+   "entity": "minecraft:cow",
+   "geometry": "baby",
+   "bones": {
+    "head": "head",
+    "body": "body",
+    "right_front_leg": "leg2",
+    "left_front_leg": "leg3",
+    "right_hind_leg": "leg0",
+    "left_hind_leg": "leg1"
+   },
+   "java_parts": {
+    "head": {
+     "pivot": [
+      0,
+      13.569,
+      -5.1667
+     ]
+    },
+    "body": {
+     "pivot": [
+      3,
+      19,
+      -5
+     ]
+    },
+    "right_front_leg": {
+     "pivot": [
+      -2.5,
+      18,
+      -3.5
+     ]
+    },
+    "left_front_leg": {
+     "pivot": [
+      2.5,
+      18,
+      -3.5
+     ]
+    },
+    "right_hind_leg": {
+     "pivot": [
+      -2.5,
+      18,
+      3.5
+     ]
+    },
+    "left_hind_leg": {
+     "pivot": [
+      2.5,
+      18,
+      3.5
+     ]
+    }
+   },
+   "family": "quadruped"
+  },
+  "creaking": {
+   "entity": "minecraft:creaking",
+   "geometry": "default",
+   "bones": {
+    "head": "head",
+    "body": "body",
+    "left_arm": "leftArm",
+    "right_arm": "rightArm",
+    "left_leg": "leftLeg",
+    "right_leg": "rightLeg"
+   },
+   "java_parts": {
+    "head": {
+     "pivot": [
+      -4,
+      -6,
+      0
+     ]
+    },
+    "body": {
+     "pivot": [
+      -1,
+      -2,
+      1
+     ]
+    },
+    "left_arm": {
+     "pivot": [
+      5,
+      -4,
+      0.5
+     ]
+    },
+    "right_arm": {
+     "pivot": [
+      -8,
+      -4.5,
+      1.5
+     ]
+    },
+    "left_leg": {
+     "pivot": [
+      1.5,
+      8,
+      0.5
+     ]
+    },
+    "right_leg": {
+     "pivot": [
+      -1,
+      6.5,
+      0.5
+     ]
+    }
+   },
+   "family": "head"
+  },
+  "creeper": {
+   "entity": "minecraft:creeper",
+   "geometry": "default",
+   "bones": {
+    "head": "head",
+    "body": "body",
+    "leg1": "leg0",
+    "leg2": "leg1",
+    "leg3": "leg2",
+    "leg4": "leg3"
+   },
+   "java_parts": {
+    "head": {
+     "pivot": [
+      0,
+      6,
+      0
+     ]
+    },
+    "body": {
+     "pivot": [
+      0,
+      6,
+      0
+     ]
+    },
+    "leg1": {
+     "pivot": [
+      -2,
+      18,
+      4
+     ]
+    },
+    "leg2": {
+     "pivot": [
+      2,
+      18,
+      4
+     ]
+    },
+    "leg3": {
+     "pivot": [
+      -2,
+      18,
+      -4
+     ]
+    },
+    "leg4": {
+     "pivot": [
+      2,
+      18,
+      -4
+     ]
+    }
+   },
+   "family": "head"
+  },
+  "creeper_charge": {
+   "entity": "minecraft:creeper",
+   "geometry": "charged",
+   "bones": {
+    "head": "head",
+    "body": "body",
+    "leg1": "leg0",
+    "leg2": "leg1",
+    "leg3": "leg2",
+    "leg4": "leg3"
+   },
+   "java_parts": {
+    "head": {
+     "pivot": [
+      0,
+      6,
+      0
+     ]
+    },
+    "body": {
+     "pivot": [
+      0,
+      6,
+      0
+     ]
+    },
+    "leg1": {
+     "pivot": [
+      -2,
+      18,
+      4
+     ]
+    },
+    "leg2": {
+     "pivot": [
+      2,
+      18,
+      4
+     ]
+    },
+    "leg3": {
+     "pivot": [
+      -2,
+      18,
+      -4
+     ]
+    },
+    "leg4": {
+     "pivot": [
+      2,
+      18,
+      -4
+     ]
+    }
+   },
+   "family": "head"
+  },
+  "dolphin": {
+   "entity": "minecraft:dolphin",
+   "geometry": "default",
+   "bones": {
+    "head": "head",
+    "body": "body",
+    "tail": "tail",
+    "right_fin": "right_fin",
+    "left_fin": "left_fin",
+    "back_fin": "back_fin",
+    "tail_fin": "tail_fin"
+   },
+   "java_parts": {
+    "head": {
+     "pivot": [
+      0,
+      20,
+      -6
+     ]
+    },
+    "body": {
+     "pivot": [
+      0,
+      24,
+      -3
+     ]
+    },
+    "tail": {
+     "pivot": [
+      0,
+      21.5,
+      11
+     ]
+    },
+    "right_fin": {
+     "pivot": [
+      -4.5,
+      24,
+      -2
+     ]
+    },
+    "left_fin": {
+     "pivot": [
+      4.5,
+      24,
+      -2
+     ]
+    },
+    "back_fin": {
+     "pivot": [
+      0,
+      13,
+      -5
+     ]
+    },
+    "tail_fin": {
+     "pivot": [
+      0,
+      21.5,
+      20
+     ]
+    }
+   },
+   "family": "head"
+  },
+  "dolphin_baby": {
+   "entity": "minecraft:dolphin",
+   "geometry": "baby",
+   "bones": {
+    "head": "head",
+    "body": "body",
+    "left_fin": "left_fin",
+    "right_fin": "right_fin",
+    "back_fin": "back_fin",
+    "tail": "tail",
+    "tail_fin": "tail_fin"
+   },
+   "java_parts": {
+    "head": {
+     "pivot": [
+      0,
+      22.5,
+      -4
+     ]
+    },
+    "body": {
+     "pivot": [
+      0,
+      21.5,
+      0
+     ]
+    },
+    "left_fin": {
+     "pivot": [
+      1.8,
+      22.35,
+      -2.6
+     ],
+     "rotation": [
+      50,
+      0,
+      97.5
+     ]
+    },
+    "right_fin": {
+     "pivot": [
+      -1.8,
+      22.35,
+      -2.6
+     ],
+     "rotation": [
+      50,
+      0,
+      -97.5
+     ]
+    },
+    "back_fin": {
+     "pivot": [
+      0,
+      20.5,
+      -2.7
+     ],
+     "rotation": [
+      50,
+      0,
+      0
+     ]
+    },
+    "tail": {
+     "pivot": [
+      0,
+      22.5,
+      4
+     ]
+    },
+    "tail_fin": {
+     "pivot": [
+      0,
+      22.5,
+      10
+     ]
+    }
+   },
+   "family": "head"
+  },
+  "donkey": {
+   "entity": "minecraft:donkey",
+   "geometry": "default",
+   "bones": {
+    "head": "Head",
+    "mouth": "Muzzle",
+    "left_ear": "EarL",
+    "right_ear": "EarR",
+    "neck": "Neck",
+    "mane": "Mane",
+    "body": "Body",
+    "tail": "Tail",
+    "front_left_leg": "LegFL",
+    "front_right_leg": "LegFR",
+    "back_left_leg": "LegBL",
+    "back_right_leg": "LegBR",
+    "left_chest": "BagL",
+    "right_chest": "BagR"
+   },
+   "java_parts": {
+    "head": {
+     "pivot": [
+      0,
+      2,
+      -9
+     ]
+    },
+    "mouth": {
+     "pivot": [
+      0,
+      2,
+      -9
+     ]
+    },
+    "left_ear": {
+     "pivot": [
+      1.5,
+      -7.9,
+      -5
+     ]
+    },
+    "right_ear": {
+     "pivot": [
+      -1.5,
+      -7.9,
+      -5
+     ]
+    },
+    "neck": {
+     "pivot": [
+      0,
+      2,
+      -9
+     ]
+    },
+    "mane": {
+     "pivot": [
+      0,
+      2,
+      -9.01
+     ]
+    },
+    "body": {
+     "pivot": [
+      0,
+      11,
+      6
+     ]
+    },
+    "tail": {
+     "pivot": [
+      0,
+      3,
+      11
+     ]
+    },
+    "front_left_leg": {
+     "pivot": [
+      4,
+      14,
+      -9
+     ]
+    },
+    "front_right_leg": {
+     "pivot": [
+      -4,
+      14,
+      -9
+     ]
+    },
+    "back_left_leg": {
+     "pivot": [
+      4,
+      14,
+      8
+     ]
+    },
+    "back_right_leg": {
+     "pivot": [
+      -4,
+      14,
+      8
+     ]
+    },
+    "left_chest": {
+     "pivot": [
+      6,
+      3,
+      6
+     ],
+     "rotation": [
+      0,
+      -90,
+      0
+     ]
+    },
+    "right_chest": {
+     "pivot": [
+      -6,
+      3,
+      6
+     ],
+     "rotation": [
+      0,
+      90,
+      0
+     ]
+    }
+   },
+   "family": "head"
+  },
+  "donkey_baby": {
+   "entity": "minecraft:donkey",
+   "geometry": "baby",
+   "bones": {
+    "head": "Head",
+    "neck": "Neck",
+    "left_ear": "left_ear",
+    "right_ear": "right_ear",
+    "body": "Body",
+    "front_left_leg": "LegFL",
+    "front_right_leg": "LegFR",
+    "back_left_leg": "LegBL",
+    "back_right_leg": "LegBR",
+    "tail": "Tail"
+   },
+   "java_parts": {
+    "head": {
+     "pivot": [
+      1,
+      6,
+      -8
+     ]
+    },
+    "neck": {
+     "pivot": [
+      1,
+      11,
+      -5
+     ]
+    },
+    "left_ear": {
+     "pivot": [
+      3,
+      2.5,
+      -9
+     ],
+     "rotation": [
+      27.5,
+      0,
+      27.5
+     ]
+    },
+    "right_ear": {
+     "pivot": [
+      -1,
+      2.5,
+      -9
+     ],
+     "rotation": [
+      27.5,
+      0,
+      -27.5
+     ]
+    },
+    "body": {
+     "pivot": [
+      1,
+      14,
+      0
+     ]
+    },
+    "front_left_leg": {
+     "pivot": [
+      3.4,
+      17.5,
+      -5.3
+     ]
+    },
+    "front_right_leg": {
+     "pivot": [
+      -1.4,
+      17.5,
+      -5.4
+     ]
+    },
+    "back_left_leg": {
+     "pivot": [
+      3.25,
+      17.5,
+      5.25
+     ]
+    },
+    "back_right_leg": {
+     "pivot": [
+      -1.4,
+      17.5,
+      5.4
+     ]
+    },
+    "tail": {
+     "pivot": [
+      1,
+      12.5,
+      6.5
+     ]
+    }
+   },
+   "family": "head"
+  },
+  "dragon": {
+   "entity": "minecraft:ender_dragon",
+   "geometry": "default",
+   "bones": {
+    "head": "head",
+    "jaw": "jaw",
+    "body": "body"
+   },
+   "parts_without_bone": [
+    "neck1",
+    "neck2",
+    "neck3",
+    "neck4",
+    "neck5",
+    "left_wing",
+    "left_wing_tip",
+    "right_wing",
+    "right_wing_tip",
+    "front_left_leg",
+    "front_left_shin",
+    "front_left_foot",
+    "front_right_leg",
+    "front_right_shin",
+    "front_right_foot",
+    "back_left_leg",
+    "back_left_shin",
+    "back_left_foot",
+    "back_right_leg",
+    "back_right_shin",
+    "back_right_foot",
+    "tail1",
+    "tail2",
+    "tail3",
+    "tail4",
+    "tail5",
+    "tail6",
+    "tail7",
+    "tail8",
+    "tail9",
+    "tail10",
+    "tail11",
+    "tail12"
+   ],
+   "java_parts": {
+    "head": {
+     "pivot": [
+      0,
+      -38,
+      -86
+     ]
+    },
+    "jaw": {
+     "pivot": [
+      0,
+      -34,
+      -94
+     ]
+    },
+    "neck1": {
+     "pivot": [
+      0,
+      -37,
+      -36
+     ]
+    },
+    "neck2": {
+     "pivot": [
+      0,
+      -37,
+      -46
+     ]
+    },
+    "neck3": {
+     "pivot": [
+      0,
+      -37,
+      -56
+     ]
+    },
+    "neck4": {
+     "pivot": [
+      0,
+      -37,
+      -66
+     ]
+    },
+    "neck5": {
+     "pivot": [
+      0,
+      -37,
+      -76
+     ]
+    },
+    "body": {
+     "pivot": [
+      0,
+      -54,
+      -16
+     ]
+    },
+    "left_wing": {
+     "pivot": [
+      12,
+      -53,
+      -22
+     ]
+    },
+    "left_wing_tip": {
+     "pivot": [
+      68,
+      -53,
+      -22
+     ]
+    },
+    "right_wing": {
+     "pivot": [
+      -12,
+      -53,
+      -22
+     ]
+    },
+    "right_wing_tip": {
+     "pivot": [
+      -68,
+      -53,
+      -22
+     ]
+    },
+    "front_left_leg": {
+     "pivot": [
+      12,
+      -38,
+      -22
+     ]
+    },
+    "front_left_shin": {
+     "pivot": [
+      12,
+      -17,
+      -22
+     ]
+    },
+    "front_left_foot": {
+     "pivot": [
+      11,
+      6,
+      -22
+     ]
+    },
+    "front_right_leg": {
+     "pivot": [
+      -12,
+      -38,
+      -22
+     ]
+    },
+    "front_right_shin": {
+     "pivot": [
+      -12,
+      -17,
+      -22
+     ]
+    },
+    "front_right_foot": {
+     "pivot": [
+      -12,
+      6,
+      -22
+     ]
+    },
+    "back_left_leg": {
+     "pivot": [
+      16,
+      -42,
+      18
+     ]
+    },
+    "back_left_shin": {
+     "pivot": [
+      16,
+      -12,
+      12
+     ]
+    },
+    "back_left_foot": {
+     "pivot": [
+      16,
+      18,
+      20
+     ]
+    },
+    "back_right_leg": {
+     "pivot": [
+      -16,
+      -42,
+      18
+     ]
+    },
+    "back_right_shin": {
+     "pivot": [
+      -16,
+      -12,
+      12
+     ]
+    },
+    "back_right_foot": {
+     "pivot": [
+      -16,
+      18,
+      20
+     ]
+    },
+    "tail1": {
+     "pivot": [
+      0,
+      -47,
+      36
+     ],
+     "rotation": [
+      0,
+      180,
+      0
+     ]
+    },
+    "tail2": {
+     "pivot": [
+      0,
+      -47,
+      46
+     ],
+     "rotation": [
+      0,
+      180,
+      0
+     ]
+    },
+    "tail3": {
+     "pivot": [
+      0,
+      -47,
+      56
+     ],
+     "rotation": [
+      0,
+      180,
+      0
+     ]
+    },
+    "tail4": {
+     "pivot": [
+      0,
+      -47,
+      66
+     ],
+     "rotation": [
+      0,
+      180,
+      0
+     ]
+    },
+    "tail5": {
+     "pivot": [
+      0,
+      -47,
+      76
+     ],
+     "rotation": [
+      0,
+      180,
+      0
+     ]
+    },
+    "tail6": {
+     "pivot": [
+      0,
+      -47,
+      86
+     ],
+     "rotation": [
+      0,
+      180,
+      0
+     ]
+    },
+    "tail7": {
+     "pivot": [
+      0,
+      -47,
+      96
+     ],
+     "rotation": [
+      0,
+      180,
+      0
+     ]
+    },
+    "tail8": {
+     "pivot": [
+      0,
+      -47,
+      106
+     ],
+     "rotation": [
+      0,
+      180,
+      0
+     ]
+    },
+    "tail9": {
+     "pivot": [
+      0,
+      -47,
+      116
+     ],
+     "rotation": [
+      0,
+      180,
+      0
+     ]
+    },
+    "tail10": {
+     "pivot": [
+      0,
+      -47,
+      126
+     ],
+     "rotation": [
+      0,
+      180,
+      0
+     ]
+    },
+    "tail11": {
+     "pivot": [
+      0,
+      -47,
+      136
+     ],
+     "rotation": [
+      0,
+      180,
+      0
+     ]
+    },
+    "tail12": {
+     "pivot": [
+      0,
+      -47,
+      146
+     ],
+     "rotation": [
+      0,
+      180,
+      0
+     ]
+    }
+   },
+   "family": "head"
+  },
+  "drowned": {
+   "entity": "minecraft:drowned",
+   "geometry": "default",
+   "bones": {
+    "head": "hat",
+    "headwear": "head",
+    "body": "jacket",
+    "left_arm": "leftSleeve",
+    "right_arm": "rightSleeve",
+    "left_leg": "leftLeg",
+    "right_leg": "rightLeg"
+   },
+   "java_parts": {
+    "head": {
+     "pivot": [
+      0,
+      0,
+      0
+     ]
+    },
+    "headwear": {
+     "pivot": [
+      0,
+      0,
+      0
+     ]
+    },
+    "body": {
+     "pivot": [
+      0,
+      0,
+      0
+     ]
+    },
+    "left_arm": {
+     "pivot": [
+      5,
+      2,
+      0
+     ]
+    },
+    "right_arm": {
+     "pivot": [
+      -5,
+      2,
+      0
+     ]
+    },
+    "left_leg": {
+     "pivot": [
+      1.9,
+      12,
+      0.1
+     ]
+    },
+    "right_leg": {
+     "pivot": [
+      -1.9,
+      12,
+      0.1
+     ]
+    }
+   },
+   "family": "zombie"
+  },
+  "drowned_baby": {
+   "entity": "minecraft:drowned",
+   "geometry": "baby",
+   "bones": {
+    "head": "Head",
+    "hat": "Head",
+    "body": "Body",
+    "left_arm": "leftArm",
+    "right_arm": "rightArm",
+    "left_leg": "leftLeg",
+    "right_leg": "rightLeg"
+   },
+   "java_parts": {
+    "head": {
+     "pivot": [
+      0,
+      15.25,
+      0
+     ]
+    },
+    "hat": {
+     "pivot": [
+      0,
+      15.25,
+      0
+     ]
+    },
+    "body": {
+     "pivot": [
+      0,
+      17.5,
+      0
+     ]
+    },
+    "left_arm": {
+     "pivot": [
+      3,
+      15.5,
+      0
+     ]
+    },
+    "right_arm": {
+     "pivot": [
+      -3,
+      15.5,
+      0
+     ]
+    },
+    "left_leg": {
+     "pivot": [
+      1,
+      20,
+      0
+     ]
+    },
+    "right_leg": {
+     "pivot": [
+      -1,
+      20,
+      0
+     ]
+    }
+   },
+   "family": "zombie"
+  },
+  "elder_guardian": {
+   "entity": "minecraft:elder_guardian",
+   "geometry": "default",
+   "bones": {
+    "body": "head",
+    "eye": "eye",
+    "tail1": "tailpart0",
+    "tail2": "tailpart1",
+    "tail3": "tailpart2",
+    "spine1": "spikepart0",
+    "spine2": "spikepart1",
+    "spine3": "spikepart2",
+    "spine4": "spikepart3",
+    "spine5": "spikepart4",
+    "spine6": "spikepart5",
+    "spine7": "spikepart6",
+    "spine8": "spikepart7",
+    "spine9": "spikepart8",
+    "spine10": "spikepart9",
+    "spine11": "spikepart10",
+    "spine12": "spikepart11"
+   },
+   "java_parts": {
+    "body": {
+     "pivot": [
+      0,
+      0,
+      0
+     ]
+    },
+    "eye": {
+     "pivot": [
+      0,
+      0.5,
+      -8.25
+     ]
+    },
+    "tail1": {
+     "pivot": [
+      0,
+      0,
+      0
+     ]
+    },
+    "tail2": {
+     "pivot": [
+      -1.5,
+      0.5,
+      14
+     ]
+    },
+    "tail3": {
+     "pivot": [
+      -1,
+      1,
+      20
+     ]
+    },
+    "spine1": {
+     "pivot": [
+      0,
+      11.5,
+      7
+     ]
+    },
+    "spine2": {
+     "pivot": [
+      0,
+      11.5,
+      -7
+     ]
+    },
+    "spine3": {
+     "pivot": [
+      7,
+      11.5,
+      0
+     ]
+    },
+    "spine4": {
+     "pivot": [
+      -7,
+      11.5,
+      0
+     ]
+    },
+    "spine5": {
+     "pivot": [
+      -7,
+      18.5,
+      -7
+     ]
+    },
+    "spine6": {
+     "pivot": [
+      7,
+      18.5,
+      -7
+     ]
+    },
+    "spine7": {
+     "pivot": [
+      7,
+      18.5,
+      7
+     ]
+    },
+    "spine8": {
+     "pivot": [
+      -7,
+      18.5,
+      7
+     ]
+    },
+    "spine9": {
+     "pivot": [
+      0,
+      25.5,
+      7
+     ]
+    },
+    "spine10": {
+     "pivot": [
+      0,
+      25.5,
+      -7
+     ]
+    },
+    "spine11": {
+     "pivot": [
+      7,
+      25.5,
+      0
+     ]
+    },
+    "spine12": {
+     "pivot": [
+      -7,
+      25.5,
+      0
+     ]
+    }
+   }
+  },
+  "end_crystal": {
+   "entity": "minecraft:ender_crystal",
+   "geometry": "default",
+   "bones": {
+    "base": "base"
+   },
+   "parts_without_bone": [
+    "cube",
+    "inner_glass",
+    "outer_glass"
+   ],
+   "java_parts": {
+    "base": {
+     "pivot": [
+      0,
+      24,
+      0
+     ],
+     "rotation": [
+      180,
+      0,
+      0
+     ]
+    },
+    "cube": {
+     "pivot": [
+      0,
+      14,
+      0
+     ]
+    },
+    "inner_glass": {
+     "pivot": [
+      0,
+      14,
+      0
+     ]
+    },
+    "outer_glass": {
+     "pivot": [
+      0,
+      14,
+      0
+     ]
+    }
+   }
+  },
+  "enderman": {
+   "entity": "minecraft:enderman",
+   "geometry": "default",
+   "bones": {
+    "body": "body",
+    "head": "head",
+    "headwear": "hat",
+    "right_arm": "rightArm",
+    "left_arm": "leftArm",
+    "right_leg": "rightLeg",
+    "left_leg": "leftLeg"
+   },
+   "java_parts": {
+    "body": {
+     "pivot": [
+      0,
+      -15,
+      0
+     ]
+    },
+    "head": {
+     "pivot": [
+      0,
+      -15,
+      0
+     ]
+    },
+    "headwear": {
+     "pivot": [
+      0,
+      -15,
+      0
+     ]
+    },
+    "right_arm": {
+     "pivot": [
+      -5,
+      -13,
+      0
+     ]
+    },
+    "left_arm": {
+     "pivot": [
+      5,
+      -13,
+      0
+     ]
+    },
+    "right_leg": {
+     "pivot": [
+      -2,
+      -6,
+      0
+     ]
+    },
+    "left_leg": {
+     "pivot": [
+      2,
+      -6,
+      0
+     ]
+    }
+   },
+   "family": "biped"
+  },
+  "endermite": {
+   "entity": "minecraft:endermite",
+   "geometry": "default",
+   "bones": {
+    "body1": "section_0",
+    "body2": "section_1",
+    "body3": "section_2",
+    "body4": "section_3"
+   },
+   "java_parts": {
+    "body1": {
+     "pivot": [
+      0,
+      21,
+      -3.5
+     ]
+    },
+    "body2": {
+     "pivot": [
+      0,
+      20,
+      0
+     ]
+    },
+    "body3": {
+     "pivot": [
+      0,
+      21,
+      3
+     ]
+    },
+    "body4": {
+     "pivot": [
+      0,
+      22,
+      4
+     ]
+    }
+   }
+  },
+  "evocation_illager": {
+   "entity": "minecraft:evocation_illager",
+   "geometry": "default"
+  },
+  "evoker": {
+   "entity": "minecraft:evocation_illager",
+   "geometry": "default",
+   "bones": {
+    "head": "head",
+    "nose": "nose",
+    "body": "body",
+    "arms": "arms",
+    "left_arm": "leftArm",
+    "right_arm": "rightArm",
+    "left_leg": "leftLeg",
+    "right_leg": "rightLeg"
+   },
+   "java_parts": {
+    "head": {
+     "pivot": [
+      0,
+      0,
+      0
+     ]
+    },
+    "nose": {
+     "pivot": [
+      0,
+      -2,
+      0
+     ]
+    },
+    "body": {
+     "pivot": [
+      0,
+      0,
+      0
+     ]
+    },
+    "arms": {
+     "pivot": [
+      0,
+      2.95,
+      -1.05
+     ],
+     "rotation": [
+      -43,
+      0,
+      0
+     ]
+    },
+    "left_arm": {
+     "pivot": [
+      5,
+      2,
+      0
+     ]
+    },
+    "right_arm": {
+     "pivot": [
+      -5,
+      2,
+      0
+     ]
+    },
+    "left_leg": {
+     "pivot": [
+      2,
+      12,
+      0
+     ]
+    },
+    "right_leg": {
+     "pivot": [
+      -2,
+      12,
+      0
+     ]
+    }
+   },
+   "family": "head"
+  },
+  "evoker_fangs": {
+   "entity": "minecraft:evocation_fang",
+   "geometry": "default",
+   "bones": {
+    "base": "base",
+    "upper_jaw": "upper_jaw",
+    "lower_jaw": "lower_jaw"
+   },
+   "java_parts": {
+    "base": {
+     "pivot": [
+      -5,
+      12,
+      -5
+     ]
+    },
+    "upper_jaw": {
+     "pivot": [
+      -0.5,
+      12,
+      -4
+     ],
+     "rotation": [
+      180,
+      180,
+      0
+     ]
+    },
+    "lower_jaw": {
+     "pivot": [
+      -1.5,
+      12,
+      4
+     ],
+     "rotation": [
+      180,
+      0,
+      0
+     ]
+    }
+   }
+  },
+  "fox": {
+   "entity": "minecraft:fox",
+   "geometry": "default",
+   "bones": {
+    "head": "head_sleeping",
+    "body": "body",
+    "leg1": "leg0",
+    "leg2": "leg1",
+    "leg3": "leg2",
+    "leg4": "leg3",
+    "tail": "tail"
+   },
+   "java_parts": {
+    "head": {
+     "pivot": [
+      -1,
+      16.5,
+      -3
+     ]
+    },
+    "body": {
+     "pivot": [
+      0,
+      16,
+      -6
+     ],
+     "rotation": [
+      90,
+      0,
+      0
+     ]
+    },
+    "leg1": {
+     "pivot": [
+      -5,
+      17.5,
+      7
+     ]
+    },
+    "leg2": {
+     "pivot": [
+      -1,
+      17.5,
+      7
+     ]
+    },
+    "leg3": {
+     "pivot": [
+      -5,
+      17.5,
+      0
+     ]
+    },
+    "leg4": {
+     "pivot": [
+      -1,
+      17.5,
+      0
+     ]
+    },
+    "tail": {
+     "pivot": [
+      -4,
+      17,
+      9
+     ],
+     "rotation": [
+      90,
+      0,
+      0
+     ]
+    }
+   },
+   "family": "head"
+  },
+  "fox_baby": {
+   "entity": "minecraft:fox",
+   "geometry": "baby",
+   "bones": {
+    "head": "head",
+    "body": "body",
+    "leg2": "leg1",
+    "leg1": "leg0",
+    "leg4": "leg3",
+    "leg3": "leg2",
+    "tail": "tail"
+   },
+   "java_parts": {
+    "head": {
+     "pivot": [
+      0,
+      18.125,
+      0.125
+     ]
+    },
+    "body": {
+     "pivot": [
+      0,
+      20,
+      2
+     ]
+    },
+    "leg2": {
+     "pivot": [
+      1.5,
+      22,
+      4
+     ]
+    },
+    "leg1": {
+     "pivot": [
+      -1.5,
+      22,
+      4
+     ]
+    },
+    "leg4": {
+     "pivot": [
+      1.5,
+      22,
+      0
+     ]
+    },
+    "leg3": {
+     "pivot": [
+      -1.5,
+      22,
+      0
+     ]
+    },
+    "tail": {
+     "pivot": [
+      0,
+      19.5,
+      5
+     ]
+    }
+   },
+   "family": "head"
+  },
+  "frog": {
+   "entity": "minecraft:frog",
+   "geometry": "default",
+   "bones": {
+    "head": "head",
+    "eyes": "eyes",
+    "tongue": "tongue",
+    "body": "body",
+    "croaking_body": "croaking_body",
+    "left_arm": "left_arm",
+    "right_arm": "right_arm",
+    "left_leg": "left_leg",
+    "right_leg": "right_leg"
+   },
+   "java_parts": {
+    "head": {
+     "pivot": [
+      0,
+      20,
+      3
+     ]
+    },
+    "eyes": {
+     "pivot": [
+      -0.5,
+      20,
+      5
+     ]
+    },
+    "tongue": {
+     "pivot": [
+      0,
+      20.9,
+      5
+     ]
+    },
+    "body": {
+     "pivot": [
+      0,
+      22,
+      4
+     ]
+    },
+    "croaking_body": {
+     "pivot": [
+      0,
+      21,
+      -1
+     ]
+    },
+    "left_arm": {
+     "pivot": [
+      4,
+      21,
+      -2.5
+     ]
+    },
+    "right_arm": {
+     "pivot": [
+      -4,
+      21,
+      -2.5
+     ]
+    },
+    "left_leg": {
+     "pivot": [
+      3.5,
+      21,
+      4
+     ]
+    },
+    "right_leg": {
+     "pivot": [
+      -3.5,
+      21,
+      4
+     ]
+    }
+   },
+   "family": "head"
+  },
+  "ghast": {
+   "entity": "minecraft:ghast",
+   "geometry": "default",
+   "bones": {
+    "body": "body",
+    "tentacle1": "tentacles_0",
+    "tentacle2": "tentacles_1",
+    "tentacle3": "tentacles_2",
+    "tentacle4": "tentacles_3",
+    "tentacle5": "tentacles_4",
+    "tentacle6": "tentacles_5",
+    "tentacle7": "tentacles_6",
+    "tentacle8": "tentacles_7",
+    "tentacle9": "tentacles_8"
+   },
+   "java_parts": {
+    "body": {
+     "pivot": [
+      0,
+      4,
+      0
+     ]
+    },
+    "tentacle1": {
+     "pivot": [
+      -3.7,
+      11,
+      -5
+     ]
+    },
+    "tentacle2": {
+     "pivot": [
+      1.3,
+      11,
+      -5
+     ]
+    },
+    "tentacle3": {
+     "pivot": [
+      6.3,
+      11,
+      -5
+     ]
+    },
+    "tentacle4": {
+     "pivot": [
+      -6.3,
+      11,
+      0
+     ]
+    },
+    "tentacle5": {
+     "pivot": [
+      -1.3,
+      11,
+      0
+     ]
+    },
+    "tentacle6": {
+     "pivot": [
+      3.7,
+      11,
+      0
+     ]
+    },
+    "tentacle7": {
+     "pivot": [
+      -3.7,
+      11,
+      5
+     ]
+    },
+    "tentacle8": {
+     "pivot": [
+      1.3,
+      11,
+      5
+     ]
+    },
+    "tentacle9": {
+     "pivot": [
+      6.3,
+      11,
+      5
+     ]
+    }
+   },
+   "frame": {
+    "scale": 4.5,
+    "offset": [
+     0,
+     -58,
+     0
+    ]
+   }
+  },
+  "glow_squid": {
+   "entity": "minecraft:glow_squid",
+   "geometry": "default",
+   "bones": {
+    "body": "body",
+    "tentacle1": "tentacle1",
+    "tentacle2": "tentacle2",
+    "tentacle3": "tentacle3",
+    "tentacle4": "tentacle4",
+    "tentacle5": "tentacle5",
+    "tentacle6": "tentacle6",
+    "tentacle7": "tentacle7",
+    "tentacle8": "tentacle8"
+   },
+   "java_parts": {
+    "body": {
+     "pivot": [
+      0,
+      -1,
+      0
+     ]
+    },
+    "tentacle1": {
+     "pivot": [
+      5,
+      6,
+      0
+     ],
+     "rotation": [
+      0,
+      90,
+      0
+     ]
+    },
+    "tentacle2": {
+     "pivot": [
+      3.5,
+      6,
+      3.5
+     ],
+     "rotation": [
+      0,
+      45,
+      0
+     ]
+    },
+    "tentacle3": {
+     "pivot": [
+      0,
+      6,
+      5
+     ]
+    },
+    "tentacle4": {
+     "pivot": [
+      -3.5,
+      6,
+      3.5
+     ],
+     "rotation": [
+      0,
+      -45,
+      0
+     ]
+    },
+    "tentacle5": {
+     "pivot": [
+      -5,
+      6,
+      0
+     ],
+     "rotation": [
+      0,
+      -90,
+      0
+     ]
+    },
+    "tentacle6": {
+     "pivot": [
+      -3.5,
+      6,
+      -3.5
+     ],
+     "rotation": [
+      0,
+      -135,
+      0
+     ]
+    },
+    "tentacle7": {
+     "pivot": [
+      0,
+      6,
+      -5
+     ],
+     "rotation": [
+      0,
+      180,
+      0
+     ]
+    },
+    "tentacle8": {
+     "pivot": [
+      3.5,
+      6,
+      -3.5
+     ],
+     "rotation": [
+      0,
+      135,
+      0
+     ]
+    }
+   },
+   "frame": {
+    "offset": [
+     0,
+     -25,
+     0
+    ]
+   }
+  },
+  "glow_squid_baby": {
+   "entity": "minecraft:glow_squid",
+   "geometry": "baby",
+   "bones": {
+    "body": "body",
+    "tentacle1": "tentacle1",
+    "tentacle2": "tentacle2",
+    "tentacle3": "tentacle3",
+    "tentacle4": "tentacle4",
+    "tentacle5": "tentacle5",
+    "tentacle6": "tentacle6",
+    "tentacle7": "tentacle7",
+    "tentacle8": "tentacle8"
+   },
+   "java_parts": {
+    "body": {
+     "pivot": [
+      0,
+      13,
+      0
+     ]
+    },
+    "tentacle1": {
+     "pivot": [
+      3,
+      18.5,
+      0
+     ],
+     "rotation": [
+      0,
+      90,
+      0
+     ]
+    },
+    "tentacle2": {
+     "pivot": [
+      2.1213,
+      18.5,
+      2.1213
+     ],
+     "rotation": [
+      0,
+      45,
+      0
+     ]
+    },
+    "tentacle3": {
+     "pivot": [
+      0,
+      18.5,
+      3
+     ]
+    },
+    "tentacle4": {
+     "pivot": [
+      -2.1213,
+      18.5,
+      2.1213
+     ],
+     "rotation": [
+      0,
+      -45,
+      0
+     ]
+    },
+    "tentacle5": {
+     "pivot": [
+      -3,
+      18.5,
+      0
+     ],
+     "rotation": [
+      0,
+      -90,
+      0
+     ]
+    },
+    "tentacle6": {
+     "pivot": [
+      -2.1213,
+      18.5,
+      -2.1213
+     ],
+     "rotation": [
+      0,
+      -135,
+      0
+     ]
+    },
+    "tentacle7": {
+     "pivot": [
+      0,
+      18.5,
+      -3
+     ],
+     "rotation": [
+      0,
+      -180,
+      0
+     ]
+    },
+    "tentacle8": {
+     "pivot": [
+      2.1213,
+      18.5,
+      -2.1213
+     ],
+     "rotation": [
+      0,
+      -225,
+      0
+     ]
+    }
+   },
+   "frame": {
+    "offset": [
+     0,
+     -10,
+     0
+    ]
+   }
+  },
+  "goat": {
+   "entity": "minecraft:goat",
+   "geometry": "default",
+   "bones": {
+    "head": "head",
+    "nose": "head",
+    "left_horn": "left_horn",
+    "right_horn": "right_horn",
+    "body": "body",
+    "leg1": "right_back_leg",
+    "leg2": "left_back_leg",
+    "leg3": "right_front_leg",
+    "leg4": "left_front_leg"
+   },
+   "java_parts": {
+    "head": {
+     "pivot": [
+      0.5,
+      14,
+      0
+     ]
+    },
+    "nose": {
+     "pivot": [
+      0.5,
+      6,
+      -8
+     ],
+     "rotation": [
+      55,
+      0,
+      0
+     ]
+    },
+    "left_horn": {
+     "pivot": [
+      0.5,
+      14,
+      0
+     ]
+    },
+    "right_horn": {
+     "pivot": [
+      0.5,
+      14,
+      0
+     ]
+    },
+    "body": {
+     "pivot": [
+      -0.5,
+      24,
+      0
+     ]
+    },
+    "leg1": {
+     "pivot": [
+      -3.5,
+      14,
+      4
+     ]
+    },
+    "leg2": {
+     "pivot": [
+      0.5,
+      14,
+      4
+     ]
+    },
+    "leg3": {
+     "pivot": [
+      -3.5,
+      14,
+      -6
+     ]
+    },
+    "leg4": {
+     "pivot": [
+      0.5,
+      14,
+      -6
+     ]
+    }
+   },
+   "family": "quadruped"
+  },
+  "goat_baby": {
+   "entity": "minecraft:goat",
+   "geometry": "baby",
+   "bones": {
+    "head": "head",
+    "left_horn": "head",
+    "right_horn": "head",
+    "body": "body",
+    "leg2": "left_back_leg",
+    "leg1": "right_back_leg",
+    "leg4": "left_front_leg",
+    "leg3": "right_front_leg"
+   },
+   "java_parts": {
+    "head": {
+     "pivot": [
+      0,
+      15.5,
+      -3
+     ],
+     "rotation": [
+      25,
+      0,
+      0
+     ]
+    },
+    "left_horn": {
+     "pivot": [
+      -1.5,
+      14.5632,
+      -4.5402
+     ],
+     "rotation": [
+      2.5,
+      0,
+      0
+     ]
+    },
+    "right_horn": {
+     "pivot": [
+      -1.5,
+      14.5632,
+      -4.5402
+     ],
+     "rotation": [
+      2.5,
+      0,
+      0
+     ]
+    },
+    "body": {
+     "pivot": [
+      0,
+      17.8,
+      0
+     ]
+    },
+    "leg2": {
+     "pivot": [
+      1.5,
+      19.5,
+      3
+     ]
+    },
+    "leg1": {
+     "pivot": [
+      -1.5,
+      19.5,
+      3
+     ]
+    },
+    "leg4": {
+     "pivot": [
+      1.5,
+      19.5,
+      -2
+     ]
+    },
+    "leg3": {
+     "pivot": [
+      -1.5,
+      19.5,
+      -2
+     ]
+    }
+   },
+   "family": "quadruped"
+  },
+  "guardian": {
+   "entity": "minecraft:guardian",
+   "geometry": "default",
+   "bones": {
+    "body": "head",
+    "eye": "eye",
+    "tail1": "tailpart0",
+    "tail2": "tailpart1",
+    "tail3": "tailpart2",
+    "spine1": "spikepart0",
+    "spine2": "spikepart1",
+    "spine3": "spikepart2",
+    "spine4": "spikepart3",
+    "spine5": "spikepart4",
+    "spine6": "spikepart5",
+    "spine7": "spikepart6",
+    "spine8": "spikepart7",
+    "spine9": "spikepart8",
+    "spine10": "spikepart9",
+    "spine11": "spikepart10",
+    "spine12": "spikepart11"
+   },
+   "java_parts": {
+    "body": {
+     "pivot": [
+      0,
+      0,
+      0
+     ]
+    },
+    "eye": {
+     "pivot": [
+      0,
+      0.5,
+      -8.25
+     ]
+    },
+    "tail1": {
+     "pivot": [
+      0,
+      0,
+      0
+     ]
+    },
+    "tail2": {
+     "pivot": [
+      -1.5,
+      0.5,
+      14
+     ]
+    },
+    "tail3": {
+     "pivot": [
+      -1,
+      1,
+      20
+     ]
+    },
+    "spine1": {
+     "pivot": [
+      0,
+      11.5,
+      7
+     ]
+    },
+    "spine2": {
+     "pivot": [
+      0,
+      11.5,
+      -7
+     ]
+    },
+    "spine3": {
+     "pivot": [
+      7,
+      11.5,
+      0
+     ]
+    },
+    "spine4": {
+     "pivot": [
+      -7,
+      11.5,
+      0
+     ]
+    },
+    "spine5": {
+     "pivot": [
+      -7,
+      18.5,
+      -7
+     ]
+    },
+    "spine6": {
+     "pivot": [
+      7,
+      18.5,
+      -7
+     ]
+    },
+    "spine7": {
+     "pivot": [
+      7,
+      18.5,
+      7
+     ]
+    },
+    "spine8": {
+     "pivot": [
+      -7,
+      18.5,
+      7
+     ]
+    },
+    "spine9": {
+     "pivot": [
+      0,
+      25.5,
+      7
+     ]
+    },
+    "spine10": {
+     "pivot": [
+      0,
+      25.5,
+      -7
+     ]
+    },
+    "spine11": {
+     "pivot": [
+      7,
+      25.5,
+      0
+     ]
+    },
+    "spine12": {
+     "pivot": [
+      -7,
+      25.5,
+      0
+     ]
+    }
+   }
+  },
+  "happy_ghast": {
+   "entity": "minecraft:happy_ghast",
+   "geometry": "default",
+   "bones": {
+    "body": "body",
+    "tentacle1": "tentacles_0",
+    "tentacle2": "tentacles_1",
+    "tentacle3": "tentacles_2",
+    "tentacle4": "tentacles_3",
+    "tentacle5": "tentacles_4",
+    "tentacle6": "tentacles_5",
+    "tentacle7": "tentacles_6",
+    "tentacle8": "tentacles_7",
+    "tentacle9": "tentacles_8"
+   },
+   "java_parts": {
+    "body": {
+     "pivot": [
+      0,
+      9,
+      0
+     ]
+    },
+    "tentacle1": {
+     "pivot": [
+      -3.75,
+      16,
+      -5
+     ]
+    },
+    "tentacle2": {
+     "pivot": [
+      1.25,
+      16,
+      -5
+     ]
+    },
+    "tentacle3": {
+     "pivot": [
+      6.25,
+      16,
+      -5
+     ]
+    },
+    "tentacle4": {
+     "pivot": [
+      -6.25,
+      16,
+      0
+     ]
+    },
+    "tentacle5": {
+     "pivot": [
+      -1.25,
+      16,
+      0
+     ]
+    },
+    "tentacle6": {
+     "pivot": [
+      3.75,
+      16,
+      0
+     ]
+    },
+    "tentacle7": {
+     "pivot": [
+      -3.75,
+      16,
+      5
+     ]
+    },
+    "tentacle8": {
+     "pivot": [
+      1.25,
+      16,
+      5
+     ]
+    },
+    "tentacle9": {
+     "pivot": [
+      6.25,
+      16,
+      5
+     ]
+    }
+   },
+   "frame": {
+    "scale": 4,
+    "offset": [
+     0,
+     -28,
+     0
+    ]
+   }
+  },
+  "happy_ghast_ropes": {
+   "entity": "minecraft:happy_ghast",
+   "geometry": "ropes",
+   "bones": {
+    "body": "body"
+   },
+   "parts_without_bone": [
+    "tentacle1",
+    "tentacle2",
+    "tentacle3",
+    "tentacle4",
+    "tentacle5",
+    "tentacle6",
+    "tentacle7",
+    "tentacle8",
+    "tentacle9"
+   ],
+   "java_parts": {
+    "body": {
+     "pivot": [
+      0,
+      9,
+      0
+     ]
+    },
+    "tentacle1": {
+     "pivot": [
+      -3.75,
+      16,
+      -5
+     ]
+    },
+    "tentacle2": {
+     "pivot": [
+      1.25,
+      16,
+      -5
+     ]
+    },
+    "tentacle3": {
+     "pivot": [
+      6.25,
+      16,
+      -5
+     ]
+    },
+    "tentacle4": {
+     "pivot": [
+      -6.25,
+      16,
+      0
+     ]
+    },
+    "tentacle5": {
+     "pivot": [
+      -1.25,
+      16,
+      0
+     ]
+    },
+    "tentacle6": {
+     "pivot": [
+      3.75,
+      16,
+      0
+     ]
+    },
+    "tentacle7": {
+     "pivot": [
+      -3.75,
+      16,
+      5
+     ]
+    },
+    "tentacle8": {
+     "pivot": [
+      1.25,
+      16,
+      5
+     ]
+    },
+    "tentacle9": {
+     "pivot": [
+      6.25,
+      16,
+      5
+     ]
+    }
+   },
+   "frame": {
+    "scale": 4,
+    "offset": [
+     0,
+     -28,
+     0
+    ]
+   }
+  },
+  "hoglin": {
+   "entity": "minecraft:hoglin",
+   "geometry": "default",
+   "bones": {
+    "head": "head",
+    "left_ear": "left_ear",
+    "right_ear": "right_ear",
+    "body": "body",
+    "mane": "body",
+    "front_left_leg": "leg_front_left",
+    "front_right_leg": "leg_front_right",
+    "back_left_leg": "leg_back_left",
+    "back_right_leg": "leg_back_right"
+   },
+   "java_parts": {
+    "head": {
+     "pivot": [
+      0,
+      3,
+      -8.5
+     ]
+    },
+    "left_ear": {
+     "pivot": [
+      6,
+      1,
+      -11.5
+     ]
+    },
+    "right_ear": {
+     "pivot": [
+      -6,
+      1,
+      -11.5
+     ]
+    },
+    "body": {
+     "pivot": [
+      0,
+      7,
+      4.5
+     ]
+    },
+    "mane": {
+     "pivot": [
+      0,
+      -7,
+      -2.5
+     ]
+    },
+    "front_left_leg": {
+     "pivot": [
+      4,
+      10,
+      -4.75
+     ]
+    },
+    "front_right_leg": {
+     "pivot": [
+      -4,
+      10,
+      -4.5
+     ]
+    },
+    "back_left_leg": {
+     "pivot": [
+      4.5,
+      13,
+      14
+     ]
+    },
+    "back_right_leg": {
+     "pivot": [
+      -4.5,
+      13,
+      14
+     ]
+    }
+   },
+   "family": "head"
+  },
+  "hoglin_baby": {
+   "entity": "minecraft:hoglin",
+   "geometry": "baby",
+   "bones": {
+    "head": "head",
+    "left_ear": "left_ear",
+    "right_ear": "right_ear",
+    "body": "body",
+    "back_left_leg": "leg_back_left",
+    "back_right_leg": "leg_back_right",
+    "front_left_leg": "leg_front_left",
+    "front_right_leg": "leg_front_right"
+   },
+   "java_parts": {
+    "head": {
+     "pivot": [
+      0,
+      13,
+      -7
+     ],
+     "rotation": [
+      50,
+      0,
+      0
+     ]
+    },
+    "left_ear": {
+     "pivot": [
+      5,
+      13.5063,
+      -8.7302
+     ],
+     "rotation": [
+      37.4537,
+      -35.932,
+      37.4537
+     ]
+    },
+    "right_ear": {
+     "pivot": [
+      -5,
+      13.5063,
+      -8.7302
+     ],
+     "rotation": [
+      37.4537,
+      35.932,
+      -37.4537
+     ]
+    },
+    "body": {
+     "pivot": [
+      0,
+      24,
+      0
+     ]
+    },
+    "back_left_leg": {
+     "pivot": [
+      2.5,
+      18,
+      4.5
+     ]
+    },
+    "back_right_leg": {
+     "pivot": [
+      -2.5,
+      18,
+      4.5
+     ]
+    },
+    "front_left_leg": {
+     "pivot": [
+      2.5,
+      18,
+      -4.5
+     ]
+    },
+    "front_right_leg": {
+     "pivot": [
+      -2.5,
+      18,
+      -4.5
+     ]
+    }
+   },
+   "family": "head"
+  },
+  "hopper_minecart": {
+   "entity": "minecraft:hopper_minecart",
+   "geometry": "default",
+   "bones": {
+    "front": "right",
+    "left": "left",
+    "right": "front",
+    "back": "back",
+    "bottom": "bottom"
+   },
+   "java_parts": {
+    "front": {
+     "pivot": [
+      0,
+      22,
+      -8
+     ],
+     "rotation": [
+      0,
+      180,
+      0
+     ]
+    },
+    "left": {
+     "pivot": [
+      -7,
+      22,
+      1
+     ],
+     "rotation": [
+      0,
+      -90,
+      0
+     ]
+    },
+    "right": {
+     "pivot": [
+      7,
+      22,
+      1
+     ],
+     "rotation": [
+      0,
+      90,
+      0
+     ]
+    },
+    "back": {
+     "pivot": [
+      0,
+      22,
+      10
+     ]
+    },
+    "bottom": {
+     "pivot": [
+      0,
+      22,
+      1
+     ],
+     "rotation": [
+      0,
+      -90,
+      90
+     ]
+    }
+   }
+  },
+  "horse": {
+   "entity": "minecraft:horse",
+   "geometry": "default",
+   "bones": {
+    "head": "Head",
+    "mouth": "Muzzle",
+    "left_ear": "EarL",
+    "right_ear": "EarR",
+    "neck": "Neck",
+    "mane": "Mane",
+    "body": "Body",
+    "tail": "Tail",
+    "front_left_leg": "LegFL",
+    "front_right_leg": "LegFR",
+    "back_left_leg": "LegBL",
+    "back_right_leg": "LegBR"
+   },
+   "java_parts": {
+    "head": {
+     "pivot": [
+      0,
+      2,
+      -9
+     ]
+    },
+    "mouth": {
+     "pivot": [
+      0,
+      2,
+      -9
+     ]
+    },
+    "left_ear": {
+     "pivot": [
+      0,
+      1,
+      -9.01
+     ]
+    },
+    "right_ear": {
+     "pivot": [
+      0,
+      1,
+      -9.01
+     ]
+    },
+    "neck": {
+     "pivot": [
+      0,
+      2,
+      -9
+     ]
+    },
+    "mane": {
+     "pivot": [
+      0,
+      2,
+      -9.01
+     ]
+    },
+    "body": {
+     "pivot": [
+      0,
+      11,
+      6
+     ]
+    },
+    "tail": {
+     "pivot": [
+      0,
+      3,
+      11
+     ]
+    },
+    "front_left_leg": {
+     "pivot": [
+      4,
+      14,
+      -9
+     ]
+    },
+    "front_right_leg": {
+     "pivot": [
+      -4,
+      14,
+      -9
+     ]
+    },
+    "back_left_leg": {
+     "pivot": [
+      4,
+      14,
+      8
+     ]
+    },
+    "back_right_leg": {
+     "pivot": [
+      -4,
+      14,
+      8
+     ]
+    }
+   },
+   "family": "head"
+  },
+  "horse_baby": {
+   "entity": "minecraft:horse",
+   "geometry": "baby",
+   "bones": {
+    "head": "Head",
+    "neck": "Neck",
+    "left_ear": "EarL",
+    "right_ear": "EarR",
+    "body": "Body",
+    "front_left_leg": "LegFL",
+    "front_right_leg": "LegFR",
+    "back_left_leg": "LegBL",
+    "back_right_leg": "LegBR",
+    "tail": "Tail"
+   },
+   "java_parts": {
+    "head": {
+     "pivot": [
+      0,
+      3.9484,
+      -6.2951
+     ]
+    },
+    "neck": {
+     "pivot": [
+      0,
+      10,
+      -6
+     ]
+    },
+    "left_ear": {
+     "pivot": [
+      2,
+      -0.3,
+      -4.35
+     ],
+     "rotation": [
+      0,
+      0,
+      15
+     ]
+    },
+    "right_ear": {
+     "pivot": [
+      -2,
+      -0.3,
+      -4.6501
+     ],
+     "rotation": [
+      0,
+      0,
+      -15
+     ]
+    },
+    "body": {
+     "pivot": [
+      0,
+      12.5,
+      0
+     ]
+    },
+    "front_left_leg": {
+     "pivot": [
+      2.4,
+      16,
+      -5.4
+     ]
+    },
+    "front_right_leg": {
+     "pivot": [
+      -2.4,
+      16,
+      -5.4
+     ]
+    },
+    "back_left_leg": {
+     "pivot": [
+      2.4,
+      16,
+      5.4
+     ]
+    },
+    "back_right_leg": {
+     "pivot": [
+      -2.4,
+      16,
+      5.4
+     ]
+    },
+    "tail": {
+     "pivot": [
+      0,
+      11.5,
+      7
+     ],
+     "rotation": [
+      -42.5,
+      0,
+      0
+     ]
+    }
+   },
+   "family": "head"
+  },
+  "husk": {
+   "entity": "minecraft:husk",
+   "geometry": "default",
+   "bones": {
+    "head": "hat",
+    "headwear": "head",
+    "body": "body",
+    "left_arm": "leftArm",
+    "right_arm": "rightArm",
+    "left_leg": "leftLeg",
+    "right_leg": "rightLeg"
+   },
+   "java_parts": {
+    "head": {
+     "pivot": [
+      0,
+      0,
+      0
+     ]
+    },
+    "headwear": {
+     "pivot": [
+      0,
+      0,
+      0
+     ]
+    },
+    "body": {
+     "pivot": [
+      0,
+      0,
+      0
+     ]
+    },
+    "left_arm": {
+     "pivot": [
+      5,
+      2,
+      0
+     ]
+    },
+    "right_arm": {
+     "pivot": [
+      -5,
+      2,
+      0
+     ]
+    },
+    "left_leg": {
+     "pivot": [
+      1.9,
+      12,
+      0
+     ]
+    },
+    "right_leg": {
+     "pivot": [
+      -1.9,
+      12,
+      0
+     ]
+    }
+   },
+   "family": "zombie"
+  },
+  "husk_baby": {
+   "entity": "minecraft:husk",
+   "geometry": "baby",
+   "bones": {
+    "head": "Head",
+    "hat": "Head",
+    "body": "Body",
+    "left_arm": "leftArm",
+    "right_arm": "rightArm",
+    "left_leg": "leftLeg",
+    "right_leg": "rightLeg"
+   },
+   "java_parts": {
+    "head": {
+     "pivot": [
+      0,
+      15.25,
+      0
+     ]
+    },
+    "hat": {
+     "pivot": [
+      0,
+      15.25,
+      0
+     ]
+    },
+    "body": {
+     "pivot": [
+      0,
+      17.5,
+      0
+     ]
+    },
+    "left_arm": {
+     "pivot": [
+      3,
+      15.5,
+      0
+     ]
+    },
+    "right_arm": {
+     "pivot": [
+      -3,
+      15.5,
+      0
+     ]
+    },
+    "left_leg": {
+     "pivot": [
+      1,
+      20,
+      0
+     ]
+    },
+    "right_leg": {
+     "pivot": [
+      -1,
+      20,
+      0
+     ]
+    }
+   },
+   "family": "zombie"
+  },
+  "iron_golem": {
+   "entity": "minecraft:iron_golem",
+   "geometry": "default",
+   "bones": {
+    "body": "body",
+    "head": "head",
+    "right_arm": "arm0",
+    "left_arm": "arm1",
+    "right_leg": "leg0",
+    "left_leg": "leg1"
+   },
+   "java_parts": {
+    "body": {
+     "pivot": [
+      0,
+      -7,
+      0
+     ]
+    },
+    "head": {
+     "pivot": [
+      0,
+      -7,
+      -2
+     ]
+    },
+    "right_arm": {
+     "pivot": [
+      0,
+      -7,
+      0
+     ]
+    },
+    "left_arm": {
+     "pivot": [
+      0,
+      -7,
+      0
+     ]
+    },
+    "right_leg": {
+     "pivot": [
+      -4,
+      11,
+      0
+     ]
+    },
+    "left_leg": {
+     "pivot": [
+      5,
+      11,
+      0
+     ]
+    }
+   },
+   "family": "head"
+  },
+  "lead_knot": {
+   "entity": "minecraft:leash_knot",
+   "geometry": "default",
+   "bones": {
+    "knot": "knot"
+   },
+   "java_parts": {
+    "knot": {
+     "pivot": [
+      0,
+      18,
+      0
+     ]
+    }
+   }
+  },
+  "llama": {
+   "entity": "minecraft:llama",
+   "geometry": "default",
+   "bones": {
+    "head": "head",
+    "body": "body",
+    "leg1": "leg0",
+    "leg2": "leg1",
+    "leg3": "leg2",
+    "leg4": "leg3",
+    "chest_left": "chest2",
+    "chest_right": "chest1"
+   },
+   "java_parts": {
+    "head": {
+     "pivot": [
+      0,
+      7,
+      -6
+     ]
+    },
+    "body": {
+     "pivot": [
+      0,
+      5,
+      2
+     ],
+     "rotation": [
+      90,
+      0,
+      0
+     ]
+    },
+    "leg1": {
+     "pivot": [
+      -3.5,
+      10,
+      6
+     ]
+    },
+    "leg2": {
+     "pivot": [
+      3.5,
+      10,
+      6
+     ]
+    },
+    "leg3": {
+     "pivot": [
+      -3.5,
+      10,
+      -5
+     ]
+    },
+    "leg4": {
+     "pivot": [
+      3.5,
+      10,
+      -5
+     ]
+    },
+    "chest_left": {
+     "pivot": [
+      5.5,
+      3,
+      3
+     ],
+     "rotation": [
+      0,
+      90,
+      0
+     ]
+    },
+    "chest_right": {
+     "pivot": [
+      -8.5,
+      3,
+      3
+     ],
+     "rotation": [
+      0,
+      90,
+      0
+     ]
+    }
+   },
+   "family": "quadruped"
+  },
+  "llama_baby": {
+   "entity": "minecraft:llama",
+   "geometry": "baby",
+   "bones": {
+    "head": "head",
+    "left_hind_leg": "leg1",
+    "right_hind_leg": "leg0",
+    "left_front_leg": "leg3",
+    "right_front_leg": "leg2",
+    "body": "body"
+   },
+   "java_parts": {
+    "head": {
+     "pivot": [
+      0,
+      12,
+      -4
+     ]
+    },
+    "left_hind_leg": {
+     "pivot": [
+      2.5,
+      16.5,
+      4.5
+     ]
+    },
+    "right_hind_leg": {
+     "pivot": [
+      -2.5,
+      16.5,
+      4.5
+     ]
+    },
+    "left_front_leg": {
+     "pivot": [
+      2.5,
+      16.5,
+      -3.5
+     ]
+    },
+    "right_front_leg": {
+     "pivot": [
+      -2.5,
+      16.5,
+      -3.5
+     ]
+    },
+    "body": {
+     "pivot": [
+      0,
+      14,
+      2.5
+     ]
+    }
+   },
+   "family": "quadruped"
+  },
+  "llama_spit": {
+   "entity": "minecraft:llama_spit",
+   "geometry": "default",
+   "bones": {
+    "body": "body"
+   },
+   "java_parts": {
+    "body": {
+     "pivot": [
+      0,
+      18,
+      0
+     ]
+    }
+   }
+  },
+  "magma_cube": {
+   "entity": "minecraft:magma_cube",
+   "geometry": "default",
+   "bones": {
+    "segment1": "bodyCube_0",
+    "segment2": "bodyCube_1",
+    "segment3": "bodyCube_2",
+    "segment4": "bodyCube_3",
+    "segment5": "bodyCube_4",
+    "segment6": "bodyCube_5",
+    "segment7": "bodyCube_6",
+    "segment8": "bodyCube_7",
+    "core": "insideCube"
+   },
+   "java_parts": {
+    "segment1": {
+     "pivot": [
+      0,
+      0,
+      0
+     ]
+    },
+    "segment2": {
+     "pivot": [
+      0,
+      0,
+      0
+     ]
+    },
+    "segment3": {
+     "pivot": [
+      0,
+      0,
+      0
+     ]
+    },
+    "segment4": {
+     "pivot": [
+      0,
+      0,
+      0
+     ]
+    },
+    "segment5": {
+     "pivot": [
+      0,
+      0,
+      0
+     ]
+    },
+    "segment6": {
+     "pivot": [
+      0,
+      0,
+      0
+     ]
+    },
+    "segment7": {
+     "pivot": [
+      0,
+      0,
+      0
+     ]
+    },
+    "segment8": {
+     "pivot": [
+      0,
+      0,
+      0
+     ]
+    },
+    "core": {
+     "pivot": [
+      0,
+      0,
+      0
+     ]
+    }
+   }
+  },
+  "minecart": {
+   "entity": "minecraft:minecart",
+   "geometry": "default",
+   "bones": {
+    "front": "front",
+    "left": "left",
+    "right": "right",
+    "back": "back",
+    "bottom": "bottom"
+   },
+   "java_parts": {
+    "front": {
+     "pivot": [
+      0,
+      22,
+      -8
+     ],
+     "rotation": [
+      0,
+      180,
+      0
+     ]
+    },
+    "left": {
+     "pivot": [
+      -7,
+      22,
+      1
+     ],
+     "rotation": [
+      0,
+      -90,
+      0
+     ]
+    },
+    "right": {
+     "pivot": [
+      7,
+      22,
+      1
+     ],
+     "rotation": [
+      0,
+      90,
+      0
+     ]
+    },
+    "back": {
+     "pivot": [
+      0,
+      22,
+      10
+     ]
+    },
+    "bottom": {
+     "pivot": [
+      0,
+      22,
+      1
+     ],
+     "rotation": [
+      0,
+      -90,
+      90
+     ]
+    }
+   }
+  },
+  "mooshroom": {
+   "entity": "minecraft:mooshroom",
+   "geometry": "default",
+   "bones": {
+    "head": "head",
+    "body": "body",
+    "leg1": "leg0",
+    "leg2": "leg1",
+    "leg3": "leg2",
+    "leg4": "leg3"
+   },
+   "java_parts": {
+    "head": {
+     "pivot": [
+      0,
+      4,
+      -8
+     ]
+    },
+    "body": {
+     "pivot": [
+      0,
+      5,
+      2
+     ],
+     "rotation": [
+      90,
+      0,
+      0
+     ]
+    },
+    "leg1": {
+     "pivot": [
+      -4,
+      12,
+      7
+     ]
+    },
+    "leg2": {
+     "pivot": [
+      4,
+      12,
+      7
+     ]
+    },
+    "leg3": {
+     "pivot": [
+      -4,
+      12,
+      -6
+     ]
+    },
+    "leg4": {
+     "pivot": [
+      4,
+      12,
+      -6
+     ]
+    }
+   },
+   "family": "quadruped"
+  },
+  "mooshroom_baby": {
+   "entity": "minecraft:mooshroom",
+   "geometry": "baby",
+   "bones": {
+    "head": "head",
+    "body": "body",
+    "right_front_leg": "leg2",
+    "left_front_leg": "leg3",
+    "right_hind_leg": "leg0",
+    "left_hind_leg": "leg1"
+   },
+   "java_parts": {
+    "head": {
+     "pivot": [
+      0,
+      13.569,
+      -5.1667
+     ]
+    },
+    "body": {
+     "pivot": [
+      3,
+      19,
+      -5
+     ]
+    },
+    "right_front_leg": {
+     "pivot": [
+      -2.5,
+      18,
+      -3.5
+     ]
+    },
+    "left_front_leg": {
+     "pivot": [
+      2.5,
+      18,
+      -3.5
+     ]
+    },
+    "right_hind_leg": {
+     "pivot": [
+      -2.5,
+      18,
+      3.5
+     ]
+    },
+    "left_hind_leg": {
+     "pivot": [
+      2.5,
+      18,
+      3.5
+     ]
+    }
+   },
+   "family": "quadruped"
+  },
+  "mule": {
+   "entity": "minecraft:mule",
+   "geometry": "default",
+   "bones": {
+    "head": "Head",
+    "mouth": "Muzzle",
+    "left_ear": "EarL",
+    "right_ear": "EarR",
+    "neck": "Neck",
+    "mane": "Mane",
+    "body": "Body",
+    "tail": "Tail",
+    "front_left_leg": "LegFL",
+    "front_right_leg": "LegFR",
+    "back_left_leg": "LegBL",
+    "back_right_leg": "LegBR",
+    "left_chest": "BagL",
+    "right_chest": "BagR"
+   },
+   "java_parts": {
+    "head": {
+     "pivot": [
+      0,
+      2,
+      -9
+     ]
+    },
+    "mouth": {
+     "pivot": [
+      0,
+      2,
+      -9
+     ]
+    },
+    "left_ear": {
+     "pivot": [
+      1.5,
+      -7.9,
+      -5
+     ]
+    },
+    "right_ear": {
+     "pivot": [
+      -1.5,
+      -7.9,
+      -5
+     ]
+    },
+    "neck": {
+     "pivot": [
+      0,
+      2,
+      -9
+     ]
+    },
+    "mane": {
+     "pivot": [
+      0,
+      2,
+      -9.01
+     ]
+    },
+    "body": {
+     "pivot": [
+      0,
+      11,
+      6
+     ]
+    },
+    "tail": {
+     "pivot": [
+      0,
+      3,
+      11
+     ]
+    },
+    "front_left_leg": {
+     "pivot": [
+      4,
+      14,
+      -9
+     ]
+    },
+    "front_right_leg": {
+     "pivot": [
+      -4,
+      14,
+      -9
+     ]
+    },
+    "back_left_leg": {
+     "pivot": [
+      4,
+      14,
+      8
+     ]
+    },
+    "back_right_leg": {
+     "pivot": [
+      -4,
+      14,
+      8
+     ]
+    },
+    "left_chest": {
+     "pivot": [
+      6,
+      3,
+      6
+     ],
+     "rotation": [
+      0,
+      -90,
+      0
+     ]
+    },
+    "right_chest": {
+     "pivot": [
+      -6,
+      3,
+      6
+     ],
+     "rotation": [
+      0,
+      90,
+      0
+     ]
+    }
+   },
+   "family": "head"
+  },
+  "mule_baby": {
+   "entity": "minecraft:mule",
+   "geometry": "baby",
+   "bones": {
+    "head": "Head",
+    "neck": "Neck",
+    "left_ear": "left_ear",
+    "right_ear": "right_ear",
+    "body": "Body",
+    "front_left_leg": "LegFL",
+    "front_right_leg": "LegFR",
+    "back_left_leg": "LegBL",
+    "back_right_leg": "LegBR",
+    "tail": "Tail"
+   },
+   "java_parts": {
+    "head": {
+     "pivot": [
+      1,
+      6,
+      -8
+     ]
+    },
+    "neck": {
+     "pivot": [
+      1,
+      11,
+      -5
+     ]
+    },
+    "left_ear": {
+     "pivot": [
+      3,
+      2.5,
+      -9
+     ],
+     "rotation": [
+      27.5,
+      0,
+      27.5
+     ]
+    },
+    "right_ear": {
+     "pivot": [
+      -1,
+      2.5,
+      -9
+     ],
+     "rotation": [
+      27.5,
+      0,
+      -27.5
+     ]
+    },
+    "body": {
+     "pivot": [
+      1,
+      14,
+      0
+     ]
+    },
+    "front_left_leg": {
+     "pivot": [
+      3.4,
+      17.5,
+      -5.3
+     ]
+    },
+    "front_right_leg": {
+     "pivot": [
+      -1.4,
+      17.5,
+      -5.4
+     ]
+    },
+    "back_left_leg": {
+     "pivot": [
+      3.25,
+      17.5,
+      5.25
+     ]
+    },
+    "back_right_leg": {
+     "pivot": [
+      -1.4,
+      17.5,
+      5.4
+     ]
+    },
+    "tail": {
+     "pivot": [
+      1,
+      12.5,
+      6.5
+     ]
+    }
+   },
+   "family": "head"
+  },
+  "nautilus": {
+   "entity": "minecraft:nautilus",
+   "geometry": "default",
+   "bones": {
+    "shell": "head",
+    "body": "body",
+    "upper_mouth": "mouth_top",
+    "inner_mouth": "inner_mouth",
+    "lower_mouth": "mouth_bottom"
+   },
+   "java_parts": {
+    "shell": {
+     "pivot": [
+      0,
+      16,
+      -1
+     ]
+    },
+    "body": {
+     "pivot": [
+      0,
+      20.5,
+      6.3
+     ]
+    },
+    "upper_mouth": {
+     "pivot": [
+      0,
+      17.99,
+      13.3
+     ]
+    },
+    "inner_mouth": {
+     "pivot": [
+      0,
+      19.99,
+      13.8
+     ]
+    },
+    "lower_mouth": {
+     "pivot": [
+      0,
+      21.99,
+      13.3
+     ]
+    }
+   }
+  },
+  "nautilus_armor": {
+   "entity": "minecraft:nautilus",
+   "geometry": "armor"
+  },
+  "nautilus_baby": {
+   "entity": "minecraft:nautilus",
+   "geometry": "baby",
+   "bones": {
+    "shell": "head",
+    "body": "body",
+    "lower_mouth": "mouth_bottom",
+    "inner_mouth": "inner_mouth",
+    "upper_mouth": "mouth_top"
+   },
+   "java_parts": {
+    "shell": {
+     "pivot": [
+      2.5,
+      20,
+      -2.5
+     ]
+    },
+    "body": {
+     "pivot": [
+      0,
+      23,
+      2.5
+     ]
+    },
+    "lower_mouth": {
+     "pivot": [
+      0,
+      22.99,
+      6.4
+     ]
+    },
+    "inner_mouth": {
+     "pivot": [
+      0,
+      21.99,
+      7.4
+     ]
+    },
+    "upper_mouth": {
+     "pivot": [
+      0,
+      20.99,
+      6.4
+     ]
+    }
+   }
+  },
+  "nautilus_saddle": {
+   "entity": "minecraft:nautilus",
+   "geometry": "saddle"
+  },
+  "ocelot": {
+   "entity": "minecraft:ocelot",
+   "geometry": "default",
+   "bones": {
+    "head": "head",
+    "body": "body",
+    "front_left_leg": "frontLegL",
+    "front_right_leg": "frontLegR",
+    "back_left_leg": "backLegL",
+    "back_right_leg": "backLegR",
+    "tail": "tail1",
+    "tail2": "tail2"
+   },
+   "java_parts": {
+    "head": {
+     "pivot": [
+      0,
+      15,
+      -9
+     ]
+    },
+    "body": {
+     "pivot": [
+      0,
+      12,
+      -10
+     ],
+     "rotation": [
+      90,
+      0,
+      0
+     ]
+    },
+    "front_left_leg": {
+     "pivot": [
+      1.1,
+      14.1,
+      -5
+     ]
+    },
+    "front_right_leg": {
+     "pivot": [
+      -1.1,
+      14.1,
+      -5
+     ]
+    },
+    "back_left_leg": {
+     "pivot": [
+      1.1,
+      18,
+      5
+     ]
+    },
+    "back_right_leg": {
+     "pivot": [
+      -1.1,
+      18,
+      5
+     ]
+    },
+    "tail": {
+     "pivot": [
+      0,
+      15.5,
+      8
+     ],
+     "rotation": [
+      90,
+      0,
+      0
+     ]
+    },
+    "tail2": {
+     "pivot": [
+      0,
+      15.5,
+      16
+     ],
+     "rotation": [
+      90,
+      0,
+      0
+     ]
+    }
+   },
+   "family": "feline"
+  },
+  "ocelot_baby": {
+   "entity": "minecraft:ocelot",
+   "geometry": "baby",
+   "bones": {
+    "head": "head",
+    "front_left_leg": "frontLegL",
+    "front_right_leg": "frontLegR",
+    "back_left_leg": "backLegL",
+    "body": "belly",
+    "back_right_leg": "backLegR",
+    "tail": "tail1"
+   },
+   "java_parts": {
+    "head": {
+     "pivot": [
+      0,
+      20,
+      -3.125
+     ]
+    },
+    "front_left_leg": {
+     "pivot": [
+      1,
+      22,
+      -1.5
+     ]
+    },
+    "front_right_leg": {
+     "pivot": [
+      -1,
+      22,
+      -1.5
+     ]
+    },
+    "back_left_leg": {
+     "pivot": [
+      1,
+      22,
+      2.5
+     ]
+    },
+    "body": {
+     "pivot": [
+      0,
+      20.5,
+      0.5
+     ]
+    },
+    "back_right_leg": {
+     "pivot": [
+      -1,
+      22,
+      2.5
+     ]
+    },
+    "tail": {
+     "pivot": [
+      0,
+      19.107,
+      3.9151
+     ],
+     "rotation": [
+      -32.5,
+      0,
+      0
+     ]
+    }
+   },
+   "family": "feline"
+  },
+  "panda": {
+   "entity": "minecraft:panda",
+   "geometry": "default",
+   "bones": {
+    "head": "head",
+    "body": "body",
+    "leg4": "leg3",
+    "leg3": "leg2",
+    "leg2": "leg1",
+    "leg1": "leg0"
+   },
+   "java_parts": {
+    "head": {
+     "pivot": [
+      0,
+      11.5,
+      -17
+     ]
+    },
+    "body": {
+     "pivot": [
+      0,
+      10,
+      0
+     ]
+    },
+    "leg4": {
+     "pivot": [
+      5.5,
+      15,
+      -9
+     ]
+    },
+    "leg3": {
+     "pivot": [
+      -5.5,
+      15,
+      -9
+     ]
+    },
+    "leg2": {
+     "pivot": [
+      5.5,
+      15,
+      9
+     ]
+    },
+    "leg1": {
+     "pivot": [
+      -5.5,
+      15,
+      9
+     ]
+    }
+   },
+   "family": "head"
+  },
+  "panda_baby": {
+   "entity": "minecraft:panda",
+   "geometry": "baby",
+   "bones": {
+    "head": "head",
+    "left_hind_leg": "leg1",
+    "right_hind_leg": "leg0",
+    "left_front_leg": "leg3",
+    "right_front_leg": "leg2",
+    "body": "body"
+   },
+   "java_parts": {
+    "head": {
+     "pivot": [
+      0,
+      19,
+      -3
+     ]
+    },
+    "left_hind_leg": {
+     "pivot": [
+      3,
+      22,
+      6.5
+     ]
+    },
+    "right_hind_leg": {
+     "pivot": [
+      -3,
+      22,
+      6.5
+     ]
+    },
+    "left_front_leg": {
+     "pivot": [
+      3,
+      22,
+      -1.5
+     ]
+    },
+    "right_front_leg": {
+     "pivot": [
+      -3,
+      22,
+      -1.5
+     ]
+    },
+    "body": {
+     "pivot": [
+      0,
+      18.5,
+      2.5
+     ]
+    }
+   },
+   "family": "head"
+  },
+  "parched": {
+   "entity": "minecraft:parched",
+   "geometry": "default",
+   "bones": {
+    "head": "head",
+    "headwear": "head",
+    "body": "body",
+    "left_leg": "leftLeg",
+    "left_arm": "leftArm",
+    "right_arm": "rightArm",
+    "right_leg": "rightLeg"
+   },
+   "java_parts": {
+    "head": {
+     "pivot": [
+      0,
+      0,
+      0
+     ]
+    },
+    "headwear": {
+     "pivot": [
+      0,
+      0,
+      0
+     ]
+    },
+    "body": {
+     "pivot": [
+      0,
+      0,
+      0
+     ]
+    },
+    "left_leg": {
+     "pivot": [
+      2,
+      12,
+      0
+     ]
+    },
+    "left_arm": {
+     "pivot": [
+      5.5,
+      2,
+      0
+     ]
+    },
+    "right_arm": {
+     "pivot": [
+      -5.5,
+      2,
+      0
+     ]
+    },
+    "right_leg": {
+     "pivot": [
+      -2,
+      12,
+      0
+     ]
+    }
+   },
+   "family": "biped"
+  },
+  "parrot": {
+   "entity": "minecraft:parrot",
+   "geometry": "default",
+   "bones": {
+    "head": "head",
+    "body": "body",
+    "left_wing": "wing0",
+    "right_wing": "wing1",
+    "left_leg": "leg1",
+    "right_leg": "leg0",
+    "tail": "tail"
+   },
+   "java_parts": {
+    "head": {
+     "pivot": [
+      0,
+      16,
+      -0.5
+     ]
+    },
+    "body": {
+     "pivot": [
+      0,
+      16.5,
+      -1
+     ]
+    },
+    "left_wing": {
+     "pivot": [
+      1.5,
+      16.9,
+      -0.8
+     ]
+    },
+    "right_wing": {
+     "pivot": [
+      -1.5,
+      16.9,
+      -0.8
+     ]
+    },
+    "left_leg": {
+     "pivot": [
+      1,
+      22,
+      -1
+     ]
+    },
+    "right_leg": {
+     "pivot": [
+      -1,
+      22,
+      -1
+     ]
+    },
+    "tail": {
+     "pivot": [
+      0,
+      21.1,
+      1.2
+     ]
+    }
+   },
+   "family": "head"
+  },
+  "phantom": {
+   "entity": "minecraft:phantom",
+   "geometry": "default",
+   "bones": {
+    "body": "body",
+    "head": "head",
+    "left_wing": "wing0",
+    "left_wing_tip": "wingtip0",
+    "right_wing": "wing1",
+    "right_wing_tip": "wingtip1",
+    "tail": "tail",
+    "tail2": "tailtip"
+   },
+   "java_parts": {
+    "body": {
+     "pivot": [
+      0.5,
+      19,
+      0
+     ]
+    },
+    "head": {
+     "pivot": [
+      0.5,
+      20.25,
+      -8
+     ]
+    },
+    "left_wing": {
+     "pivot": [
+      2.5,
+      17,
+      -8
+     ]
+    },
+    "left_wing_tip": {
+     "pivot": [
+      8.5,
+      17,
+      -8
+     ]
+    },
+    "right_wing": {
+     "pivot": [
+      -2.5,
+      17,
+      -8
+     ]
+    },
+    "right_wing_tip": {
+     "pivot": [
+      -8.5,
+      17,
+      -8
+     ]
+    },
+    "tail": {
+     "pivot": [
+      0.5,
+      17,
+      1
+     ]
+    },
+    "tail2": {
+     "pivot": [
+      0.5,
+      17.5,
+      7
+     ]
+    }
+   },
+   "family": "head",
+   "frame": {
+    "offset": [
+     -0.5,
+     19,
+     0
+    ]
+   }
+  },
+  "pig": {
+   "entity": "minecraft:pig",
+   "geometry": "default",
+   "bones": {
+    "body": "body",
+    "head": "head",
+    "leg1": "leg0",
+    "leg2": "leg1",
+    "leg3": "leg2",
+    "leg4": "leg3"
+   },
+   "java_parts": {
+    "body": {
+     "pivot": [
+      0,
+      11,
+      2
+     ],
+     "rotation": [
+      90,
+      0,
+      0
+     ]
+    },
+    "head": {
+     "pivot": [
+      0,
+      12,
+      -6
+     ]
+    },
+    "leg1": {
+     "pivot": [
+      -3,
+      18,
+      7
+     ]
+    },
+    "leg2": {
+     "pivot": [
+      3,
+      18,
+      7
+     ]
+    },
+    "leg3": {
+     "pivot": [
+      -3,
+      18,
+      -5
+     ]
+    },
+    "leg4": {
+     "pivot": [
+      3,
+      18,
+      -5
+     ]
+    }
+   },
+   "family": "quadruped"
+  },
+  "pig_baby": {
+   "entity": "minecraft:pig",
+   "geometry": "baby",
+   "bones": {
+    "head": "head",
+    "body": "body",
+    "left_hind_leg": "leg1",
+    "right_hind_leg": "leg0",
+    "left_front_leg": "leg3",
+    "right_front_leg": "leg2"
+   },
+   "java_parts": {
+    "head": {
+     "pivot": [
+      0,
+      19,
+      -2
+     ]
+    },
+    "body": {
+     "pivot": [
+      0,
+      19,
+      0.5
+     ]
+    },
+    "left_hind_leg": {
+     "pivot": [
+      2.5,
+      22,
+      4
+     ]
+    },
+    "right_hind_leg": {
+     "pivot": [
+      -2.5,
+      22,
+      4
+     ]
+    },
+    "left_front_leg": {
+     "pivot": [
+      2.5,
+      22,
+      -3
+     ]
+    },
+    "right_front_leg": {
+     "pivot": [
+      -2.5,
+      22,
+      -3
+     ]
+    }
+   },
+   "family": "quadruped"
+  },
+  "piglin": {
+   "entity": "minecraft:piglin",
+   "geometry": "default",
+   "bones": {
+    "head": "head",
+    "left_ear": "leftear",
+    "right_ear": "rightear",
+    "body": "body",
+    "jacket": "body",
+    "left_arm": "leftarm",
+    "left_sleeve": "leftarm",
+    "right_arm": "rightarm",
+    "right_sleeve": "rightarm",
+    "left_leg": "leftleg",
+    "left_pants": "leftleg",
+    "right_leg": "rightleg",
+    "right_pants": "rightleg"
+   },
+   "java_parts": {
+    "head": {
+     "pivot": [
+      0,
+      0,
+      0
+     ]
+    },
+    "left_ear": {
+     "pivot": [
+      4.5,
+      -6,
+      0
+     ],
+     "rotation": [
+      0,
+      0,
+      -35
+     ]
+    },
+    "right_ear": {
+     "pivot": [
+      -4.5,
+      -6,
+      0
+     ],
+     "rotation": [
+      0,
+      0,
+      35
+     ]
+    },
+    "body": {
+     "pivot": [
+      0,
+      0,
+      0
+     ]
+    },
+    "jacket": {
+     "pivot": [
+      0,
+      0,
+      0
+     ]
+    },
+    "left_arm": {
+     "pivot": [
+      5,
+      2,
+      0
+     ]
+    },
+    "left_sleeve": {
+     "pivot": [
+      5,
+      2,
+      0
+     ]
+    },
+    "right_arm": {
+     "pivot": [
+      -5,
+      2,
+      0
+     ]
+    },
+    "right_sleeve": {
+     "pivot": [
+      -5,
+      2,
+      0
+     ]
+    },
+    "left_leg": {
+     "pivot": [
+      2,
+      12,
+      0
+     ]
+    },
+    "left_pants": {
+     "pivot": [
+      2,
+      12,
+      0
+     ]
+    },
+    "right_leg": {
+     "pivot": [
+      -2,
+      12,
+      0
+     ]
+    },
+    "right_pants": {
+     "pivot": [
+      -2,
+      12,
+      0
+     ]
+    }
+   },
+   "family": "biped"
+  },
+  "piglin_baby": {
+   "entity": "minecraft:piglin",
+   "geometry": "baby",
+   "bones": {
+    "head": "head",
+    "headwear": "head",
+    "left_ear": "leftear",
+    "right_ear": "rightear",
+    "body": "Body",
+    "left_arm": "LeftArm",
+    "right_arm": "RightArm",
+    "left_leg": "LeftLeg",
+    "right_leg": "RightLeg"
+   },
+   "java_parts": {
+    "head": {
+     "pivot": [
+      0,
+      15,
+      0
+     ]
+    },
+    "headwear": {
+     "pivot": [
+      0,
+      15,
+      0
+     ]
+    },
+    "left_ear": {
+     "pivot": [
+      4.2,
+      11,
+      0
+     ],
+     "rotation": [
+      0,
+      0,
+      -5
+     ]
+    },
+    "right_ear": {
+     "pivot": [
+      -4.2,
+      11,
+      0
+     ],
+     "rotation": [
+      0,
+      0,
+      5
+     ]
+    },
+    "body": {
+     "pivot": [
+      0,
+      18,
+      -0.5
+     ]
+    },
+    "left_arm": {
+     "pivot": [
+      4,
+      15,
+      0
+     ]
+    },
+    "right_arm": {
+     "pivot": [
+      -4,
+      15,
+      0
+     ]
+    },
+    "left_leg": {
+     "pivot": [
+      1.5,
+      20,
+      0
+     ]
+    },
+    "right_leg": {
+     "pivot": [
+      -1.5,
+      20,
+      0
+     ]
+    }
+   },
+   "family": "biped"
+  },
+  "piglin_brute": {
+   "entity": "minecraft:piglin_brute",
+   "geometry": "default",
+   "bones": {
+    "head": "head",
+    "left_ear": "leftear",
+    "right_ear": "rightear",
+    "body": "body",
+    "jacket": "body",
+    "left_arm": "leftarm",
+    "left_sleeve": "leftarm",
+    "right_arm": "rightarm",
+    "right_sleeve": "rightarm",
+    "left_leg": "leftleg",
+    "left_pants": "leftleg",
+    "right_leg": "rightleg",
+    "right_pants": "rightleg"
+   },
+   "java_parts": {
+    "head": {
+     "pivot": [
+      0,
+      0,
+      0
+     ]
+    },
+    "left_ear": {
+     "pivot": [
+      4.5,
+      -6,
+      0
+     ],
+     "rotation": [
+      0,
+      0,
+      -35
+     ]
+    },
+    "right_ear": {
+     "pivot": [
+      -4.5,
+      -6,
+      0
+     ],
+     "rotation": [
+      0,
+      0,
+      35
+     ]
+    },
+    "body": {
+     "pivot": [
+      0,
+      0,
+      0
+     ]
+    },
+    "jacket": {
+     "pivot": [
+      0,
+      0,
+      0
+     ]
+    },
+    "left_arm": {
+     "pivot": [
+      5,
+      2,
+      0
+     ]
+    },
+    "left_sleeve": {
+     "pivot": [
+      5,
+      2,
+      0
+     ]
+    },
+    "right_arm": {
+     "pivot": [
+      -5,
+      2,
+      0
+     ]
+    },
+    "right_sleeve": {
+     "pivot": [
+      -5,
+      2,
+      0
+     ]
+    },
+    "left_leg": {
+     "pivot": [
+      2,
+      12,
+      0
+     ]
+    },
+    "left_pants": {
+     "pivot": [
+      2,
+      12,
+      0
+     ]
+    },
+    "right_leg": {
+     "pivot": [
+      -2,
+      12,
+      0
+     ]
+    },
+    "right_pants": {
+     "pivot": [
+      -2,
+      12,
+      0
+     ]
+    }
+   },
+   "family": "biped"
+  },
+  "pillager": {
+   "entity": "minecraft:pillager",
+   "geometry": "default",
+   "bones": {
+    "head": "head",
+    "headwear": "head",
+    "nose": "nose",
+    "body": "body",
+    "left_arm": "leftarm",
+    "right_arm": "rightarm",
+    "left_leg": "leftLeg",
+    "right_leg": "rightLeg"
+   },
+   "java_parts": {
+    "head": {
+     "pivot": [
+      0,
+      0,
+      0
+     ]
+    },
+    "headwear": {
+     "pivot": [
+      0,
+      0,
+      0
+     ]
+    },
+    "nose": {
+     "pivot": [
+      0,
+      -2,
+      0
+     ]
+    },
+    "body": {
+     "pivot": [
+      0,
+      0,
+      0
+     ]
+    },
+    "left_arm": {
+     "pivot": [
+      5,
+      2,
+      0
+     ]
+    },
+    "right_arm": {
+     "pivot": [
+      -5,
+      2,
+      0
+     ]
+    },
+    "left_leg": {
+     "pivot": [
+      2,
+      12,
+      0
+     ]
+    },
+    "right_leg": {
+     "pivot": [
+      -2,
+      12,
+      0
+     ]
+    }
+   },
+   "family": "head"
+  },
+  "polar_bear": {
+   "entity": "minecraft:polar_bear",
+   "geometry": "default",
+   "bones": {
+    "head": "head",
+    "body": "body",
+    "leg1": "leg1",
+    "leg2": "leg0",
+    "leg3": "leg3",
+    "leg4": "leg2"
+   },
+   "java_parts": {
+    "head": {
+     "pivot": [
+      0,
+      10,
+      -16
+     ]
+    },
+    "body": {
+     "pivot": [
+      -2,
+      9,
+      12
+     ],
+     "rotation": [
+      90,
+      0,
+      0
+     ]
+    },
+    "leg1": {
+     "pivot": [
+      4.5,
+      14,
+      6
+     ]
+    },
+    "leg2": {
+     "pivot": [
+      -4.5,
+      14,
+      6
+     ]
+    },
+    "leg3": {
+     "pivot": [
+      3.5,
+      14,
+      -8
+     ]
+    },
+    "leg4": {
+     "pivot": [
+      -3.5,
+      14,
+      -8
+     ]
+    }
+   },
+   "family": "head"
+  },
+  "polar_bear_baby": {
+   "entity": "minecraft:polar_bear",
+   "geometry": "baby",
+   "bones": {
+    "head": "head",
+    "left_hind_leg": "leg1",
+    "right_hind_leg": "leg0",
+    "left_front_leg": "leg3",
+    "right_front_leg": "leg2",
+    "body": "body"
+   },
+   "java_parts": {
+    "head": {
+     "pivot": [
+      0,
+      18.625,
+      -5.75
+     ]
+    },
+    "left_hind_leg": {
+     "pivot": [
+      2.5,
+      21.5,
+      4.5
+     ]
+    },
+    "right_hind_leg": {
+     "pivot": [
+      -2.5,
+      21.5,
+      4.5
+     ]
+    },
+    "left_front_leg": {
+     "pivot": [
+      2.5,
+      21.5,
+      -4.5
+     ]
+    },
+    "right_front_leg": {
+     "pivot": [
+      -2.5,
+      21.5,
+      -4.5
+     ]
+    },
+    "body": {
+     "pivot": [
+      0,
+      17.5,
+      0
+     ]
+    }
+   },
+   "family": "head"
+  },
+  "puffer_fish_big": {
+   "entity": "minecraft:pufferfish",
+   "geometry": "large",
+   "bones": {
+    "body": "body",
+    "fin_left": "leftFin",
+    "fin_right": "rightFin",
+    "spikes_front_top": "spines_top_front",
+    "spikes_middle_top": "spines_top_mid",
+    "spikes_back_top": "spines_top_back",
+    "spikes_front_left": "spines_left_front",
+    "spikes_front_right": "spines_right_front",
+    "spikes_back_left": "spines_left_back",
+    "spikes_back_right": "spines_right_back",
+    "spikes_front_bottom": "spines_bottom_front",
+    "spikes_middle_bottom": "spines_bottom_mid",
+    "spikes_back_bottom": "spines_bottom_back"
+   },
+   "java_parts": {
+    "body": {
+     "pivot": [
+      0,
+      23,
+      0
+     ]
+    },
+    "fin_left": {
+     "pivot": [
+      4,
+      16,
+      -2
+     ]
+    },
+    "fin_right": {
+     "pivot": [
+      -4,
+      16,
+      -2
+     ]
+    },
+    "spikes_front_top": {
+     "pivot": [
+      0,
+      15,
+      -4
+     ],
+     "rotation": [
+      45,
+      0,
+      0
+     ]
+    },
+    "spikes_middle_top": {
+     "pivot": [
+      0,
+      15,
+      0
+     ]
+    },
+    "spikes_back_top": {
+     "pivot": [
+      0,
+      15,
+      4
+     ],
+     "rotation": [
+      -45,
+      0,
+      0
+     ]
+    },
+    "spikes_front_left": {
+     "pivot": [
+      4,
+      23,
+      -4
+     ],
+     "rotation": [
+      0,
+      45,
+      0
+     ]
+    },
+    "spikes_front_right": {
+     "pivot": [
+      -4,
+      23,
+      -4
+     ],
+     "rotation": [
+      0,
+      -45,
+      0
+     ]
+    },
+    "spikes_back_left": {
+     "pivot": [
+      4,
+      23,
+      4
+     ],
+     "rotation": [
+      0,
+      -45,
+      0
+     ]
+    },
+    "spikes_back_right": {
+     "pivot": [
+      -4,
+      23,
+      4
+     ],
+     "rotation": [
+      0,
+      45,
+      0
+     ]
+    },
+    "spikes_front_bottom": {
+     "pivot": [
+      0,
+      23,
+      -4
+     ],
+     "rotation": [
+      -45,
+      0,
+      0
+     ]
+    },
+    "spikes_middle_bottom": {
+     "pivot": [
+      0,
+      23,
+      0
+     ]
+    },
+    "spikes_back_bottom": {
+     "pivot": [
+      0,
+      23,
+      4
+     ],
+     "rotation": [
+      45,
+      0,
+      0
+     ]
+    }
+   }
+  },
+  "puffer_fish_medium": {
+   "entity": "minecraft:pufferfish",
+   "geometry": "mid",
+   "bones": {
+    "body": "body",
+    "fin_left": "leftFin",
+    "fin_right": "rightFin",
+    "spikes_front_top": "spines_top_front",
+    "spikes_back_top": "spines_top_back",
+    "spikes_front_left": "spines_left_front",
+    "spikes_front_right": "spines_right_front",
+    "spikes_back_left": "spines_left_back",
+    "spikes_back_right": "spines_right_back",
+    "spikes_front_bottom": "spines_bottom_front",
+    "spikes_back_bottom": "spines_bottom_back"
+   },
+   "java_parts": {
+    "body": {
+     "pivot": [
+      0,
+      23,
+      0
+     ]
+    },
+    "fin_left": {
+     "pivot": [
+      2.5,
+      19,
+      -1.5
+     ]
+    },
+    "fin_right": {
+     "pivot": [
+      -2.5,
+      19,
+      -1.5
+     ]
+    },
+    "spikes_front_top": {
+     "pivot": [
+      0,
+      18,
+      -2.5
+     ],
+     "rotation": [
+      45,
+      0,
+      0
+     ]
+    },
+    "spikes_back_top": {
+     "pivot": [
+      0,
+      18,
+      2.5
+     ],
+     "rotation": [
+      -45,
+      0,
+      0
+     ]
+    },
+    "spikes_front_left": {
+     "pivot": [
+      2.5,
+      23,
+      -2.5
+     ],
+     "rotation": [
+      0,
+      45,
+      0
+     ]
+    },
+    "spikes_front_right": {
+     "pivot": [
+      -2.5,
+      23,
+      -2.5
+     ],
+     "rotation": [
+      0,
+      -45,
+      0
+     ]
+    },
+    "spikes_back_left": {
+     "pivot": [
+      2.5,
+      23,
+      2.5
+     ],
+     "rotation": [
+      0,
+      -45,
+      0
+     ]
+    },
+    "spikes_back_right": {
+     "pivot": [
+      -2.5,
+      23,
+      2.5
+     ],
+     "rotation": [
+      0,
+      45,
+      0
+     ]
+    },
+    "spikes_front_bottom": {
+     "pivot": [
+      0,
+      23,
+      -2.5
+     ],
+     "rotation": [
+      -45,
+      0,
+      0
+     ]
+    },
+    "spikes_back_bottom": {
+     "pivot": [
+      -2.5,
+      23,
+      2.5
+     ],
+     "rotation": [
+      45,
+      0,
+      0
+     ]
+    }
+   }
+  },
+  "puffer_fish_small": {
+   "entity": "minecraft:pufferfish",
+   "geometry": "default",
+   "bones": {
+    "body": "body",
+    "tail": "tailfin",
+    "fin_right": "rightFin",
+    "fin_left": "leftFin",
+    "eye_right": "body",
+    "eye_left": "body"
+   },
+   "java_parts": {
+    "body": {
+     "pivot": [
+      0,
+      24,
+      0
+     ]
+    },
+    "tail": {
+     "pivot": [
+      0,
+      23,
+      1.5
+     ]
+    },
+    "fin_right": {
+     "pivot": [
+      -1.5,
+      23,
+      -1.5
+     ]
+    },
+    "fin_left": {
+     "pivot": [
+      1.5,
+      23,
+      -1.5
+     ]
+    },
+    "eye_right": {
+     "pivot": [
+      0,
+      21,
+      0
+     ]
+    },
+    "eye_left": {
+     "pivot": [
+      0,
+      21,
+      0
+     ]
+    }
+   }
+  },
+  "rabbit": {
+   "entity": "minecraft:rabbit",
+   "geometry": "default",
+   "bones": {
+    "head": "head",
+    "left_ear": "left_ear",
+    "right_ear": "right_ear",
+    "body": "body",
+    "left_foot": "leftBackLeg",
+    "right_foot": "rightBackLeg",
+    "tail": "tail"
+   },
+   "java_parts": {
+    "head": {
+     "pivot": [
+      0,
+      15,
+      -1.5
+     ],
+     "rotation": [
+      -22.5,
+      0,
+      0
+     ]
+    },
+    "left_ear": {
+     "pivot": [
+      1.5,
+      11.2426,
+      -0.8841
+     ],
+     "rotation": [
+      -22.5,
+      0,
+      0
+     ]
+    },
+    "right_ear": {
+     "pivot": [
+      -1.5,
+      11.2426,
+      -0.8841
+     ],
+     "rotation": [
+      -22.5,
+      0,
+      0
+     ]
+    },
+    "body": {
+     "pivot": [
+      0,
+      23,
+      4
+     ],
+     "rotation": [
+      -22.5,
+      0,
+      0
+     ]
+    },
+    "left_foot": {
+     "pivot": [
+      3,
+      23,
+      4
+     ],
+     "rotation": [
+      0,
+      -22.5,
+      0
+     ]
+    },
+    "right_foot": {
+     "pivot": [
+      -3,
+      23,
+      4
+     ],
+     "rotation": [
+      0,
+      22.5,
+      0
+     ]
+    },
+    "tail": {
+     "pivot": [
+      0,
+      18.3932,
+      5.9217
+     ],
+     "rotation": [
+      -22.5,
+      0,
+      0
+     ]
+    }
+   },
+   "family": "head"
+  },
+  "rabbit_baby": {
+   "entity": "minecraft:rabbit",
+   "geometry": "baby",
+   "bones": {
+    "head": "head",
+    "left_ear": "left_ear",
+    "right_ear": "right_ear",
+    "body": "body",
+    "left_arm": "leftFrontLeg",
+    "right_arm": "rightFrontLeg",
+    "left_foot": "leftBackLeg",
+    "right_foot": "rightBackLeg",
+    "tail": "tail"
+   },
+   "java_parts": {
+    "head": {
+     "pivot": [
+      0,
+      18,
+      -1
+     ]
+    },
+    "left_ear": {
+     "pivot": [
+      1.5,
+      14.5,
+      -1.5
+     ]
+    },
+    "right_ear": {
+     "pivot": [
+      -1.5,
+      14.5,
+      -1.5
+     ]
+    },
+    "body": {
+     "pivot": [
+      0,
+      21,
+      0
+     ],
+     "rotation": [
+      -30,
+      0,
+      0
+     ]
+    },
+    "left_arm": {
+     "pivot": [
+      1,
+      21.5,
+      -1.5
+     ],
+     "rotation": [
+      22.5,
+      0,
+      0
+     ]
+    },
+    "right_arm": {
+     "pivot": [
+      -1,
+      21.5,
+      -1.5
+     ],
+     "rotation": [
+      22.5,
+      0,
+      0
+     ]
+    },
+    "left_foot": {
+     "pivot": [
+      0.5,
+      23.5,
+      2
+     ],
+     "rotation": [
+      0,
+      135,
+      0
+     ]
+    },
+    "right_foot": {
+     "pivot": [
+      -1.915,
+      23.5,
+      3.414
+     ],
+     "rotation": [
+      0,
+      -135,
+      0
+     ]
+    },
+    "tail": {
+     "pivot": [
+      -0.1,
+      20.8,
+      3.6
+     ],
+     "rotation": [
+      -30,
+      0,
+      0
+     ]
+    }
+   },
+   "family": "head"
+  },
+  "ravager": {
+   "entity": "minecraft:ravager",
+   "geometry": "default",
+   "bones": {
+    "head": "head",
+    "jaw": "mouth",
+    "body": "body",
+    "leg1": "leg0",
+    "leg2": "leg1",
+    "leg3": "leg2",
+    "leg4": "leg3",
+    "neck": "neck"
+   },
+   "java_parts": {
+    "head": {
+     "pivot": [
+      0,
+      10,
+      -10
+     ]
+    },
+    "jaw": {
+     "pivot": [
+      0,
+      8,
+      -8
+     ]
+    },
+    "body": {
+     "pivot": [
+      0,
+      1,
+      3.5
+     ]
+    },
+    "leg1": {
+     "pivot": [
+      -8,
+      -13,
+      21
+     ]
+    },
+    "leg2": {
+     "pivot": [
+      8,
+      -13,
+      21
+     ]
+    },
+    "leg3": {
+     "pivot": [
+      -8,
+      -13,
+      -3.5
+     ]
+    },
+    "leg4": {
+     "pivot": [
+      8,
+      -13,
+      -3.5
+     ]
+    },
+    "neck": {
+     "pivot": [
+      0,
+      -6,
+      8
+     ]
+    }
+   },
+   "family": "head"
+  },
+  "salmon": {
+   "entity": "minecraft:salmon",
+   "geometry": "default",
+   "bones": {
+    "head": "head",
+    "body_front": "body_front",
+    "body_back": "body_back",
+    "fin_left": "leftFin",
+    "fin_right": "rightFin",
+    "fin_back_1": "dorsal_front",
+    "fin_back_2": "dorsal_back",
+    "tail": "tailfin"
+   },
+   "java_parts": {
+    "head": {
+     "pivot": [
+      0,
+      21.5,
+      -8
+     ]
+    },
+    "body_front": {
+     "pivot": [
+      0,
+      21.5,
+      -8
+     ]
+    },
+    "body_back": {
+     "pivot": [
+      0,
+      21.5,
+      0
+     ]
+    },
+    "fin_left": {
+     "pivot": [
+      1.5,
+      23,
+      -8
+     ],
+     "rotation": [
+      0,
+      0,
+      45
+     ]
+    },
+    "fin_right": {
+     "pivot": [
+      -1.5,
+      23,
+      -8
+     ],
+     "rotation": [
+      0,
+      0,
+      -45
+     ]
+    },
+    "fin_back_1": {
+     "pivot": [
+      0,
+      17,
+      -3
+     ]
+    },
+    "fin_back_2": {
+     "pivot": [
+      0,
+      17,
+      -1
+     ]
+    },
+    "tail": {
+     "pivot": [
+      0,
+      21.5,
+      8
+     ]
+    }
+   },
+   "family": "head",
+   "frame": {
+    "offset": [
+     0,
+     3.5,
+     4
+    ]
+   }
+  },
+  "sheep": {
+   "entity": "minecraft:sheep",
+   "geometry": "default",
+   "bones": {
+    "body": "body",
+    "head": "head",
+    "leg1": "leg0",
+    "leg2": "leg1",
+    "leg3": "leg2",
+    "leg4": "leg3"
+   },
+   "java_parts": {
+    "body": {
+     "pivot": [
+      0,
+      5,
+      2
+     ]
+    },
+    "head": {
+     "pivot": [
+      0,
+      6,
+      -8
+     ]
+    },
+    "leg1": {
+     "pivot": [
+      -3,
+      12,
+      7
+     ]
+    },
+    "leg2": {
+     "pivot": [
+      3,
+      12,
+      7
+     ]
+    },
+    "leg3": {
+     "pivot": [
+      -3,
+      12,
+      -5
+     ]
+    },
+    "leg4": {
+     "pivot": [
+      3,
+      12,
+      -5
+     ]
+    }
+   },
+   "family": "quadruped"
+  },
+  "sheep_baby": {
+   "entity": "minecraft:sheep",
+   "geometry": "baby",
+   "bones": {
+    "head": "head",
+    "body": "body",
+    "left_hind_leg": "leg1",
+    "right_hind_leg": "leg0",
+    "left_front_leg": "leg3",
+    "right_front_leg": "leg2"
+   },
+   "java_parts": {
+    "head": {
+     "pivot": [
+      0,
+      15.5,
+      -2.5
+     ]
+    },
+    "body": {
+     "pivot": [
+      0,
+      17,
+      0.5
+     ]
+    },
+    "left_hind_leg": {
+     "pivot": [
+      2,
+      19,
+      3
+     ]
+    },
+    "right_hind_leg": {
+     "pivot": [
+      -2,
+      19,
+      3
+     ]
+    },
+    "left_front_leg": {
+     "pivot": [
+      2,
+      19,
+      -2
+     ]
+    },
+    "right_front_leg": {
+     "pivot": [
+      -2,
+      19,
+      -2
+     ]
+    }
+   },
+   "family": "quadruped"
+  },
+  "shulker": {
+   "entity": "minecraft:shulker",
+   "geometry": "default",
+   "bones": {
+    "lid": "lid",
+    "base": "base",
+    "head": "head"
+   },
+   "java_parts": {
+    "lid": {
+     "pivot": [
+      0,
+      24,
+      0
+     ]
+    },
+    "base": {
+     "pivot": [
+      0,
+      24,
+      0
+     ]
+    },
+    "head": {
+     "pivot": [
+      0,
+      12,
+      0
+     ]
+    }
+   },
+   "family": "head"
+  },
+  "shulker_bullet": {
+   "entity": "minecraft:shulker_bullet",
+   "geometry": "default",
+   "bones": {
+    "bullet": "body"
+   },
+   "java_parts": {
+    "bullet": {
+     "pivot": [
+      0,
+      20,
+      0
+     ]
+    }
+   }
+  },
+  "silverfish": {
+   "entity": "minecraft:silverfish",
+   "geometry": "default",
+   "bones": {
+    "body1": "bodyPart_0",
+    "body2": "bodyPart_1",
+    "body3": "bodyPart_2",
+    "body4": "bodyPart_3",
+    "body5": "bodyPart_4",
+    "body6": "bodyPart_5",
+    "body7": "bodyPart_6",
+    "wing1": "bodyLayer_0",
+    "wing2": "bodyLayer_1",
+    "wing3": "bodyLayer_2"
+   },
+   "java_parts": {
+    "body1": {
+     "pivot": [
+      0,
+      22,
+      -7
+     ]
+    },
+    "body2": {
+     "pivot": [
+      0,
+      21,
+      -5
+     ]
+    },
+    "body3": {
+     "pivot": [
+      0,
+      20,
+      -2.5
+     ]
+    },
+    "body4": {
+     "pivot": [
+      0,
+      21,
+      0.5
+     ]
+    },
+    "body5": {
+     "pivot": [
+      0,
+      22,
+      3.5
+     ]
+    },
+    "body6": {
+     "pivot": [
+      0,
+      23,
+      6
+     ]
+    },
+    "body7": {
+     "pivot": [
+      0,
+      23,
+      8
+     ]
+    },
+    "wing1": {
+     "pivot": [
+      0,
+      16,
+      -2.5
+     ]
+    },
+    "wing2": {
+     "pivot": [
+      0,
+      20,
+      3.5
+     ]
+    },
+    "wing3": {
+     "pivot": [
+      0,
+      19,
+      -5
+     ]
+    }
+   },
+   "frame": {
+    "offset": [
+     0,
+     0,
+     3.5
+    ]
+   }
+  },
+  "skeleton": {
+   "entity": "minecraft:skeleton",
+   "geometry": "default",
+   "bones": {
+    "head": "hat",
+    "headwear": "head",
+    "body": "body",
+    "left_arm": "leftArm",
+    "right_arm": "rightArm",
+    "left_leg": "leftLeg",
+    "right_leg": "rightLeg"
+   },
+   "java_parts": {
+    "head": {
+     "pivot": [
+      0,
+      0,
+      0
+     ]
+    },
+    "headwear": {
+     "pivot": [
+      0,
+      0,
+      0
+     ]
+    },
+    "body": {
+     "pivot": [
+      0,
+      0,
+      0
+     ]
+    },
+    "left_arm": {
+     "pivot": [
+      5,
+      2,
+      0
+     ]
+    },
+    "right_arm": {
+     "pivot": [
+      -5,
+      2,
+      0
+     ]
+    },
+    "left_leg": {
+     "pivot": [
+      2,
+      12,
+      0
+     ]
+    },
+    "right_leg": {
+     "pivot": [
+      -2,
+      12,
+      0
+     ]
+    }
+   },
+   "family": "biped"
+  },
+  "skeleton_horse": {
+   "entity": "minecraft:skeleton_horse",
+   "geometry": "default",
+   "bones": {
+    "head": "Head",
+    "mouth": "Muzzle",
+    "left_ear": "EarL",
+    "right_ear": "EarR",
+    "neck": "Neck",
+    "mane": "Mane",
+    "body": "Body",
+    "tail": "Tail",
+    "front_left_leg": "LegFL",
+    "front_right_leg": "LegFR",
+    "back_left_leg": "LegBL",
+    "back_right_leg": "LegBR"
+   },
+   "java_parts": {
+    "head": {
+     "pivot": [
+      0,
+      2,
+      -9
+     ]
+    },
+    "mouth": {
+     "pivot": [
+      0,
+      2,
+      -9
+     ]
+    },
+    "left_ear": {
+     "pivot": [
+      0,
+      1,
+      -9.01
+     ]
+    },
+    "right_ear": {
+     "pivot": [
+      0,
+      1,
+      -9.01
+     ]
+    },
+    "neck": {
+     "pivot": [
+      0,
+      2,
+      -9
+     ]
+    },
+    "mane": {
+     "pivot": [
+      0,
+      2,
+      -9.01
+     ]
+    },
+    "body": {
+     "pivot": [
+      0,
+      11,
+      6
+     ]
+    },
+    "tail": {
+     "pivot": [
+      0,
+      3,
+      11
+     ]
+    },
+    "front_left_leg": {
+     "pivot": [
+      4,
+      14,
+      -9
+     ]
+    },
+    "front_right_leg": {
+     "pivot": [
+      -4,
+      14,
+      -9
+     ]
+    },
+    "back_left_leg": {
+     "pivot": [
+      4,
+      14,
+      8
+     ]
+    },
+    "back_right_leg": {
+     "pivot": [
+      -4,
+      14,
+      8
+     ]
+    }
+   },
+   "family": "head"
+  },
+  "skeleton_horse_baby": {
+   "entity": "minecraft:skeleton_horse",
+   "geometry": "baby",
+   "bones": {
+    "head": "Head",
+    "neck": "Neck",
+    "left_ear": "EarL",
+    "right_ear": "EarR",
+    "body": "Body",
+    "front_left_leg": "LegFL",
+    "front_right_leg": "LegFR",
+    "back_left_leg": "LegBL",
+    "back_right_leg": "LegBR",
+    "tail": "Tail"
+   },
+   "java_parts": {
+    "head": {
+     "pivot": [
+      0,
+      3.9484,
+      -6.2951
+     ]
+    },
+    "neck": {
+     "pivot": [
+      0,
+      10,
+      -6
+     ]
+    },
+    "left_ear": {
+     "pivot": [
+      2,
+      -0.3,
+      -4.35
+     ],
+     "rotation": [
+      0,
+      0,
+      15
+     ]
+    },
+    "right_ear": {
+     "pivot": [
+      -2,
+      -0.3,
+      -4.6501
+     ],
+     "rotation": [
+      0,
+      0,
+      -15
+     ]
+    },
+    "body": {
+     "pivot": [
+      0,
+      12.5,
+      0
+     ]
+    },
+    "front_left_leg": {
+     "pivot": [
+      2.4,
+      16,
+      -5.4
+     ]
+    },
+    "front_right_leg": {
+     "pivot": [
+      -2.4,
+      16,
+      -5.4
+     ]
+    },
+    "back_left_leg": {
+     "pivot": [
+      2.4,
+      16,
+      5.4
+     ]
+    },
+    "back_right_leg": {
+     "pivot": [
+      -2.4,
+      16,
+      5.4
+     ]
+    },
+    "tail": {
+     "pivot": [
+      0,
+      11.5,
+      7
+     ],
+     "rotation": [
+      -42.5,
+      0,
+      0
+     ]
+    }
+   },
+   "family": "head"
+  },
+  "slime": {
+   "entity": "minecraft:slime",
+   "geometry": "default",
+   "bones": {
+    "body": "cube",
+    "right_eye": "eye1",
+    "left_eye": "eye0",
+    "mouth": "mouth"
+   },
+   "java_parts": {
+    "body": {
+     "pivot": [
+      0,
+      0,
+      0
+     ]
+    },
+    "right_eye": {
+     "pivot": [
+      0,
+      0,
+      0
+     ]
+    },
+    "left_eye": {
+     "pivot": [
+      0,
+      0,
+      0
+     ]
+    },
+    "mouth": {
+     "pivot": [
+      0,
+      0,
+      0
+     ]
+    }
+   }
+  },
+  "slime_outer": {
+   "entity": "minecraft:slime",
+   "geometry": "armor",
+   "bones": {
+    "body": "cube"
+   },
+   "java_parts": {
+    "body": {
+     "pivot": [
+      0,
+      0,
+      0
+     ]
+    }
+   }
+  },
+  "sniffer": {
+   "entity": "minecraft:sniffer",
+   "geometry": "default",
+   "bones": {
+    "head": "head",
+    "lower_beak": "lower_beak",
+    "nose": "nose",
+    "left_ear": "left_ear",
+    "right_ear": "right_ear",
+    "body": "body",
+    "front_left_leg": "left_front_leg",
+    "front_right_leg": "right_front_leg",
+    "middle_left_leg": "left_mid_leg",
+    "middle_right_leg": "right_mid_leg",
+    "back_left_leg": "left_hind_leg",
+    "back_right_leg": "right_hind_leg"
+   },
+   "java_parts": {
+    "head": {
+     "pivot": [
+      0,
+      11.5,
+      -19.5
+     ]
+    },
+    "lower_beak": {
+     "pivot": [
+      0,
+      14,
+      -32
+     ]
+    },
+    "nose": {
+     "pivot": [
+      0,
+      7,
+      -31
+     ]
+    },
+    "left_ear": {
+     "pivot": [
+      6.51,
+      4,
+      -24
+     ]
+    },
+    "right_ear": {
+     "pivot": [
+      -6.51,
+      4,
+      -24
+     ]
+    },
+    "body": {
+     "pivot": [
+      0,
+      5,
+      0
+     ]
+    },
+    "front_left_leg": {
+     "pivot": [
+      7.5,
+      15,
+      -15
+     ]
+    },
+    "front_right_leg": {
+     "pivot": [
+      -7.5,
+      15,
+      -15
+     ]
+    },
+    "middle_left_leg": {
+     "pivot": [
+      7.5,
+      15,
+      0
+     ]
+    },
+    "middle_right_leg": {
+     "pivot": [
+      -7.5,
+      15,
+      0
+     ]
+    },
+    "back_left_leg": {
+     "pivot": [
+      7.5,
+      15,
+      15
+     ]
+    },
+    "back_right_leg": {
+     "pivot": [
+      -7.5,
+      15,
+      15
+     ]
+    }
+   },
+   "family": "head"
+  },
+  "sniffer_baby": {
+   "entity": "minecraft:sniffer",
+   "geometry": "baby",
+   "bones": {
+    "head": "head",
+    "nose": "nose",
+    "lower_beak": "lower_beak",
+    "left_ear": "left_ear",
+    "right_ear": "right_ear",
+    "body": "body",
+    "front_left_leg": "left_front_leg",
+    "front_right_leg": "right_front_leg",
+    "middle_left_leg": "left_mid_leg",
+    "middle_right_leg": "right_mid_leg",
+    "back_left_leg": "left_back_leg",
+    "back_right_leg": "right_hind_leg"
+   },
+   "java_parts": {
+    "head": {
+     "pivot": [
+      0,
+      16.25,
+      -9.5
+     ]
+    },
+    "nose": {
+     "pivot": [
+      0,
+      15,
+      -19
+     ]
+    },
+    "lower_beak": {
+     "pivot": [
+      0,
+      17.5,
+      -19
+     ]
+    },
+    "left_ear": {
+     "pivot": [
+      5,
+      12,
+      -11
+     ]
+    },
+    "right_ear": {
+     "pivot": [
+      -5,
+      12,
+      -11
+     ]
+    },
+    "body": {
+     "pivot": [
+      6,
+      21,
+      -9.5
+     ]
+    },
+    "front_left_leg": {
+     "pivot": [
+      4,
+      20,
+      -7
+     ]
+    },
+    "front_right_leg": {
+     "pivot": [
+      -4,
+      20,
+      -7
+     ]
+    },
+    "middle_left_leg": {
+     "pivot": [
+      4,
+      20,
+      0
+     ]
+    },
+    "middle_right_leg": {
+     "pivot": [
+      -4,
+      20,
+      0
+     ]
+    },
+    "back_left_leg": {
+     "pivot": [
+      4,
+      20,
+      7
+     ]
+    },
+    "back_right_leg": {
+     "pivot": [
+      -4,
+      20,
+      7
+     ]
+    }
+   },
+   "family": "head"
+  },
+  "snow_golem": {
+   "entity": "minecraft:snow_golem",
+   "geometry": "default",
+   "bones": {
+    "head": "head",
+    "left_hand": "arm2",
+    "right_hand": "arm1",
+    "body": "piece1",
+    "body_bottom": "piece2"
+   },
+   "java_parts": {
+    "head": {
+     "pivot": [
+      0,
+      4,
+      0
+     ]
+    },
+    "left_hand": {
+     "pivot": [
+      4.5,
+      5.25,
+      0
+     ]
+    },
+    "right_hand": {
+     "pivot": [
+      -14.5,
+      5.25,
+      0
+     ]
+    },
+    "body": {
+     "pivot": [
+      0,
+      13,
+      0
+     ]
+    },
+    "body_bottom": {
+     "pivot": [
+      0,
+      24,
+      0
+     ]
+    }
+   },
+   "family": "head"
+  },
+  "spectral_arrow": {
+   "entity": "minecraft:arrow",
+   "geometry": "default",
+   "bones": {},
+   "parts_without_bone": [
+    "back",
+    "cross_1",
+    "cross_2"
+   ],
+   "java_parts": {
+    "back": {
+     "pivot": [
+      0,
+      20.5,
+      7
+     ],
+     "rotation": [
+      -135,
+      90,
+      0
+     ]
+    },
+    "cross_1": {
+     "pivot": [
+      0,
+      20.5,
+      -4
+     ],
+     "rotation": [
+      -135,
+      90,
+      0
+     ]
+    },
+    "cross_2": {
+     "pivot": [
+      0,
+      20.5,
+      -4
+     ],
+     "rotation": [
+      -45,
+      90,
+      0
+     ]
+    }
+   }
+  },
+  "spider": {
+   "entity": "minecraft:spider",
+   "geometry": "default",
+   "bones": {
+    "head": "head",
+    "neck": "body0",
+    "body": "body1",
+    "leg1": "leg0",
+    "leg2": "leg1",
+    "leg3": "leg2",
+    "leg4": "leg3",
+    "leg5": "leg4",
+    "leg6": "leg5",
+    "leg7": "leg6",
+    "leg8": "leg7"
+   },
+   "java_parts": {
+    "head": {
+     "pivot": [
+      0,
+      15,
+      -3
+     ]
+    },
+    "neck": {
+     "pivot": [
+      0,
+      15,
+      0
+     ]
+    },
+    "body": {
+     "pivot": [
+      0,
+      15,
+      9
+     ]
+    },
+    "leg1": {
+     "pivot": [
+      -4,
+      15,
+      4
+     ]
+    },
+    "leg2": {
+     "pivot": [
+      4,
+      15,
+      4
+     ]
+    },
+    "leg3": {
+     "pivot": [
+      -4,
+      15,
+      1
+     ]
+    },
+    "leg4": {
+     "pivot": [
+      4,
+      15,
+      1
+     ]
+    },
+    "leg5": {
+     "pivot": [
+      -4,
+      15,
+      -2
+     ]
+    },
+    "leg6": {
+     "pivot": [
+      4,
+      15,
+      -2
+     ]
+    },
+    "leg7": {
+     "pivot": [
+      -4,
+      15,
+      -5
+     ]
+    },
+    "leg8": {
+     "pivot": [
+      4,
+      15,
+      -5
+     ]
+    }
+   },
+   "family": "head"
+  },
+  "squid": {
+   "entity": "minecraft:squid",
+   "geometry": "default",
+   "bones": {
+    "body": "body",
+    "tentacle1": "tentacle1",
+    "tentacle2": "tentacle2",
+    "tentacle3": "tentacle3",
+    "tentacle4": "tentacle4",
+    "tentacle5": "tentacle5",
+    "tentacle6": "tentacle6",
+    "tentacle7": "tentacle7",
+    "tentacle8": "tentacle8"
+   },
+   "java_parts": {
+    "body": {
+     "pivot": [
+      0,
+      -1,
+      0
+     ]
+    },
+    "tentacle1": {
+     "pivot": [
+      5,
+      6,
+      0
+     ],
+     "rotation": [
+      0,
+      90,
+      0
+     ]
+    },
+    "tentacle2": {
+     "pivot": [
+      3.5,
+      6,
+      3.5
+     ],
+     "rotation": [
+      0,
+      45,
+      0
+     ]
+    },
+    "tentacle3": {
+     "pivot": [
+      0,
+      6,
+      5
+     ]
+    },
+    "tentacle4": {
+     "pivot": [
+      -3.5,
+      6,
+      3.5
+     ],
+     "rotation": [
+      0,
+      -45,
+      0
+     ]
+    },
+    "tentacle5": {
+     "pivot": [
+      -5,
+      6,
+      0
+     ],
+     "rotation": [
+      0,
+      -90,
+      0
+     ]
+    },
+    "tentacle6": {
+     "pivot": [
+      -3.5,
+      6,
+      -3.5
+     ],
+     "rotation": [
+      0,
+      -135,
+      0
+     ]
+    },
+    "tentacle7": {
+     "pivot": [
+      0,
+      6,
+      -5
+     ],
+     "rotation": [
+      0,
+      180,
+      0
+     ]
+    },
+    "tentacle8": {
+     "pivot": [
+      3.5,
+      6,
+      -3.5
+     ],
+     "rotation": [
+      0,
+      135,
+      0
+     ]
+    }
+   },
+   "frame": {
+    "offset": [
+     0,
+     -25,
+     0
+    ]
+   }
+  },
+  "squid_baby": {
+   "entity": "minecraft:squid",
+   "geometry": "baby",
+   "bones": {
+    "body": "body",
+    "tentacle1": "tentacle1",
+    "tentacle2": "tentacle2",
+    "tentacle3": "tentacle3",
+    "tentacle4": "tentacle4",
+    "tentacle5": "tentacle5",
+    "tentacle6": "tentacle6",
+    "tentacle7": "tentacle7",
+    "tentacle8": "tentacle8"
+   },
+   "java_parts": {
+    "body": {
+     "pivot": [
+      0,
+      13,
+      0
+     ]
+    },
+    "tentacle1": {
+     "pivot": [
+      3,
+      18.5,
+      0
+     ],
+     "rotation": [
+      0,
+      90,
+      0
+     ]
+    },
+    "tentacle2": {
+     "pivot": [
+      2.1213,
+      18.5,
+      2.1213
+     ],
+     "rotation": [
+      0,
+      45,
+      0
+     ]
+    },
+    "tentacle3": {
+     "pivot": [
+      0,
+      18.5,
+      3
+     ]
+    },
+    "tentacle4": {
+     "pivot": [
+      -2.1213,
+      18.5,
+      2.1213
+     ],
+     "rotation": [
+      0,
+      -45,
+      0
+     ]
+    },
+    "tentacle5": {
+     "pivot": [
+      -3,
+      18.5,
+      0
+     ],
+     "rotation": [
+      0,
+      -90,
+      0
+     ]
+    },
+    "tentacle6": {
+     "pivot": [
+      -2.1213,
+      18.5,
+      -2.1213
+     ],
+     "rotation": [
+      0,
+      -135,
+      0
+     ]
+    },
+    "tentacle7": {
+     "pivot": [
+      0,
+      18.5,
+      -3
+     ],
+     "rotation": [
+      0,
+      -180,
+      0
+     ]
+    },
+    "tentacle8": {
+     "pivot": [
+      2.1213,
+      18.5,
+      -2.1213
+     ],
+     "rotation": [
+      0,
+      -225,
+      0
+     ]
+    }
+   },
+   "frame": {
+    "offset": [
+     0,
+     -10,
+     0
+    ]
+   }
+  },
+  "stray": {
+   "entity": "minecraft:stray",
+   "geometry": "default",
+   "bones": {
+    "head": "hat",
+    "headwear": "head",
+    "body": "body",
+    "left_arm": "leftArm",
+    "right_arm": "rightArm",
+    "left_leg": "leftLeg",
+    "right_leg": "rightLeg"
+   },
+   "java_parts": {
+    "head": {
+     "pivot": [
+      0,
+      0,
+      0
+     ]
+    },
+    "headwear": {
+     "pivot": [
+      0,
+      0,
+      0
+     ]
+    },
+    "body": {
+     "pivot": [
+      0,
+      0,
+      0
+     ]
+    },
+    "left_arm": {
+     "pivot": [
+      5,
+      2,
+      0
+     ]
+    },
+    "right_arm": {
+     "pivot": [
+      -5,
+      2,
+      0
+     ]
+    },
+    "left_leg": {
+     "pivot": [
+      2,
+      12,
+      0
+     ]
+    },
+    "right_leg": {
+     "pivot": [
+      -2,
+      12,
+      0
+     ]
+    }
+   },
+   "family": "biped"
+  },
+  "stray_outer": {
+   "entity": "minecraft:stray",
+   "geometry": "overlay",
+   "bones": {
+    "head": "hat",
+    "headwear": "head",
+    "body": "body",
+    "left_arm": "leftArm",
+    "right_arm": "rightArm",
+    "left_leg": "leftLeg",
+    "right_leg": "rightLeg"
+   },
+   "java_parts": {
+    "head": {
+     "pivot": [
+      0,
+      0,
+      0
+     ]
+    },
+    "headwear": {
+     "pivot": [
+      0,
+      0,
+      0
+     ]
+    },
+    "body": {
+     "pivot": [
+      0,
+      0,
+      0
+     ]
+    },
+    "left_arm": {
+     "pivot": [
+      5,
+      2,
+      0
+     ]
+    },
+    "right_arm": {
+     "pivot": [
+      -5,
+      2,
+      0
+     ]
+    },
+    "left_leg": {
+     "pivot": [
+      1.9,
+      12,
+      0
+     ]
+    },
+    "right_leg": {
+     "pivot": [
+      -1.9,
+      12,
+      0
+     ]
+    }
+   },
+   "family": "head"
+  },
+  "strider": {
+   "entity": "minecraft:strider",
+   "geometry": "default",
+   "bones": {
+    "body": "body",
+    "left_leg": "left_leg",
+    "right_leg": "right_leg",
+    "hair_left_top": "bristle3",
+    "hair_left_middle": "bristle4",
+    "hair_left_bottom": "bristle5",
+    "hair_right_top": "bristle2",
+    "hair_right_middle": "bristle1",
+    "hair_right_bottom": "bristle0"
+   },
+   "java_parts": {
+    "body": {
+     "pivot": [
+      0,
+      1,
+      0
+     ]
+    },
+    "left_leg": {
+     "pivot": [
+      -4,
+      7,
+      0
+     ]
+    },
+    "right_leg": {
+     "pivot": [
+      4,
+      7,
+      0
+     ]
+    },
+    "hair_left_top": {
+     "pivot": [
+      8,
+      -5,
+      -8
+     ]
+    },
+    "hair_left_middle": {
+     "pivot": [
+      8,
+      -1,
+      -8
+     ]
+    },
+    "hair_left_bottom": {
+     "pivot": [
+      8,
+      4,
+      -8
+     ]
+    },
+    "hair_right_top": {
+     "pivot": [
+      -8,
+      -4,
+      -8
+     ]
+    },
+    "hair_right_middle": {
+     "pivot": [
+      -8,
+      0,
+      -8
+     ]
+    },
+    "hair_right_bottom": {
+     "pivot": [
+      -8,
+      5,
+      -8
+     ]
+    }
+   }
+  },
+  "strider_baby": {
+   "entity": "minecraft:strider",
+   "geometry": "baby",
+   "bones": {
+    "body": "body",
+    "bristle0": "bristle0",
+    "bristle1": "bristle1",
+    "bristle2": "bristle2",
+    "left_leg": "left_leg",
+    "right_leg": "right_leg"
+   },
+   "java_parts": {
+    "body": {
+     "pivot": [
+      0,
+      16.75,
+      0
+     ]
+    },
+    "bristle0": {
+     "pivot": [
+      0,
+      12.5,
+      2
+     ]
+    },
+    "bristle1": {
+     "pivot": [
+      0,
+      12.5,
+      0
+     ]
+    },
+    "bristle2": {
+     "pivot": [
+      0,
+      12.5,
+      -2
+     ]
+    },
+    "left_leg": {
+     "pivot": [
+      1.5,
+      20,
+      0
+     ]
+    },
+    "right_leg": {
+     "pivot": [
+      -1.5,
+      20,
+      0
+     ]
+    }
+   }
+  },
+  "sulfur_cube": {
+   "entity": "minecraft:sulfur_cube",
+   "geometry": "default",
+   "bones": {
+    "cube": "sulfur_cube"
+   },
+   "java_parts": {
+    "cube": {
+     "pivot": [
+      0,
+      15,
+      0
+     ]
+    }
+   }
+  },
+  "tadpole": {
+   "entity": "minecraft:tadpole",
+   "geometry": "default",
+   "bones": {
+    "body": "body",
+    "tail": "tail"
+   },
+   "java_parts": {
+    "body": {
+     "pivot": [
+      0,
+      23,
+      -1.5
+     ]
+    },
+    "tail": {
+     "pivot": [
+      0,
+      23,
+      1.5
+     ]
+    }
+   },
+   "frame": {
+    "offset": [
+     0,
+     3,
+     -1.5
+    ]
+   }
+  },
+  "tnt_minecart": {
+   "entity": "minecraft:tnt_minecart",
+   "geometry": "default",
+   "bones": {
+    "front": "right",
+    "left": "left",
+    "right": "front",
+    "back": "back",
+    "bottom": "bottom"
+   },
+   "java_parts": {
+    "front": {
+     "pivot": [
+      0,
+      22,
+      -8
+     ],
+     "rotation": [
+      0,
+      180,
+      0
+     ]
+    },
+    "left": {
+     "pivot": [
+      -7,
+      22,
+      1
+     ],
+     "rotation": [
+      0,
+      -90,
+      0
+     ]
+    },
+    "right": {
+     "pivot": [
+      7,
+      22,
+      1
+     ],
+     "rotation": [
+      0,
+      90,
+      0
+     ]
+    },
+    "back": {
+     "pivot": [
+      0,
+      22,
+      10
+     ]
+    },
+    "bottom": {
+     "pivot": [
+      0,
+      22,
+      1
+     ],
+     "rotation": [
+      0,
+      -90,
+      90
+     ]
+    }
+   }
+  },
+  "trader_llama": {
+   "entity": "minecraft:trader_llama",
+   "geometry": "default",
+   "bones": {
+    "head": "head",
+    "body": "body",
+    "leg1": "leg0",
+    "leg2": "leg1",
+    "leg3": "leg2",
+    "leg4": "leg3",
+    "chest_left": "chest2",
+    "chest_right": "chest1"
+   },
+   "java_parts": {
+    "head": {
+     "pivot": [
+      0,
+      7,
+      -6
+     ]
+    },
+    "body": {
+     "pivot": [
+      0,
+      5,
+      2
+     ],
+     "rotation": [
+      90,
+      0,
+      0
+     ]
+    },
+    "leg1": {
+     "pivot": [
+      -3.5,
+      10,
+      6
+     ]
+    },
+    "leg2": {
+     "pivot": [
+      3.5,
+      10,
+      6
+     ]
+    },
+    "leg3": {
+     "pivot": [
+      -3.5,
+      10,
+      -5
+     ]
+    },
+    "leg4": {
+     "pivot": [
+      3.5,
+      10,
+      -5
+     ]
+    },
+    "chest_left": {
+     "pivot": [
+      5.5,
+      3,
+      3
+     ],
+     "rotation": [
+      0,
+      90,
+      0
+     ]
+    },
+    "chest_right": {
+     "pivot": [
+      -8.5,
+      3,
+      3
+     ],
+     "rotation": [
+      0,
+      90,
+      0
+     ]
+    }
+   },
+   "family": "quadruped"
+  },
+  "trader_llama_baby": {
+   "entity": "minecraft:trader_llama",
+   "geometry": "baby",
+   "bones": {
+    "head": "head",
+    "left_hind_leg": "leg1",
+    "right_hind_leg": "leg0",
+    "left_front_leg": "leg3",
+    "right_front_leg": "leg2",
+    "body": "body"
+   },
+   "java_parts": {
+    "head": {
+     "pivot": [
+      0,
+      12,
+      -4
+     ]
+    },
+    "left_hind_leg": {
+     "pivot": [
+      2.5,
+      16.5,
+      4.5
+     ]
+    },
+    "right_hind_leg": {
+     "pivot": [
+      -2.5,
+      16.5,
+      4.5
+     ]
+    },
+    "left_front_leg": {
+     "pivot": [
+      2.5,
+      16.5,
+      -3.5
+     ]
+    },
+    "right_front_leg": {
+     "pivot": [
+      -2.5,
+      16.5,
+      -3.5
+     ]
+    },
+    "body": {
+     "pivot": [
+      0,
+      14,
+      2.5
+     ]
+    }
+   },
+   "family": "quadruped"
+  },
+  "trident": {
+   "entity": "minecraft:thrown_trident",
+   "geometry": "default",
+   "bones": {},
+   "parts_without_bone": [
+    "body",
+    "base",
+    "left_spike",
+    "middle_spike",
+    "right_spike"
+   ],
+   "java_parts": {
+    "body": {
+     "pivot": [
+      0,
+      -3,
+      0
+     ]
+    },
+    "base": {
+     "pivot": [
+      0,
+      -3,
+      0
+     ]
+    },
+    "left_spike": {
+     "pivot": [
+      0,
+      -3,
+      0
+     ]
+    },
+    "middle_spike": {
+     "pivot": [
+      0,
+      -3,
+      0
+     ]
+    },
+    "right_spike": {
+     "pivot": [
+      0,
+      -3,
+      0
+     ]
+    }
+   }
+  },
+  "tropical_fish_a": {
+   "entity": "minecraft:tropicalfish",
+   "geometry": "typeA",
+   "bones": {
+    "body": "body",
+    "fin_top": "body",
+    "tail": "tailfin",
+    "fin_left": "leftFin",
+    "fin_right": "rightFin"
+   },
+   "java_parts": {
+    "body": {
+     "pivot": [
+      0,
+      22.5,
+      0
+     ]
+    },
+    "fin_top": {
+     "pivot": [
+      0,
+      21,
+      -3
+     ]
+    },
+    "tail": {
+     "pivot": [
+      0,
+      22.5,
+      3
+     ]
+    },
+    "fin_left": {
+     "pivot": [
+      0,
+      24,
+      0
+     ]
+    },
+    "fin_right": {
+     "pivot": [
+      0,
+      24,
+      0
+     ]
+    }
+   }
+  },
+  "tropical_fish_b": {
+   "entity": "minecraft:tropicalfish",
+   "geometry": "typeB",
+   "bones": {
+    "body": "body",
+    "fin_top": "body",
+    "fin_bottom": "body",
+    "tail": "tailfin",
+    "fin_left": "leftFin",
+    "fin_right": "rightFin"
+   },
+   "java_parts": {
+    "body": {
+     "pivot": [
+      0,
+      21,
+      3
+     ]
+    },
+    "fin_top": {
+     "pivot": [
+      0,
+      18,
+      0
+     ]
+    },
+    "fin_bottom": {
+     "pivot": [
+      0,
+      24,
+      0
+     ]
+    },
+    "tail": {
+     "pivot": [
+      0,
+      21,
+      6
+     ]
+    },
+    "fin_left": {
+     "pivot": [
+      0,
+      24,
+      0
+     ]
+    },
+    "fin_right": {
+     "pivot": [
+      0,
+      24,
+      0
+     ]
+    }
+   }
+  },
+  "turtle": {
+   "entity": "minecraft:turtle",
+   "geometry": "default",
+   "bones": {
+    "head": "head",
+    "body": "body",
+    "body2": "eggbelly",
+    "leg1": "leg0",
+    "leg2": "leg1",
+    "leg3": "leg2",
+    "leg4": "leg3"
+   },
+   "java_parts": {
+    "head": {
+     "pivot": [
+      0,
+      19,
+      -10
+     ]
+    },
+    "body": {
+     "pivot": [
+      0,
+      11,
+      -10
+     ]
+    },
+    "body2": {
+     "pivot": [
+      0,
+      11,
+      -10
+     ]
+    },
+    "leg1": {
+     "pivot": [
+      -3.5,
+      22,
+      11
+     ]
+    },
+    "leg2": {
+     "pivot": [
+      3.5,
+      22,
+      11
+     ]
+    },
+    "leg3": {
+     "pivot": [
+      -5,
+      21,
+      -4
+     ]
+    },
+    "leg4": {
+     "pivot": [
+      5,
+      21,
+      -4
+     ]
+    }
+   },
+   "family": "head"
+  },
+  "turtle_baby": {
+   "entity": "minecraft:turtle",
+   "geometry": "baby",
+   "bones": {
+    "head": "head",
+    "leg2": "leg1",
+    "leg1": "leg0",
+    "leg4": "leg3",
+    "leg3": "leg2",
+    "body": "body"
+   },
+   "java_parts": {
+    "head": {
+     "pivot": [
+      0,
+      22.9,
+      -1
+     ]
+    },
+    "leg2": {
+     "pivot": [
+      2,
+      23.9,
+      2.5
+     ]
+    },
+    "leg1": {
+     "pivot": [
+      -2,
+      23.9,
+      2.5
+     ]
+    },
+    "leg4": {
+     "pivot": [
+      2,
+      23.9,
+      -0.5
+     ]
+    },
+    "leg3": {
+     "pivot": [
+      -2,
+      23.9,
+      -0.5
+     ]
+    },
+    "body": {
+     "pivot": [
+      0,
+      22.9,
+      1
+     ]
+    }
+   },
+   "family": "head"
+  },
+  "vex": {
+   "entity": "minecraft:vex",
+   "geometry": "default",
+   "bones": {
+    "head": "head",
+    "body": "body",
+    "right_arm": "rightArm",
+    "left_arm": "leftArm",
+    "left_wing": "leftWing",
+    "right_wing": "rightWing"
+   },
+   "java_parts": {
+    "head": {
+     "pivot": [
+      0,
+      18,
+      0
+     ]
+    },
+    "body": {
+     "pivot": [
+      0,
+      18,
+      0
+     ]
+    },
+    "right_arm": {
+     "pivot": [
+      -2,
+      18.5,
+      0
+     ]
+    },
+    "left_arm": {
+     "pivot": [
+      2,
+      18.5,
+      0
+     ]
+    },
+    "left_wing": {
+     "pivot": [
+      0.5,
+      19,
+      1
+     ]
+    },
+    "right_wing": {
+     "pivot": [
+      -0.5,
+      19,
+      1
+     ]
+    }
+   },
+   "family": "head"
+  },
+  "vindicator": {
+   "entity": "minecraft:vindicator",
+   "geometry": "default",
+   "bones": {
+    "head": "head",
+    "nose": "nose",
+    "body": "body",
+    "arms": "arms",
+    "left_arm": "leftArm",
+    "right_arm": "rightArm",
+    "left_leg": "leg1",
+    "right_leg": "leg0"
+   },
+   "java_parts": {
+    "head": {
+     "pivot": [
+      0,
+      0,
+      0
+     ]
+    },
+    "nose": {
+     "pivot": [
+      0,
+      -2,
+      0
+     ]
+    },
+    "body": {
+     "pivot": [
+      0,
+      0,
+      0
+     ]
+    },
+    "arms": {
+     "pivot": [
+      0,
+      2.95,
+      -1.05
+     ],
+     "rotation": [
+      -43,
+      0,
+      0
+     ]
+    },
+    "left_arm": {
+     "pivot": [
+      5,
+      2,
+      0
+     ]
+    },
+    "right_arm": {
+     "pivot": [
+      -5,
+      2,
+      0
+     ]
+    },
+    "left_leg": {
+     "pivot": [
+      2,
+      12,
+      0
+     ]
+    },
+    "right_leg": {
+     "pivot": [
+      -2,
+      12,
+      0
+     ]
+    }
+   },
+   "family": "head"
+  },
+  "wandering_trader": {
+   "entity": "minecraft:wandering_trader",
+   "geometry": "default",
+   "bones": {
+    "head": "head",
+    "nose": "nose",
+    "headwear": "helmet",
+    "headwear2": "brim",
+    "body": "body",
+    "bodywear": "body",
+    "arms": "arms",
+    "right_leg": "leg0",
+    "left_leg": "leg1"
+   },
+   "java_parts": {
+    "head": {
+     "pivot": [
+      0,
+      0,
+      0
+     ]
+    },
+    "nose": {
+     "pivot": [
+      0,
+      -2,
+      0
+     ]
+    },
+    "headwear": {
+     "pivot": [
+      0,
+      0,
+      0
+     ]
+    },
+    "headwear2": {
+     "pivot": [
+      0,
+      0,
+      0
+     ],
+     "rotation": [
+      -90,
+      0,
+      0
+     ]
+    },
+    "body": {
+     "pivot": [
+      0,
+      0,
+      0
+     ]
+    },
+    "bodywear": {
+     "pivot": [
+      0,
+      0,
+      0
+     ]
+    },
+    "arms": {
+     "pivot": [
+      0,
+      2.95,
+      -1.05
+     ],
+     "rotation": [
+      -43,
+      0,
+      0
+     ]
+    },
+    "right_leg": {
+     "pivot": [
+      -2,
+      12,
+      0
+     ]
+    },
+    "left_leg": {
+     "pivot": [
+      2,
+      12,
+      0
+     ]
+    }
+   },
+   "family": "head"
+  },
+  "warden": {
+   "entity": "minecraft:warden",
+   "geometry": "default",
+   "bones": {
+    "head": "head",
+    "left_tendril": "left_tendril",
+    "right_tendril": "right_tendril",
+    "torso": "body",
+    "left_ribcage": "left_ribcage",
+    "right_ribcage": "right_ribcage",
+    "left_arm": "left_arm",
+    "right_arm": "right_arm",
+    "left_leg": "left_leg",
+    "right_leg": "right_leg"
+   },
+   "java_parts": {
+    "head": {
+     "pivot": [
+      0,
+      -10,
+      -1
+     ]
+    },
+    "left_tendril": {
+     "pivot": [
+      8,
+      -22,
+      0
+     ]
+    },
+    "right_tendril": {
+     "pivot": [
+      -8,
+      -22,
+      0
+     ]
+    },
+    "torso": {
+     "pivot": [
+      0,
+      3,
+      -1
+     ]
+    },
+    "left_ribcage": {
+     "pivot": [
+      7,
+      1,
+      -5
+     ]
+    },
+    "right_ribcage": {
+     "pivot": [
+      -7,
+      1,
+      -5
+     ]
+    },
+    "left_arm": {
+     "pivot": [
+      13,
+      -10,
+      0
+     ]
+    },
+    "right_arm": {
+     "pivot": [
+      -13,
+      -10,
+      0
+     ]
+    },
+    "left_leg": {
+     "pivot": [
+      6,
+      11,
+      -1
+     ]
+    },
+    "right_leg": {
+     "pivot": [
+      -6,
+      11,
+      -1
+     ]
+    }
+   },
+   "family": "head"
+  },
+  "warm_chicken": {
+   "entity": "minecraft:chicken",
+   "geometry": "warm",
+   "bones": {
+    "head": "head",
+    "bill": "beak",
+    "chin": "comb",
+    "body": "body",
+    "left_wing": "wing1",
+    "right_wing": "wing0",
+    "left_leg": "leg1",
+    "right_leg": "leg0"
+   },
+   "java_parts": {
+    "head": {
+     "pivot": [
+      0,
+      15,
+      -4
+     ]
+    },
+    "bill": {
+     "pivot": [
+      0,
+      15,
+      -4
+     ]
+    },
+    "chin": {
+     "pivot": [
+      0,
+      15,
+      -4
+     ]
+    },
+    "body": {
+     "pivot": [
+      0,
+      16,
+      0
+     ],
+     "rotation": [
+      90,
+      0,
+      0
+     ]
+    },
+    "left_wing": {
+     "pivot": [
+      4,
+      13,
+      0
+     ]
+    },
+    "right_wing": {
+     "pivot": [
+      -4,
+      13,
+      0
+     ]
+    },
+    "left_leg": {
+     "pivot": [
+      1,
+      19,
+      1
+     ]
+    },
+    "right_leg": {
+     "pivot": [
+      -2,
+      19,
+      1
+     ]
+    }
+   },
+   "family": "chicken"
+  },
+  "warm_chicken_baby": {
+   "entity": "minecraft:chicken",
+   "geometry": "baby_warm",
+   "bones": {
+    "body": "body",
+    "left_leg": "leg1",
+    "right_leg": "leg0",
+    "right_wing": "wing1",
+    "left_wing": "wing0"
+   },
+   "java_parts": {
+    "body": {
+     "pivot": [
+      0,
+      20.25,
+      -1.25
+     ]
+    },
+    "left_leg": {
+     "pivot": [
+      1,
+      22,
+      0.5
+     ]
+    },
+    "right_leg": {
+     "pivot": [
+      -1,
+      22,
+      0.5
+     ]
+    },
+    "right_wing": {
+     "pivot": [
+      2,
+      20,
+      0
+     ]
+    },
+    "left_wing": {
+     "pivot": [
+      -2,
+      20,
+      0
+     ]
+    }
+   }
+  },
+  "warm_cow": {
+   "entity": "minecraft:cow",
+   "geometry": "warm",
+   "bones": {
+    "head": "head",
+    "body": "body",
+    "leg1": "leg0",
+    "leg2": "leg1",
+    "leg3": "leg2",
+    "leg4": "leg3"
+   },
+   "java_parts": {
+    "head": {
+     "pivot": [
+      0,
+      4,
+      -8
+     ]
+    },
+    "body": {
+     "pivot": [
+      0,
+      5,
+      2
+     ],
+     "rotation": [
+      90,
+      0,
+      0
+     ]
+    },
+    "leg1": {
+     "pivot": [
+      -4,
+      12,
+      7
+     ]
+    },
+    "leg2": {
+     "pivot": [
+      4,
+      12,
+      7
+     ]
+    },
+    "leg3": {
+     "pivot": [
+      -4,
+      12,
+      -6
+     ]
+    },
+    "leg4": {
+     "pivot": [
+      4,
+      12,
+      -6
+     ]
+    }
+   },
+   "family": "quadruped"
+  },
+  "warm_cow_baby": {
+   "entity": "minecraft:cow",
+   "geometry": "baby_warm",
+   "bones": {
+    "head": "head",
+    "body": "body",
+    "right_front_leg": "leg2",
+    "left_front_leg": "leg3",
+    "right_hind_leg": "leg0",
+    "left_hind_leg": "leg1"
+   },
+   "java_parts": {
+    "head": {
+     "pivot": [
+      0,
+      13.569,
+      -5.1667
+     ]
+    },
+    "body": {
+     "pivot": [
+      3,
+      19,
+      -5
+     ]
+    },
+    "right_front_leg": {
+     "pivot": [
+      -2.5,
+      18,
+      -3.5
+     ]
+    },
+    "left_front_leg": {
+     "pivot": [
+      2.5,
+      18,
+      -3.5
+     ]
+    },
+    "right_hind_leg": {
+     "pivot": [
+      -2.5,
+      18,
+      3.5
+     ]
+    },
+    "left_hind_leg": {
+     "pivot": [
+      2.5,
+      18,
+      3.5
+     ]
+    }
+   },
+   "family": "quadruped"
+  },
+  "warm_pig": {
+   "entity": "minecraft:pig",
+   "geometry": "warm",
+   "bones": {
+    "body": "body",
+    "head": "head",
+    "leg1": "leg0",
+    "leg2": "leg1",
+    "leg3": "leg2",
+    "leg4": "leg3"
+   },
+   "java_parts": {
+    "body": {
+     "pivot": [
+      0,
+      11,
+      2
+     ],
+     "rotation": [
+      90,
+      0,
+      0
+     ]
+    },
+    "head": {
+     "pivot": [
+      0,
+      12,
+      -6
+     ]
+    },
+    "leg1": {
+     "pivot": [
+      -3,
+      18,
+      7
+     ]
+    },
+    "leg2": {
+     "pivot": [
+      3,
+      18,
+      7
+     ]
+    },
+    "leg3": {
+     "pivot": [
+      -3,
+      18,
+      -5
+     ]
+    },
+    "leg4": {
+     "pivot": [
+      3,
+      18,
+      -5
+     ]
+    }
+   },
+   "family": "quadruped"
+  },
+  "warm_pig_baby": {
+   "entity": "minecraft:pig",
+   "geometry": "baby_warm",
+   "bones": {
+    "head": "head",
+    "body": "body",
+    "left_hind_leg": "leg1",
+    "right_hind_leg": "leg0",
+    "left_front_leg": "leg3",
+    "right_front_leg": "leg2"
+   },
+   "java_parts": {
+    "head": {
+     "pivot": [
+      0,
+      19,
+      -2
+     ]
+    },
+    "body": {
+     "pivot": [
+      0,
+      19,
+      0.5
+     ]
+    },
+    "left_hind_leg": {
+     "pivot": [
+      2.5,
+      22,
+      4
+     ]
+    },
+    "right_hind_leg": {
+     "pivot": [
+      -2.5,
+      22,
+      4
+     ]
+    },
+    "left_front_leg": {
+     "pivot": [
+      2.5,
+      22,
+      -3
+     ]
+    },
+    "right_front_leg": {
+     "pivot": [
+      -2.5,
+      22,
+      -3
+     ]
+    }
+   },
+   "family": "quadruped"
+  },
+  "wind_charge": {
+   "entity": "minecraft:wind_charge_projectile",
+   "geometry": "default",
+   "bones": {
+    "charge": "wind_charge",
+    "wind": "wind"
+   },
+   "java_parts": {
+    "charge": {
+     "pivot": [
+      0,
+      22,
+      0
+     ],
+     "rotation": [
+      180,
+      0,
+      0
+     ]
+    },
+    "wind": {
+     "pivot": [
+      0,
+      22,
+      0
+     ]
+    }
+   }
+  },
+  "witch": {
+   "entity": "minecraft:witch",
+   "geometry": "default",
+   "bones": {
+    "head": "head",
+    "nose": "nose",
+    "headwear": "hat",
+    "headwear2": "hat2",
+    "mole": "nose",
+    "body": "body",
+    "bodywear": "body",
+    "arms": "arms",
+    "left_leg": "leg1",
+    "right_leg": "leg0"
+   },
+   "java_parts": {
+    "head": {
+     "pivot": [
+      0,
+      0,
+      0
+     ]
+    },
+    "nose": {
+     "pivot": [
+      0,
+      -2,
+      0
+     ]
+    },
+    "headwear": {
+     "pivot": [
+      -5,
+      -10.05,
+      -5
+     ]
+    },
+    "headwear2": {
+     "pivot": [
+      0,
+      -4,
+      14
+     ]
+    },
+    "mole": {
+     "pivot": [
+      0,
+      -4,
+      0
+     ]
+    },
+    "body": {
+     "pivot": [
+      0,
+      0,
+      0
+     ]
+    },
+    "bodywear": {
+     "pivot": [
+      0,
+      0,
+      0
+     ]
+    },
+    "arms": {
+     "pivot": [
+      0,
+      2.95,
+      -1.05
+     ],
+     "rotation": [
+      -43,
+      0,
+      0
+     ]
+    },
+    "left_leg": {
+     "pivot": [
+      2,
+      12,
+      0
+     ]
+    },
+    "right_leg": {
+     "pivot": [
+      -2,
+      12,
+      0
+     ]
+    }
+   },
+   "family": "head"
+  },
+  "wither": {
+   "entity": "minecraft:wither",
+   "geometry": "default",
+   "bones": {
+    "head1": "head1",
+    "head2": "head2",
+    "head3": "head3",
+    "body1": "upperBodyPart1",
+    "body2": "upperBodyPart2",
+    "body3": "upperBodyPart3"
+   },
+   "java_parts": {
+    "head1": {
+     "pivot": [
+      0,
+      0,
+      0
+     ]
+    },
+    "head2": {
+     "pivot": [
+      -8,
+      4,
+      0
+     ]
+    },
+    "head3": {
+     "pivot": [
+      10,
+      4,
+      0
+     ]
+    },
+    "body1": {
+     "pivot": [
+      0,
+      0,
+      0
+     ]
+    },
+    "body2": {
+     "pivot": [
+      -2,
+      6.9,
+      -0.5
+     ]
+    },
+    "body3": {
+     "pivot": [
+      -2,
+      16.9,
+      -0.5
+     ]
+    }
+   }
+  },
+  "wither_skeleton": {
+   "entity": "minecraft:wither_skeleton",
+   "geometry": "default",
+   "bones": {
+    "head": "hat",
+    "headwear": "head",
+    "body": "body",
+    "left_arm": "leftArm",
+    "right_arm": "rightArm",
+    "left_leg": "leftLeg",
+    "right_leg": "rightLeg"
+   },
+   "java_parts": {
+    "head": {
+     "pivot": [
+      0,
+      0,
+      0
+     ]
+    },
+    "headwear": {
+     "pivot": [
+      0,
+      0,
+      0
+     ]
+    },
+    "body": {
+     "pivot": [
+      0,
+      0,
+      0
+     ]
+    },
+    "left_arm": {
+     "pivot": [
+      5,
+      2,
+      0
+     ]
+    },
+    "right_arm": {
+     "pivot": [
+      -5,
+      2,
+      0
+     ]
+    },
+    "left_leg": {
+     "pivot": [
+      2,
+      12,
+      0
+     ]
+    },
+    "right_leg": {
+     "pivot": [
+      -2,
+      12,
+      0
+     ]
+    }
+   },
+   "family": "biped"
+  },
+  "wither_skull": {
+   "entity": "minecraft:wither_skull",
+   "geometry": "default",
+   "bones": {
+    "head": "head"
+   },
+   "java_parts": {
+    "head": {
+     "pivot": [
+      0,
+      24,
+      0
+     ]
+    }
+   },
+   "family": "head"
+  },
+  "wolf": {
+   "entity": "minecraft:wolf",
+   "geometry": "default",
+   "bones": {
+    "head": "head",
+    "mane": "upperBody",
+    "body": "body",
+    "leg1": "leg0",
+    "leg2": "leg1",
+    "leg3": "leg2",
+    "leg4": "leg3",
+    "tail": "tail"
+   },
+   "java_parts": {
+    "head": {
+     "pivot": [
+      -1,
+      13.5,
+      -7
+     ]
+    },
+    "mane": {
+     "pivot": [
+      -1,
+      14,
+      -3
+     ],
+     "rotation": [
+      90,
+      0,
+      0
+     ]
+    },
+    "body": {
+     "pivot": [
+      0,
+      14,
+      2
+     ],
+     "rotation": [
+      90,
+      0,
+      0
+     ]
+    },
+    "leg1": {
+     "pivot": [
+      -2.5,
+      16,
+      7
+     ]
+    },
+    "leg2": {
+     "pivot": [
+      0.5,
+      16,
+      7
+     ]
+    },
+    "leg3": {
+     "pivot": [
+      -2.5,
+      16,
+      -4
+     ]
+    },
+    "leg4": {
+     "pivot": [
+      0.5,
+      16,
+      -4
+     ]
+    },
+    "tail": {
+     "pivot": [
+      -1,
+      12,
+      10
+     ]
+    }
+   },
+   "family": "quadruped"
+  },
+  "wolf_baby": {
+   "entity": "minecraft:wolf",
+   "geometry": "baby",
+   "bones": {
+    "head": "head",
+    "body": "body",
+    "leg2": "leg1",
+    "leg1": "leg0",
+    "leg4": "leg3",
+    "leg3": "leg2",
+    "tail": "tail"
+   },
+   "java_parts": {
+    "head": {
+     "pivot": [
+      0,
+      18.25,
+      -4
+     ]
+    },
+    "body": {
+     "pivot": [
+      0,
+      19,
+      0
+     ]
+    },
+    "leg2": {
+     "pivot": [
+      1.5,
+      21,
+      3
+     ]
+    },
+    "leg1": {
+     "pivot": [
+      -1.5,
+      21,
+      3
+     ]
+    },
+    "leg4": {
+     "pivot": [
+      1.5,
+      21,
+      -3
+     ]
+    },
+    "leg3": {
+     "pivot": [
+      -1.5,
+      21,
+      -3
+     ]
+    },
+    "tail": {
+     "pivot": [
+      0,
+      19,
+      3
+     ],
+     "rotation": [
+      90,
+      0,
+      0
+     ]
+    }
+   },
+   "family": "quadruped"
+  },
+  "zoglin": {
+   "entity": "minecraft:zoglin",
+   "geometry": "default",
+   "bones": {
+    "head": "head",
+    "left_ear": "left_ear",
+    "right_ear": "right_ear",
+    "body": "body",
+    "mane": "body",
+    "front_left_leg": "leg_front_left",
+    "front_right_leg": "leg_front_right",
+    "back_left_leg": "leg_back_left",
+    "back_right_leg": "leg_back_right"
+   },
+   "java_parts": {
+    "head": {
+     "pivot": [
+      0,
+      3,
+      -8.5
+     ]
+    },
+    "left_ear": {
+     "pivot": [
+      6,
+      1,
+      -11.5
+     ]
+    },
+    "right_ear": {
+     "pivot": [
+      -6,
+      1,
+      -11.5
+     ]
+    },
+    "body": {
+     "pivot": [
+      0,
+      7,
+      4.5
+     ]
+    },
+    "mane": {
+     "pivot": [
+      0,
+      -7,
+      -2.5
+     ]
+    },
+    "front_left_leg": {
+     "pivot": [
+      4,
+      10,
+      -4.75
+     ]
+    },
+    "front_right_leg": {
+     "pivot": [
+      -4,
+      10,
+      -4.5
+     ]
+    },
+    "back_left_leg": {
+     "pivot": [
+      4.5,
+      13,
+      14
+     ]
+    },
+    "back_right_leg": {
+     "pivot": [
+      -4.5,
+      13,
+      14
+     ]
+    }
+   },
+   "family": "head"
+  },
+  "zoglin_baby": {
+   "entity": "minecraft:zoglin",
+   "geometry": "baby",
+   "bones": {
+    "head": "head",
+    "left_ear": "left_ear",
+    "right_ear": "right_ear",
+    "body": "body",
+    "back_left_leg": "leg_back_left",
+    "back_right_leg": "leg_back_right",
+    "front_left_leg": "leg_front_left",
+    "front_right_leg": "leg_front_right"
+   },
+   "java_parts": {
+    "head": {
+     "pivot": [
+      0,
+      13,
+      -7
+     ],
+     "rotation": [
+      50,
+      0,
+      0
+     ]
+    },
+    "left_ear": {
+     "pivot": [
+      5,
+      13.5063,
+      -8.7302
+     ],
+     "rotation": [
+      37.4537,
+      -35.932,
+      37.4537
+     ]
+    },
+    "right_ear": {
+     "pivot": [
+      -5,
+      13.5063,
+      -8.7302
+     ],
+     "rotation": [
+      37.4537,
+      35.932,
+      -37.4537
+     ]
+    },
+    "body": {
+     "pivot": [
+      0,
+      24,
+      0
+     ]
+    },
+    "back_left_leg": {
+     "pivot": [
+      2.5,
+      18,
+      4.5
+     ]
+    },
+    "back_right_leg": {
+     "pivot": [
+      -2.5,
+      18,
+      4.5
+     ]
+    },
+    "front_left_leg": {
+     "pivot": [
+      2.5,
+      18,
+      -4.5
+     ]
+    },
+    "front_right_leg": {
+     "pivot": [
+      -2.5,
+      18,
+      -4.5
+     ]
+    }
+   },
+   "family": "head"
+  },
+  "zombie": {
+   "entity": "minecraft:zombie",
+   "geometry": "default",
+   "bones": {
+    "head": "hat",
+    "headwear": "head",
+    "body": "body",
+    "left_arm": "leftArm",
+    "right_arm": "rightArm",
+    "left_leg": "leftLeg",
+    "right_leg": "rightLeg"
+   },
+   "java_parts": {
+    "head": {
+     "pivot": [
+      0,
+      0,
+      0
+     ]
+    },
+    "headwear": {
+     "pivot": [
+      0,
+      0,
+      0
+     ]
+    },
+    "body": {
+     "pivot": [
+      0,
+      0,
+      0
+     ]
+    },
+    "left_arm": {
+     "pivot": [
+      5,
+      2,
+      0
+     ]
+    },
+    "right_arm": {
+     "pivot": [
+      -5,
+      2,
+      0
+     ]
+    },
+    "left_leg": {
+     "pivot": [
+      1.9,
+      12,
+      0
+     ]
+    },
+    "right_leg": {
+     "pivot": [
+      -1.9,
+      12,
+      0
+     ]
+    }
+   },
+   "family": "zombie"
+  },
+  "zombie_baby": {
+   "entity": "minecraft:zombie",
+   "geometry": "baby",
+   "bones": {
+    "head": "Head",
+    "hat": "Head",
+    "body": "Body",
+    "left_arm": "leftArm",
+    "right_arm": "rightArm",
+    "left_leg": "leftLeg",
+    "right_leg": "rightLeg"
+   },
+   "java_parts": {
+    "head": {
+     "pivot": [
+      0,
+      15.25,
+      0
+     ]
+    },
+    "hat": {
+     "pivot": [
+      0,
+      15.25,
+      0
+     ]
+    },
+    "body": {
+     "pivot": [
+      0,
+      17.5,
+      0
+     ]
+    },
+    "left_arm": {
+     "pivot": [
+      3,
+      15.5,
+      0
+     ]
+    },
+    "right_arm": {
+     "pivot": [
+      -3,
+      15.5,
+      0
+     ]
+    },
+    "left_leg": {
+     "pivot": [
+      1,
+      20,
+      0
+     ]
+    },
+    "right_leg": {
+     "pivot": [
+      -1,
+      20,
+      0
+     ]
+    }
+   },
+   "family": "zombie"
+  },
+  "zombie_horse": {
+   "entity": "minecraft:zombie_horse",
+   "geometry": "default",
+   "bones": {
+    "head": "Head",
+    "mouth": "Muzzle",
+    "left_ear": "EarL",
+    "right_ear": "EarR",
+    "neck": "Neck",
+    "mane": "Mane",
+    "body": "Body",
+    "tail": "Tail",
+    "front_left_leg": "LegFL",
+    "front_right_leg": "LegFR",
+    "back_left_leg": "LegBL",
+    "back_right_leg": "LegBR"
+   },
+   "java_parts": {
+    "head": {
+     "pivot": [
+      0,
+      2,
+      -9
+     ]
+    },
+    "mouth": {
+     "pivot": [
+      0,
+      2,
+      -9
+     ]
+    },
+    "left_ear": {
+     "pivot": [
+      0,
+      1,
+      -9.01
+     ]
+    },
+    "right_ear": {
+     "pivot": [
+      0,
+      1,
+      -9.01
+     ]
+    },
+    "neck": {
+     "pivot": [
+      0,
+      2,
+      -9
+     ]
+    },
+    "mane": {
+     "pivot": [
+      0,
+      2,
+      -9.01
+     ]
+    },
+    "body": {
+     "pivot": [
+      0,
+      11,
+      6
+     ]
+    },
+    "tail": {
+     "pivot": [
+      0,
+      3,
+      11
+     ]
+    },
+    "front_left_leg": {
+     "pivot": [
+      4,
+      14,
+      -9
+     ]
+    },
+    "front_right_leg": {
+     "pivot": [
+      -4,
+      14,
+      -9
+     ]
+    },
+    "back_left_leg": {
+     "pivot": [
+      4,
+      14,
+      8
+     ]
+    },
+    "back_right_leg": {
+     "pivot": [
+      -4,
+      14,
+      8
+     ]
+    }
+   },
+   "family": "head"
+  },
+  "zombie_horse_baby": {
+   "entity": "minecraft:zombie_horse",
+   "geometry": "baby",
+   "bones": {
+    "head": "Head",
+    "neck": "Neck",
+    "left_ear": "EarL",
+    "right_ear": "EarR",
+    "body": "Body",
+    "front_left_leg": "LegFL",
+    "front_right_leg": "LegFR",
+    "back_left_leg": "LegBL",
+    "back_right_leg": "LegBR",
+    "tail": "Tail"
+   },
+   "java_parts": {
+    "head": {
+     "pivot": [
+      0,
+      3.9484,
+      -6.2951
+     ]
+    },
+    "neck": {
+     "pivot": [
+      0,
+      10,
+      -6
+     ]
+    },
+    "left_ear": {
+     "pivot": [
+      2,
+      -0.3,
+      -4.35
+     ],
+     "rotation": [
+      0,
+      0,
+      15
+     ]
+    },
+    "right_ear": {
+     "pivot": [
+      -2,
+      -0.3,
+      -4.6501
+     ],
+     "rotation": [
+      0,
+      0,
+      -15
+     ]
+    },
+    "body": {
+     "pivot": [
+      0,
+      12.5,
+      0
+     ]
+    },
+    "front_left_leg": {
+     "pivot": [
+      2.4,
+      16,
+      -5.4
+     ]
+    },
+    "front_right_leg": {
+     "pivot": [
+      -2.4,
+      16,
+      -5.4
+     ]
+    },
+    "back_left_leg": {
+     "pivot": [
+      2.4,
+      16,
+      5.4
+     ]
+    },
+    "back_right_leg": {
+     "pivot": [
+      -2.4,
+      16,
+      5.4
+     ]
+    },
+    "tail": {
+     "pivot": [
+      0,
+      11.5,
+      7
+     ],
+     "rotation": [
+      -42.5,
+      0,
+      0
+     ]
+    }
+   },
+   "family": "head"
+  },
+  "zombie_nautilus": {
+   "entity": "minecraft:zombie_nautilus",
+   "geometry": "default",
+   "bones": {
+    "shell": "head",
+    "body": "body",
+    "upper_mouth": "mouth_top",
+    "inner_mouth": "inner_mouth",
+    "lower_mouth": "mouth_bottom"
+   },
+   "java_parts": {
+    "shell": {
+     "pivot": [
+      0,
+      16,
+      -1
+     ]
+    },
+    "body": {
+     "pivot": [
+      0,
+      20.5,
+      6.3
+     ]
+    },
+    "upper_mouth": {
+     "pivot": [
+      0,
+      17.99,
+      13.3
+     ]
+    },
+    "inner_mouth": {
+     "pivot": [
+      0,
+      19.99,
+      13.8
+     ]
+    },
+    "lower_mouth": {
+     "pivot": [
+      0,
+      21.99,
+      13.3
+     ]
+    }
+   }
+  },
+  "zombie_nautilus_coral": {
+   "entity": "minecraft:zombie_nautilus",
+   "geometry": "coral",
+   "bones": {
+    "shell": "head",
+    "body": "body",
+    "upper_mouth": "mouth_top",
+    "inner_mouth": "inner_mouth",
+    "lower_mouth": "mouth_bottom"
+   },
+   "java_parts": {
+    "shell": {
+     "pivot": [
+      0,
+      16,
+      -1
+     ]
+    },
+    "body": {
+     "pivot": [
+      0,
+      20.5,
+      6.3
+     ]
+    },
+    "upper_mouth": {
+     "pivot": [
+      0,
+      17.99,
+      13.3
+     ]
+    },
+    "inner_mouth": {
+     "pivot": [
+      0,
+      19.99,
+      13.8
+     ]
+    },
+    "lower_mouth": {
+     "pivot": [
+      0,
+      21.99,
+      13.3
+     ]
+    }
+   }
+  },
+  "zombified_piglin": {
+   "entity": "minecraft:zombie_pigman",
+   "geometry": "default",
+   "bones": {
+    "head": "head",
+    "left_ear": "leftear",
+    "right_ear": "rightear",
+    "body": "body",
+    "jacket": "body",
+    "left_arm": "leftarm",
+    "left_sleeve": "leftarm",
+    "right_arm": "rightarm",
+    "right_sleeve": "rightarm",
+    "left_leg": "leftleg",
+    "left_pants": "leftleg",
+    "right_leg": "rightleg",
+    "right_pants": "rightleg"
+   },
+   "java_parts": {
+    "head": {
+     "pivot": [
+      0,
+      0,
+      0
+     ]
+    },
+    "left_ear": {
+     "pivot": [
+      4.5,
+      -6,
+      0
+     ],
+     "rotation": [
+      0,
+      0,
+      -35
+     ]
+    },
+    "right_ear": {
+     "pivot": [
+      -4.5,
+      -6,
+      0
+     ],
+     "rotation": [
+      0,
+      0,
+      35
+     ]
+    },
+    "body": {
+     "pivot": [
+      0,
+      0,
+      0
+     ]
+    },
+    "jacket": {
+     "pivot": [
+      0,
+      0,
+      0
+     ]
+    },
+    "left_arm": {
+     "pivot": [
+      5,
+      2,
+      0
+     ]
+    },
+    "left_sleeve": {
+     "pivot": [
+      5,
+      2,
+      0
+     ]
+    },
+    "right_arm": {
+     "pivot": [
+      -5,
+      2,
+      0
+     ]
+    },
+    "right_sleeve": {
+     "pivot": [
+      -5,
+      2,
+      0
+     ]
+    },
+    "left_leg": {
+     "pivot": [
+      2,
+      12,
+      0
+     ]
+    },
+    "left_pants": {
+     "pivot": [
+      2,
+      12,
+      0
+     ]
+    },
+    "right_leg": {
+     "pivot": [
+      -2,
+      12,
+      0
+     ]
+    },
+    "right_pants": {
+     "pivot": [
+      -2,
+      12,
+      0
+     ]
+    }
+   },
+   "family": "zombie"
+  },
+  "zombified_piglin_baby": {
+   "entity": "minecraft:zombie_pigman",
+   "geometry": "baby",
+   "bones": {
+    "head": "head",
+    "headwear": "head",
+    "left_ear": "leftear",
+    "right_ear": "rightear",
+    "body": "Body",
+    "left_arm": "LeftArm",
+    "right_arm": "RightArm",
+    "left_leg": "LeftLeg",
+    "right_leg": "RightLeg"
+   },
+   "java_parts": {
+    "head": {
+     "pivot": [
+      0,
+      15,
+      0
+     ]
+    },
+    "headwear": {
+     "pivot": [
+      0,
+      15,
+      0
+     ]
+    },
+    "left_ear": {
+     "pivot": [
+      4.2,
+      11,
+      0
+     ],
+     "rotation": [
+      0,
+      0,
+      -5
+     ]
+    },
+    "right_ear": {
+     "pivot": [
+      -4.2,
+      11,
+      0
+     ],
+     "rotation": [
+      0,
+      0,
+      5
+     ]
+    },
+    "body": {
+     "pivot": [
+      0,
+      18,
+      -0.5
+     ]
+    },
+    "left_arm": {
+     "pivot": [
+      4,
+      15,
+      0
+     ]
+    },
+    "right_arm": {
+     "pivot": [
+      -4,
+      15,
+      0
+     ]
+    },
+    "left_leg": {
+     "pivot": [
+      1.5,
+      20,
+      0
+     ]
+    },
+    "right_leg": {
+     "pivot": [
+      -1.5,
+      20,
+      0
+     ]
+    }
+   },
+   "family": "zombie"
+  }
+ },
+ "unsupported": {
+  "bed": "Bedrock draws beds from one geometry laid out in a different frame from the Java head and foot parts",
+  "bell": "Bedrock draws bells without an entity geometry",
+  "bow": "no Java entity model of this name",
+  "breeze_wind": "Bedrock splits the wind into three geometries animated separately",
+  "camel_husk_saddle": "Bedrock draws saddles and horse armor inside the mob geometry",
+  "camel_saddle": "Bedrock draws saddles and horse armor inside the mob geometry",
+  "cat_baby_collar": "Bedrock draws this layer with the main geometry",
+  "cat_collar": "Bedrock draws this layer with the main geometry",
+  "donkey_saddle": "Bedrock draws saddles and horse armor inside the mob geometry",
+  "drowned_baby_boots": "baby armour piece: Bedrock draws armour with its own attachable geometry",
+  "drowned_baby_chestplate": "baby armour piece: Bedrock draws armour with its own attachable geometry",
+  "drowned_baby_helmet": "baby armour piece: Bedrock draws armour with its own attachable geometry",
+  "drowned_baby_leggings": "baby armour piece: Bedrock draws armour with its own attachable geometry",
+  "drowned_baby_outer": "Bedrock draws this layer with the main geometry",
+  "drowned_outer": "Bedrock draws this layer with the main geometry",
+  "giant": "Bedrock has no such entity",
+  "happy_ghast_baby": "Bedrock draws the baby with the adult geometry",
+  "happy_ghast_harness": "Bedrock draws this layer with the main geometry",
+  "horse_armor": "Bedrock draws saddles and horse armor inside the mob geometry",
+  "horse_saddle": "Bedrock draws saddles and horse armor inside the mob geometry",
+  "husk_baby_boots": "baby armour piece: Bedrock draws armour with its own attachable geometry",
+  "husk_baby_chestplate": "baby armour piece: Bedrock draws armour with its own attachable geometry",
+  "husk_baby_helmet": "baby armour piece: Bedrock draws armour with its own attachable geometry",
+  "husk_baby_leggings": "baby armour piece: Bedrock draws armour with its own attachable geometry",
+  "illusioner": "Bedrock has no such entity",
+  "llama_baby_decor": "Bedrock draws this layer with the main geometry",
+  "llama_decor": "Bedrock draws this layer with the main geometry",
+  "mule_saddle": "Bedrock draws saddles and horse armor inside the mob geometry",
+  "pig_saddle": "Bedrock draws saddles and horse armor inside the mob geometry",
+  "piglin_baby_boots": "baby armour piece: Bedrock draws armour with its own attachable geometry",
+  "piglin_baby_chestplate": "baby armour piece: Bedrock draws armour with its own attachable geometry",
+  "piglin_baby_helmet": "baby armour piece: Bedrock draws armour with its own attachable geometry",
+  "piglin_baby_leggings": "baby armour piece: Bedrock draws armour with its own attachable geometry",
+  "sheep_baby_wool": "Bedrock draws this layer with the main geometry",
+  "sheep_wool": "Bedrock draws this layer with the main geometry",
+  "sheep_wool_undercoat": "Bedrock draws this layer with the main geometry",
+  "skeleton_horse_armor": "Bedrock draws saddles and horse armor inside the mob geometry",
+  "skeleton_horse_saddle": "Bedrock draws saddles and horse armor inside the mob geometry",
+  "strider_saddle": "Bedrock draws saddles and horse armor inside the mob geometry",
+  "trader_llama_baby_decor": "Bedrock draws this layer with the main geometry",
+  "trader_llama_decor": "Bedrock draws this layer with the main geometry",
+  "tropical_fish_pattern_a": "Bedrock draws this layer with the main geometry",
+  "tropical_fish_pattern_b": "Bedrock draws this layer with the main geometry",
+  "warden_bioluminescent": "Bedrock draws this layer with the main geometry",
+  "warden_heart": "Bedrock draws this layer with the main geometry",
+  "warden_pulsating_spots": "Bedrock draws this layer with the main geometry",
+  "warden_tendrils": "Bedrock draws this layer with the main geometry",
+  "wolf_armor": "Bedrock draws this layer with the main geometry",
+  "wolf_baby_collar": "Bedrock draws this layer with the main geometry",
+  "wolf_collar": "Bedrock draws this layer with the main geometry",
+  "zombie_baby_boots": "baby armour piece: Bedrock draws armour with its own attachable geometry",
+  "zombie_baby_chestplate": "baby armour piece: Bedrock draws armour with its own attachable geometry",
+  "zombie_baby_helmet": "baby armour piece: Bedrock draws armour with its own attachable geometry",
+  "zombie_baby_leggings": "baby armour piece: Bedrock draws armour with its own attachable geometry",
+  "zombie_horse_armor": "Bedrock draws saddles and horse armor inside the mob geometry",
+  "zombie_horse_saddle": "Bedrock draws saddles and horse armor inside the mob geometry",
+  "zombie_villager_baby_boots": "baby armour piece: Bedrock draws armour with its own attachable geometry",
+  "zombie_villager_baby_chestplate": "baby armour piece: Bedrock draws armour with its own attachable geometry",
+  "zombie_villager_baby_helmet": "baby armour piece: Bedrock draws armour with its own attachable geometry",
+  "zombie_villager_baby_leggings": "baby armour piece: Bedrock draws armour with its own attachable geometry",
+  "zombified_piglin_baby_boots": "baby armour piece: Bedrock draws armour with its own attachable geometry",
+  "zombified_piglin_baby_chestplate": "baby armour piece: Bedrock draws armour with its own attachable geometry",
+  "zombified_piglin_baby_helmet": "baby armour piece: Bedrock draws armour with its own attachable geometry",
+  "zombified_piglin_baby_leggings": "baby armour piece: Bedrock draws armour with its own attachable geometry"
+ },
+ "families": {
+  "head": {
+   "head.rx": "torad(head_pitch)",
+   "head.ry": "torad(head_yaw)"
+  },
+  "quadruped": {
+   "head.rx": "torad(head_pitch)",
+   "head.ry": "torad(head_yaw)",
+   "leg1.rx": "cos(limb_swing*0.6662)*1.4*limb_speed",
+   "right_hind_leg.rx": "cos(limb_swing*0.6662)*1.4*limb_speed",
+   "leg2.rx": "cos(limb_swing*0.6662+pi)*1.4*limb_speed",
+   "left_hind_leg.rx": "cos(limb_swing*0.6662+pi)*1.4*limb_speed",
+   "leg3.rx": "cos(limb_swing*0.6662+pi)*1.4*limb_speed",
+   "right_front_leg.rx": "cos(limb_swing*0.6662+pi)*1.4*limb_speed",
+   "leg4.rx": "cos(limb_swing*0.6662)*1.4*limb_speed",
+   "left_front_leg.rx": "cos(limb_swing*0.6662)*1.4*limb_speed"
+  },
+  "baby_quadruped": {
+   "head.rx": "torad(head_pitch)",
+   "head.ry": "torad(head_yaw)",
+   "leg1.rx": "cos(limb_swing*0.6662)*1.4*limb_speed",
+   "right_hind_leg.rx": "cos(limb_swing*0.6662)*1.4*limb_speed",
+   "leg2.rx": "cos(limb_swing*0.6662+pi)*1.4*limb_speed",
+   "left_hind_leg.rx": "cos(limb_swing*0.6662+pi)*1.4*limb_speed",
+   "leg3.rx": "cos(limb_swing*0.6662+pi)*1.4*limb_speed",
+   "right_front_leg.rx": "cos(limb_swing*0.6662+pi)*1.4*limb_speed",
+   "leg4.rx": "cos(limb_swing*0.6662)*1.4*limb_speed",
+   "left_front_leg.rx": "cos(limb_swing*0.6662)*1.4*limb_speed"
+  },
+  "chicken": {
+   "head.rx": "torad(head_pitch)",
+   "head.ry": "torad(head_yaw)",
+   "bill.rx": "torad(head_pitch)",
+   "bill.ry": "torad(head_yaw)",
+   "chin.rx": "torad(head_pitch)",
+   "chin.ry": "torad(head_yaw)",
+   "right_leg.rx": "cos(limb_swing*0.6662)*1.4*limb_speed",
+   "left_leg.rx": "cos(limb_swing*0.6662+pi)*1.4*limb_speed",
+   "right_wing.rz": "(sin(wing_flap_position)+1)*wing_flap_speed",
+   "left_wing.rz": "-(sin(wing_flap_position)+1)*wing_flap_speed"
+  },
+  "feline": {
+   "head.rx": "torad(head_pitch)",
+   "head.ry": "torad(head_yaw)",
+   "back_left_leg.rx": "cos(limb_swing*0.6662)*1*limb_speed",
+   "back_right_leg.rx": "cos(limb_swing*0.6662+pi)*1*limb_speed",
+   "front_left_leg.rx": "cos(limb_swing*0.6662+pi)*1*limb_speed",
+   "front_right_leg.rx": "cos(limb_swing*0.6662)*1*limb_speed"
+  },
+  "biped": {
+   "head.rx": "torad(head_pitch)",
+   "head.ry": "torad(head_yaw)",
+   "right_arm.rx": "cos(limb_swing*0.6662+pi)*1*limb_speed+sin(age*0.067)*0.05",
+   "left_arm.rx": "cos(limb_swing*0.6662)*1*limb_speed-sin(age*0.067)*0.05",
+   "right_arm.rz": "cos(age*0.09)*0.05+0.05",
+   "left_arm.rz": "-(cos(age*0.09)*0.05+0.05)",
+   "right_leg.rx": "cos(limb_swing*0.6662)*1.4*limb_speed",
+   "left_leg.rx": "cos(limb_swing*0.6662+pi)*1.4*limb_speed"
+  },
+  "zombie": {
+   "head.rx": "torad(head_pitch)",
+   "head.ry": "torad(head_yaw)",
+   "right_arm.rx": "-pi/if(is_aggressive,1.5,2.25)+sin(swing_progress*pi)*1.2-sin((1-(1-swing_progress)*(1-swing_progress))*pi)*0.4+sin(age*0.067)*0.05",
+   "left_arm.rx": "-pi/if(is_aggressive,1.5,2.25)+sin(swing_progress*pi)*1.2-sin((1-(1-swing_progress)*(1-swing_progress))*pi)*0.4-sin(age*0.067)*0.05",
+   "right_arm.ry": "-(0.1-sin(swing_progress*pi)*0.6)",
+   "left_arm.ry": "0.1-sin(swing_progress*pi)*0.6",
+   "right_arm.rz": "cos(age*0.09)*0.05+0.05",
+   "left_arm.rz": "-(cos(age*0.09)*0.05+0.05)",
+   "right_leg.rx": "cos(limb_swing*0.6662)*1.4*limb_speed",
+   "left_leg.rx": "cos(limb_swing*0.6662+pi)*1.4*limb_speed"
+  }
+ }
+}

@@ -1,0 +1,9 @@
+* text=auto eol=lf
+*.png binary
+*.tga binary
+*.mcstructure binary
+*.mcpack binary
+*.mcaddon binary
+*.zip binary
+*.cmd text eol=crlf
+*.ps1 text eol=crlf

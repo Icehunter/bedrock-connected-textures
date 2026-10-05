@@ -1,0 +1,24 @@
+{
+  "carrier_types": 96,
+  "native_only": [
+    "minecraft:stone", "minecraft:granite", "minecraft:diorite", "minecraft:andesite",
+    "minecraft:deepslate", "minecraft:tuff", "minecraft:calcite", "minecraft:dripstone_block",
+    "minecraft:dirt", "minecraft:coarse_dirt", "minecraft:rooted_dirt", "minecraft:mud",
+    "minecraft:grass_block", "minecraft:grass", "minecraft:podzol", "minecraft:mycelium",
+    "minecraft:sand", "minecraft:red_sand", "minecraft:gravel", "minecraft:clay",
+    "minecraft:netherrack", "minecraft:soul_sand", "minecraft:soul_soil", "minecraft:end_stone",
+    "minecraft:snow", "minecraft:snow_layer", "minecraft:ice", "minecraft:packed_ice",
+    "*_log", "*_wood", "*_stem", "*_hyphae", "*_leaves",
+    "*_wool", "*_carpet", "*terracotta", "*_concrete", "*_concrete_powder", "*_ore"
+  ],
+  "entity_allowlist": [
+    "minecraft:glass", "minecraft:tinted_glass", "*_stained_glass", "*glass_pane",
+    "*_planks", "minecraft:bookshelf", "minecraft:chiseled_bookshelf",
+    "minecraft:brick_block", "minecraft:bricks", "*_bricks", "minecraft:stonebrick",
+    "*sandstone", "minecraft:cobblestone", "minecraft:mossy_cobblestone",
+    "minecraft:quartz_block", "*_quartz_block", "minecraft:quartz_pillar", "minecraft:smooth_stone",
+    "minecraft:polished_*", "*_tiles",
+    "minecraft:iron_block", "minecraft:gold_block", "minecraft:diamond_block", "minecraft:emerald_block",
+    "minecraft:lapis_block", "minecraft:redstone_block", "minecraft:netherite_block", "*copper_block"
+  ]
+}
