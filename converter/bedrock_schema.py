@@ -71,6 +71,13 @@ class Schemas:
         self._check(instance, self.load(path), path, '', errors)
         return errors
 
+    def validate_file(self, instance, path):
+        """Error strings for an instance of the schema in a file of its own (BCT's docs/bct.schema.json)."""
+        path = Path(path).resolve()
+        errors = []
+        self._check(instance, self.load(path), path, '', errors)
+        return errors
+
     def component_names(self):
         return set(self.load(self.root / COMPONENTS_SCHEMA)['properties'])
 
@@ -255,7 +262,12 @@ def geometry_errors(document, limit=True):
                 if len(cube.get('origin', [])) != 3 or len(cube.get('size', [])) != 3:
                     errors.append(f'{identifier}/{name}/cubes[{index}]: origin and size need three numbers')
                     continue
-                for face, uv in (cube.get('uv') or {}).items():
+                uv_map = cube.get('uv')
+                if isinstance(uv_map, list):
+                    if len(uv_map) != 2:
+                        errors.append(f'{identifier}/{name}/cubes[{index}]: box uv needs two numbers')
+                    uv_map = {}  # box UV: the whole texture is laid out from one corner
+                for face, uv in (uv_map or {}).items():
                     if face not in GEOMETRY_FACES:
                         errors.append(f'{identifier}/{name}/cubes[{index}]: unknown face {face!r}')
                     elif uv.get('material_instance') == '*':

@@ -193,6 +193,17 @@ test('a marked leaf touching a log only by a corner does not decay', () => {
   assert.equal(env.engine.leaves.status.decays, 0);
 });
 
+test('a marked leaf decays beside the trunk of a separate tree its leaves do not reach, as in vanilla', () => {
+  const env = setup({ extra: [...tree(), ['20,61,20', 'minecraft:oak_leaves', { persistent_bit: false, update_bit: false }],
+    ...[61, 62, 63].map(y => [`23,${y},20`, 'minecraft:oak_log', { pillar_axis: 'y' }])] });
+  settle(env);
+  assert.equal(env.blocks.get('20,61,20'), 'bct_t:m_oak_leaves');
+  env.states.set('20,61,20', { ...env.states.get('20,61,20'), 'bct:update_bit': 1 });
+  tick(env, '20,61,20');
+  assert.equal(env.blocks.get('20,61,20'), undefined, 'a log 3 blocks away with no leaves between keeps nothing alive');
+  assert.equal(env.engine.leaves.status.decays, 1);
+});
+
 test('an unmarked leaf with no log within 6 blocks is caught by a random check (logs gone without an event)', () => {
   const env = setup();
   settle(env);
@@ -245,6 +256,19 @@ test('vanilla leaves next to a conversion that stay vanilla get update_bit clear
   assert.equal(env.blocks.get('15,65,8'), 'bct_t:m_oak_leaves');
   assert.equal(env.blocks.get('16,65,8'), 'minecraft:oak_leaves');
   assert.equal(env.states.get('16,65,8').update_bit, false, 'no decay check is left pending at the edge');
+});
+
+test('when each look has its own weights, the model pick uses the weights of that look', () => {
+  // Look 0 (near a log) can only pick turn 0, look 1 (5 to 7 away) only turn 3.
+  const oak = { ...leafData.blocks[0], turn: { ...leafData.blocks[0].turn, byLook: [[1, 0, 0, 0], [0, 0, 0, 1]] } };
+  const env = setup({ data: { ...data, leaves: { ...leafData, blocks: [oak, leafData.blocks[1]] } }, replace: { farDistance: 0 } });
+  settle(env);
+  const converted = [...env.blocks].filter(([, type]) => type === 'bct_t:m_oak_leaves');
+  assert.ok(converted.length > 0);
+  for (const [key] of converted) {
+    const states = env.states.get(key);
+    assert.equal(states['bct:t'], states['bct:look'] === 1 ? 3 : 0, key + ' look ' + states['bct:look']);
+  }
 });
 
 test('after a fast flight the trees around the player convert within two seconds', () => {

@@ -22,6 +22,7 @@ import { createBudget } from './budget.mjs';
 import { createLeaves } from './leaves.mjs';
 import { createOverlaySurfaces } from './terrain-native.mjs';
 import { createFar } from './far.mjs';
+import { AuthoredError, compileAuthored } from './authored.mjs';
 
 export function startEngine(api) {
   const { world, system } = api;
@@ -92,22 +93,38 @@ export function startEngine(api) {
   ] });
 
   const terrainSources = new Map();
+  /** A pack's terrain data: generated edges (terrain providers) and its overlay surfaces as one {overlay} entry. */
+  function setTerrain(provider, data) {
+    if (!Array.isArray(data)) throw new Error('Invalid terrain data');
+    const edges = data.filter(entry => !entry?.overlay);
+    const next = new Map(terrainSources);
+    next.set(provider, edges);
+    terrain.setProviders([...next.values()].flat());
+    terrainSources.set(provider, edges);
+    overlays.setSource(provider, data.find(entry => entry?.overlay)?.overlay);
+    replacements.refreshTypes();
+    overlayScanner.reset();
+  }
   const sources = listenSources({ system, log, onSource(part, provider, data) {
-    if (part === 'connected') connected.setSource(provider, data);
+    if (part === 'authored') {
+      // A hand-written pack's data compiles into the same replace data the converter writes.
+      let compiled;
+      try { compiled = compileAuthored(api, data); }
+      catch (error) {
+        if (error instanceof AuthoredError) {
+          try { world.sendMessage('§c[BCT] ' + provider + ' (scripts/bct.js): ' + error.message); } catch { /* no players yet */ }
+        }
+        throw error;
+      }
+      replacements.setSource(provider, compiled.replace); leaves.setSource(provider, compiled.replace); replaceScanner.reset();
+      // Its edges join the converted packs' terrain data, under a name of their own.
+      if (compiled.terrain.length || terrainSources.has('authored:' + provider)) setTerrain('authored:' + provider, compiled.terrain);
+      if (compiled.connected) connected.setSource('authored:' + provider, compiled.connected);
+    }
+    else if (part === 'connected') connected.setSource(provider, data);
     // Replacements first: the leaves count the replacement logs as logs, so they must exist when the leaves read them.
     else if (part === 'replace') { replacements.setSource(provider, data); leaves.setSource(provider, data); replaceScanner.reset(); }
-    else {
-      if (!Array.isArray(data)) throw new Error('Invalid terrain data');
-      // A pack's overlay surfaces travel in its terrain data as one {overlay} entry.
-      const edges = data.filter(entry => !entry?.overlay);
-      const next = new Map(terrainSources);
-      next.set(provider, edges);
-      terrain.setProviders([...next.values()].flat());
-      terrainSources.set(provider, edges);
-      overlays.setSource(provider, data.find(entry => entry?.overlay)?.overlay);
-      replacements.refreshTypes();
-      overlayScanner.reset();
-    }
+    else setTerrain(provider, data);
     scanner.reset();
   } });
   installRepeatBlocks(system);

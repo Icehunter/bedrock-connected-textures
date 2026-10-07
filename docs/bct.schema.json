@@ -1,0 +1,148 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/Icehunter/bedrock-connected-textures/docs/bct.schema.json",
+  "title": "BCT pack data (scripts/bct.js)",
+  "description": "What a Bedrock pack's scripts/bct.js exports for the Bedrock Connected Textures engine. See docs/AUTHORING.md.",
+  "type": "object",
+  "required": ["format", "pack"],
+  "additionalProperties": false,
+  "properties": {
+    "format": { "const": 1, "description": "The data format: 1." },
+    "pack": { "type": "string", "pattern": "^[a-z0-9_-]{1,80}$", "description": "A short id for the pack." },
+    "priority": { "type": "integer", "description": "When two BCT packs draw the same block, the higher priority wins." },
+    "blocks": {
+      "type": "object",
+      "description": "Pattern blocks: vanilla block id to the pack's block and its pattern.",
+      "propertyNames": { "$ref": "#/definitions/blockId" },
+      "additionalProperties": {
+        "type": "object",
+        "required": ["block"],
+        "properties": {
+          "block": { "$ref": "#/definitions/blockId" },
+          "pattern": {
+            "type": "object",
+            "properties": {
+              "repeat": { "type": "array", "items": { "type": "integer", "minimum": 1, "maximum": 16 }, "minItems": 2, "maxItems": 2,
+                          "description": "[width, height] of a fixed pattern." },
+              "random": { "$ref": "#/definitions/weights", "description": "Weights of random tiles." }
+            },
+            "additionalProperties": false
+          },
+          "open": { "type": "boolean", "description": "Written by bct.py block: the block is see-through." },
+          "strip": { "$ref": "#/definitions/blockId", "description": "Written by bct.py block: an axe strips it to this block." },
+          "xp": { "type": "array", "items": { "type": "integer" }, "minItems": 2, "maxItems": 2 },
+          "tool": { "type": "object" },
+          "leafGuard": { "type": "object" },
+          "cost": { "type": "integer" }
+        }
+      }
+    },
+    "leaves": {
+      "type": "object",
+      "description": "3D leaves: vanilla leaf id to the pack's leaf block and its model weights.",
+      "propertyNames": { "$ref": "#/definitions/blockId" },
+      "additionalProperties": {
+        "type": "object",
+        "required": ["block"],
+        "additionalProperties": false,
+        "properties": {
+          "block": { "$ref": "#/definitions/blockId" },
+          "models": {
+            "oneOf": [
+              { "$ref": "#/definitions/weights" },
+              {
+                "type": "object",
+                "required": ["near", "far"],
+                "additionalProperties": false,
+                "properties": {
+                  "near": { "$ref": "#/definitions/weights" },
+                  "far": { "$ref": "#/definitions/weights" },
+                  "nearUpTo": { "type": "integer", "minimum": 1, "maximum": 5,
+                                "description": "Leaves up to this log distance use the near models (default 3)." }
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    "edges": {
+      "type": "array",
+      "maxItems": 16,
+      "description": "Ground spreading onto the tops of blocks beside it; earlier edges lie over later ones.",
+      "items": {
+        "type": "object",
+        "required": ["from", "onto", "block"],
+        "additionalProperties": false,
+        "properties": {
+          "from": { "$ref": "#/definitions/blockIds" },
+          "onto": { "$ref": "#/definitions/blockIds" },
+          "block": { "type": "string", "pattern": "^[a-z][a-z0-9_]*:[a-z][a-z0-9_]*$" }
+        }
+      }
+    },
+    "overlays": {
+      "type": "array",
+      "description": "17-tile overlays; build their surface blocks with python bct.py overlays.",
+      "items": {
+        "type": "object",
+        "required": ["tiles", "onto", "from"],
+        "additionalProperties": false,
+        "properties": {
+          "tiles": { "$ref": "#/definitions/tilePath" },
+          "onto": { "$ref": "#/definitions/blockIds" },
+          "from": { "$ref": "#/definitions/blockIds" },
+          "faces": { "$ref": "#/definitions/faces" },
+          "tint": { "enum": ["none", "grass", "foliage"] }
+        }
+      }
+    },
+    "connected": {
+      "type": "object",
+      "description": "Connected blocks drawn by the block itself: vanilla block id to the pack's block.",
+      "propertyNames": { "$ref": "#/definitions/blockId" },
+      "additionalProperties": {
+        "type": "object",
+        "required": ["block"],
+        "properties": {
+          "block": { "$ref": "#/definitions/blockId" },
+          "connect": { "oneOf": [{ "const": "same" }, { "$ref": "#/definitions/blockIds" }] },
+          "open": { "type": "boolean" },
+          "strip": { "$ref": "#/definitions/blockId" },
+          "xp": { "type": "array", "items": { "type": "integer" }, "minItems": 2, "maxItems": 2 },
+          "tool": { "type": "object" }
+        }
+      }
+    },
+    "carriers": {
+      "type": "array",
+      "description": "The full 47-tile connected look drawn by entities; build them with python bct.py carriers.",
+      "items": {
+        "type": "object",
+        "required": ["tiles", "blocks"],
+        "additionalProperties": false,
+        "properties": {
+          "tiles": { "$ref": "#/definitions/tilePath" },
+          "blocks": { "$ref": "#/definitions/blockIds" },
+          "faces": { "$ref": "#/definitions/faces" }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "blockId": { "type": "string", "pattern": "^[a-z0-9_.-]+:[a-z0-9_./-]+$" },
+    "blockIds": {
+      "oneOf": [
+        { "$ref": "#/definitions/blockId" },
+        { "type": "array", "items": { "$ref": "#/definitions/blockId" }, "minItems": 1, "maxItems": 128 }
+      ]
+    },
+    "weights": { "type": "array", "items": { "type": "integer", "minimum": 0 }, "minItems": 1, "maxItems": 16 },
+    "tilePath": { "type": "string", "pattern": "^textures/", "description": "A tile path without its number: textures/blocks/grass_overlay for grass_overlay_0, _1..." },
+    "faces": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "enum": ["up", "north", "south", "west", "east", "down"] }
+    }
+  }
+}

@@ -1,0 +1,4066 @@
+{
+  "minecraft:acacia_leaves": {
+    "loot": {
+      "pools": [
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "match_tool",
+              "item": "minecraft:shears"
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:acacia_leaves"
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "random_chance",
+              "chance": 0.05
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:acacia_sapling",
+              "functions": [
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "match_tool",
+              "enchantments": [
+                {
+                  "enchantment": "fortune",
+                  "levels": {
+                    "range_min": 1,
+                    "range_max": 1
+                  }
+                }
+              ]
+            },
+            {
+              "condition": "random_chance",
+              "chance": 0.013157895
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:acacia_sapling",
+              "functions": [
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "match_tool",
+              "enchantments": [
+                {
+                  "enchantment": "fortune",
+                  "levels": {
+                    "range_min": 2,
+                    "range_max": 2
+                  }
+                }
+              ]
+            },
+            {
+              "condition": "random_chance",
+              "chance": 0.035087722
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:acacia_sapling",
+              "functions": [
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "match_tool",
+              "enchantments": [
+                {
+                  "enchantment": "fortune",
+                  "levels": {
+                    "range_min": 3,
+                    "range_max": 3
+                  }
+                }
+              ]
+            },
+            {
+              "condition": "random_chance",
+              "chance": 0.052631579
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:acacia_sapling",
+              "functions": [
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "random_chance",
+              "chance": 0.02
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:stick",
+              "functions": [
+                {
+                  "function": "set_count",
+                  "count": {
+                    "min": 1,
+                    "max": 2
+                  }
+                },
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "match_tool",
+              "enchantments": [
+                {
+                  "enchantment": "fortune",
+                  "levels": {
+                    "range_min": 1,
+                    "range_max": 1
+                  }
+                }
+              ]
+            },
+            {
+              "condition": "random_chance",
+              "chance": 0.002267574
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:stick",
+              "functions": [
+                {
+                  "function": "set_count",
+                  "count": {
+                    "min": 1,
+                    "max": 2
+                  }
+                },
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "match_tool",
+              "enchantments": [
+                {
+                  "enchantment": "fortune",
+                  "levels": {
+                    "range_min": 2,
+                    "range_max": 2
+                  }
+                }
+              ]
+            },
+            {
+              "condition": "random_chance",
+              "chance": 0.005102041
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:stick",
+              "functions": [
+                {
+                  "function": "set_count",
+                  "count": {
+                    "min": 1,
+                    "max": 2
+                  }
+                },
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "match_tool",
+              "enchantments": [
+                {
+                  "enchantment": "fortune",
+                  "levels": {
+                    "range_min": 3,
+                    "range_max": 3
+                  }
+                }
+              ]
+            },
+            {
+              "condition": "random_chance",
+              "chance": 0.013605444
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:stick",
+              "functions": [
+                {
+                  "function": "set_count",
+                  "count": {
+                    "min": 1,
+                    "max": 2
+                  }
+                },
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "tint": "default_foliage"
+  },
+  "minecraft:azalea_leaves": {
+    "loot": {
+      "pools": [
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "match_tool",
+              "item": "minecraft:shears"
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:azalea_leaves"
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "random_chance",
+              "chance": 0.05
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:azalea",
+              "functions": [
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "match_tool",
+              "enchantments": [
+                {
+                  "enchantment": "fortune",
+                  "levels": {
+                    "range_min": 1,
+                    "range_max": 1
+                  }
+                }
+              ]
+            },
+            {
+              "condition": "random_chance",
+              "chance": 0.013157895
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:azalea",
+              "functions": [
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "match_tool",
+              "enchantments": [
+                {
+                  "enchantment": "fortune",
+                  "levels": {
+                    "range_min": 2,
+                    "range_max": 2
+                  }
+                }
+              ]
+            },
+            {
+              "condition": "random_chance",
+              "chance": 0.035087722
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:azalea",
+              "functions": [
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "match_tool",
+              "enchantments": [
+                {
+                  "enchantment": "fortune",
+                  "levels": {
+                    "range_min": 3,
+                    "range_max": 3
+                  }
+                }
+              ]
+            },
+            {
+              "condition": "random_chance",
+              "chance": 0.052631579
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:azalea",
+              "functions": [
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "random_chance",
+              "chance": 0.02
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:stick",
+              "functions": [
+                {
+                  "function": "set_count",
+                  "count": {
+                    "min": 1,
+                    "max": 2
+                  }
+                },
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "match_tool",
+              "enchantments": [
+                {
+                  "enchantment": "fortune",
+                  "levels": {
+                    "range_min": 1,
+                    "range_max": 1
+                  }
+                }
+              ]
+            },
+            {
+              "condition": "random_chance",
+              "chance": 0.002267574
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:stick",
+              "functions": [
+                {
+                  "function": "set_count",
+                  "count": {
+                    "min": 1,
+                    "max": 2
+                  }
+                },
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "match_tool",
+              "enchantments": [
+                {
+                  "enchantment": "fortune",
+                  "levels": {
+                    "range_min": 2,
+                    "range_max": 2
+                  }
+                }
+              ]
+            },
+            {
+              "condition": "random_chance",
+              "chance": 0.005102041
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:stick",
+              "functions": [
+                {
+                  "function": "set_count",
+                  "count": {
+                    "min": 1,
+                    "max": 2
+                  }
+                },
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "match_tool",
+              "enchantments": [
+                {
+                  "enchantment": "fortune",
+                  "levels": {
+                    "range_min": 3,
+                    "range_max": 3
+                  }
+                }
+              ]
+            },
+            {
+              "condition": "random_chance",
+              "chance": 0.013605444
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:stick",
+              "functions": [
+                {
+                  "function": "set_count",
+                  "count": {
+                    "min": 1,
+                    "max": 2
+                  }
+                },
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "tint": null
+  },
+  "minecraft:azalea_leaves_flowered": {
+    "loot": {
+      "pools": [
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "match_tool",
+              "item": "minecraft:shears"
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:azalea_leaves_flowered"
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "random_chance",
+              "chance": 0.05
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:flowering_azalea",
+              "functions": [
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "match_tool",
+              "enchantments": [
+                {
+                  "enchantment": "fortune",
+                  "levels": {
+                    "range_min": 1,
+                    "range_max": 1
+                  }
+                }
+              ]
+            },
+            {
+              "condition": "random_chance",
+              "chance": 0.013157895
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:flowering_azalea",
+              "functions": [
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "match_tool",
+              "enchantments": [
+                {
+                  "enchantment": "fortune",
+                  "levels": {
+                    "range_min": 2,
+                    "range_max": 2
+                  }
+                }
+              ]
+            },
+            {
+              "condition": "random_chance",
+              "chance": 0.035087722
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:flowering_azalea",
+              "functions": [
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "match_tool",
+              "enchantments": [
+                {
+                  "enchantment": "fortune",
+                  "levels": {
+                    "range_min": 3,
+                    "range_max": 3
+                  }
+                }
+              ]
+            },
+            {
+              "condition": "random_chance",
+              "chance": 0.052631579
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:flowering_azalea",
+              "functions": [
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "random_chance",
+              "chance": 0.02
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:stick",
+              "functions": [
+                {
+                  "function": "set_count",
+                  "count": {
+                    "min": 1,
+                    "max": 2
+                  }
+                },
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "match_tool",
+              "enchantments": [
+                {
+                  "enchantment": "fortune",
+                  "levels": {
+                    "range_min": 1,
+                    "range_max": 1
+                  }
+                }
+              ]
+            },
+            {
+              "condition": "random_chance",
+              "chance": 0.002267574
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:stick",
+              "functions": [
+                {
+                  "function": "set_count",
+                  "count": {
+                    "min": 1,
+                    "max": 2
+                  }
+                },
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "match_tool",
+              "enchantments": [
+                {
+                  "enchantment": "fortune",
+                  "levels": {
+                    "range_min": 2,
+                    "range_max": 2
+                  }
+                }
+              ]
+            },
+            {
+              "condition": "random_chance",
+              "chance": 0.005102041
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:stick",
+              "functions": [
+                {
+                  "function": "set_count",
+                  "count": {
+                    "min": 1,
+                    "max": 2
+                  }
+                },
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "match_tool",
+              "enchantments": [
+                {
+                  "enchantment": "fortune",
+                  "levels": {
+                    "range_min": 3,
+                    "range_max": 3
+                  }
+                }
+              ]
+            },
+            {
+              "condition": "random_chance",
+              "chance": 0.013605444
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:stick",
+              "functions": [
+                {
+                  "function": "set_count",
+                  "count": {
+                    "min": 1,
+                    "max": 2
+                  }
+                },
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "tint": null
+  },
+  "minecraft:birch_leaves": {
+    "loot": {
+      "pools": [
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "match_tool",
+              "item": "minecraft:shears"
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:birch_leaves"
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "random_chance",
+              "chance": 0.05
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:birch_sapling",
+              "functions": [
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "match_tool",
+              "enchantments": [
+                {
+                  "enchantment": "fortune",
+                  "levels": {
+                    "range_min": 1,
+                    "range_max": 1
+                  }
+                }
+              ]
+            },
+            {
+              "condition": "random_chance",
+              "chance": 0.013157895
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:birch_sapling",
+              "functions": [
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "match_tool",
+              "enchantments": [
+                {
+                  "enchantment": "fortune",
+                  "levels": {
+                    "range_min": 2,
+                    "range_max": 2
+                  }
+                }
+              ]
+            },
+            {
+              "condition": "random_chance",
+              "chance": 0.035087722
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:birch_sapling",
+              "functions": [
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "match_tool",
+              "enchantments": [
+                {
+                  "enchantment": "fortune",
+                  "levels": {
+                    "range_min": 3,
+                    "range_max": 3
+                  }
+                }
+              ]
+            },
+            {
+              "condition": "random_chance",
+              "chance": 0.052631579
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:birch_sapling",
+              "functions": [
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "random_chance",
+              "chance": 0.02
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:stick",
+              "functions": [
+                {
+                  "function": "set_count",
+                  "count": {
+                    "min": 1,
+                    "max": 2
+                  }
+                },
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "match_tool",
+              "enchantments": [
+                {
+                  "enchantment": "fortune",
+                  "levels": {
+                    "range_min": 1,
+                    "range_max": 1
+                  }
+                }
+              ]
+            },
+            {
+              "condition": "random_chance",
+              "chance": 0.002267574
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:stick",
+              "functions": [
+                {
+                  "function": "set_count",
+                  "count": {
+                    "min": 1,
+                    "max": 2
+                  }
+                },
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "match_tool",
+              "enchantments": [
+                {
+                  "enchantment": "fortune",
+                  "levels": {
+                    "range_min": 2,
+                    "range_max": 2
+                  }
+                }
+              ]
+            },
+            {
+              "condition": "random_chance",
+              "chance": 0.005102041
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:stick",
+              "functions": [
+                {
+                  "function": "set_count",
+                  "count": {
+                    "min": 1,
+                    "max": 2
+                  }
+                },
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "match_tool",
+              "enchantments": [
+                {
+                  "enchantment": "fortune",
+                  "levels": {
+                    "range_min": 3,
+                    "range_max": 3
+                  }
+                }
+              ]
+            },
+            {
+              "condition": "random_chance",
+              "chance": 0.013605444
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:stick",
+              "functions": [
+                {
+                  "function": "set_count",
+                  "count": {
+                    "min": 1,
+                    "max": 2
+                  }
+                },
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "tint": "birch_foliage"
+  },
+  "minecraft:cherry_leaves": {
+    "loot": {
+      "pools": [
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "match_tool",
+              "item": "minecraft:shears"
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:cherry_leaves"
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "random_chance",
+              "chance": 0.05
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:cherry_sapling",
+              "functions": [
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "match_tool",
+              "enchantments": [
+                {
+                  "enchantment": "fortune",
+                  "levels": {
+                    "range_min": 1,
+                    "range_max": 1
+                  }
+                }
+              ]
+            },
+            {
+              "condition": "random_chance",
+              "chance": 0.013157895
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:cherry_sapling",
+              "functions": [
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "match_tool",
+              "enchantments": [
+                {
+                  "enchantment": "fortune",
+                  "levels": {
+                    "range_min": 2,
+                    "range_max": 2
+                  }
+                }
+              ]
+            },
+            {
+              "condition": "random_chance",
+              "chance": 0.035087722
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:cherry_sapling",
+              "functions": [
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "match_tool",
+              "enchantments": [
+                {
+                  "enchantment": "fortune",
+                  "levels": {
+                    "range_min": 3,
+                    "range_max": 3
+                  }
+                }
+              ]
+            },
+            {
+              "condition": "random_chance",
+              "chance": 0.052631579
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:cherry_sapling",
+              "functions": [
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "random_chance",
+              "chance": 0.02
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:stick",
+              "functions": [
+                {
+                  "function": "set_count",
+                  "count": {
+                    "min": 1,
+                    "max": 2
+                  }
+                },
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "match_tool",
+              "enchantments": [
+                {
+                  "enchantment": "fortune",
+                  "levels": {
+                    "range_min": 1,
+                    "range_max": 1
+                  }
+                }
+              ]
+            },
+            {
+              "condition": "random_chance",
+              "chance": 0.002267574
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:stick",
+              "functions": [
+                {
+                  "function": "set_count",
+                  "count": {
+                    "min": 1,
+                    "max": 2
+                  }
+                },
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "match_tool",
+              "enchantments": [
+                {
+                  "enchantment": "fortune",
+                  "levels": {
+                    "range_min": 2,
+                    "range_max": 2
+                  }
+                }
+              ]
+            },
+            {
+              "condition": "random_chance",
+              "chance": 0.005102041
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:stick",
+              "functions": [
+                {
+                  "function": "set_count",
+                  "count": {
+                    "min": 1,
+                    "max": 2
+                  }
+                },
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "match_tool",
+              "enchantments": [
+                {
+                  "enchantment": "fortune",
+                  "levels": {
+                    "range_min": 3,
+                    "range_max": 3
+                  }
+                }
+              ]
+            },
+            {
+              "condition": "random_chance",
+              "chance": 0.013605444
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:stick",
+              "functions": [
+                {
+                  "function": "set_count",
+                  "count": {
+                    "min": 1,
+                    "max": 2
+                  }
+                },
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "tint": null
+  },
+  "minecraft:dark_oak_leaves": {
+    "loot": {
+      "pools": [
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "match_tool",
+              "item": "minecraft:shears"
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:dark_oak_leaves"
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "random_chance",
+              "chance": 0.05
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:dark_oak_sapling",
+              "functions": [
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "match_tool",
+              "enchantments": [
+                {
+                  "enchantment": "fortune",
+                  "levels": {
+                    "range_min": 1,
+                    "range_max": 1
+                  }
+                }
+              ]
+            },
+            {
+              "condition": "random_chance",
+              "chance": 0.013157895
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:dark_oak_sapling",
+              "functions": [
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "match_tool",
+              "enchantments": [
+                {
+                  "enchantment": "fortune",
+                  "levels": {
+                    "range_min": 2,
+                    "range_max": 2
+                  }
+                }
+              ]
+            },
+            {
+              "condition": "random_chance",
+              "chance": 0.035087722
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:dark_oak_sapling",
+              "functions": [
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "match_tool",
+              "enchantments": [
+                {
+                  "enchantment": "fortune",
+                  "levels": {
+                    "range_min": 3,
+                    "range_max": 3
+                  }
+                }
+              ]
+            },
+            {
+              "condition": "random_chance",
+              "chance": 0.052631579
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:dark_oak_sapling",
+              "functions": [
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "random_chance",
+              "chance": 0.02
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:stick",
+              "functions": [
+                {
+                  "function": "set_count",
+                  "count": {
+                    "min": 1,
+                    "max": 2
+                  }
+                },
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "match_tool",
+              "enchantments": [
+                {
+                  "enchantment": "fortune",
+                  "levels": {
+                    "range_min": 1,
+                    "range_max": 1
+                  }
+                }
+              ]
+            },
+            {
+              "condition": "random_chance",
+              "chance": 0.002267574
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:stick",
+              "functions": [
+                {
+                  "function": "set_count",
+                  "count": {
+                    "min": 1,
+                    "max": 2
+                  }
+                },
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "match_tool",
+              "enchantments": [
+                {
+                  "enchantment": "fortune",
+                  "levels": {
+                    "range_min": 2,
+                    "range_max": 2
+                  }
+                }
+              ]
+            },
+            {
+              "condition": "random_chance",
+              "chance": 0.005102041
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:stick",
+              "functions": [
+                {
+                  "function": "set_count",
+                  "count": {
+                    "min": 1,
+                    "max": 2
+                  }
+                },
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "match_tool",
+              "enchantments": [
+                {
+                  "enchantment": "fortune",
+                  "levels": {
+                    "range_min": 3,
+                    "range_max": 3
+                  }
+                }
+              ]
+            },
+            {
+              "condition": "random_chance",
+              "chance": 0.013605444
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:stick",
+              "functions": [
+                {
+                  "function": "set_count",
+                  "count": {
+                    "min": 1,
+                    "max": 2
+                  }
+                },
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "random_chance",
+              "chance": 0.005
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:apple",
+              "functions": [
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "match_tool",
+              "enchantments": [
+                {
+                  "enchantment": "fortune",
+                  "levels": {
+                    "range_min": 1,
+                    "range_max": 1
+                  }
+                }
+              ]
+            },
+            {
+              "condition": "random_chance",
+              "chance": 0.000558347
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:apple",
+              "functions": [
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "match_tool",
+              "enchantments": [
+                {
+                  "enchantment": "fortune",
+                  "levels": {
+                    "range_min": 2,
+                    "range_max": 2
+                  }
+                }
+              ]
+            },
+            {
+              "condition": "random_chance",
+              "chance": 0.001256281
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:apple",
+              "functions": [
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "match_tool",
+              "enchantments": [
+                {
+                  "enchantment": "fortune",
+                  "levels": {
+                    "range_min": 3,
+                    "range_max": 3
+                  }
+                }
+              ]
+            },
+            {
+              "condition": "random_chance",
+              "chance": 0.003350084
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:apple",
+              "functions": [
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "tint": "default_foliage"
+  },
+  "minecraft:jungle_leaves": {
+    "loot": {
+      "pools": [
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "match_tool",
+              "item": "minecraft:shears"
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:jungle_leaves"
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "random_chance",
+              "chance": 0.025
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:jungle_sapling",
+              "functions": [
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "match_tool",
+              "enchantments": [
+                {
+                  "enchantment": "fortune",
+                  "levels": {
+                    "range_min": 1,
+                    "range_max": 1
+                  }
+                }
+              ]
+            },
+            {
+              "condition": "random_chance",
+              "chance": 0.002849003
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:jungle_sapling",
+              "functions": [
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "match_tool",
+              "enchantments": [
+                {
+                  "enchantment": "fortune",
+                  "levels": {
+                    "range_min": 2,
+                    "range_max": 2
+                  }
+                }
+              ]
+            },
+            {
+              "condition": "random_chance",
+              "chance": 0.006410256
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:jungle_sapling",
+              "functions": [
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "match_tool",
+              "enchantments": [
+                {
+                  "enchantment": "fortune",
+                  "levels": {
+                    "range_min": 3,
+                    "range_max": 3
+                  }
+                }
+              ]
+            },
+            {
+              "condition": "random_chance",
+              "chance": 0.017094018
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:jungle_sapling",
+              "functions": [
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "random_chance",
+              "chance": 0.02
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:stick",
+              "functions": [
+                {
+                  "function": "set_count",
+                  "count": {
+                    "min": 1,
+                    "max": 2
+                  }
+                },
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "match_tool",
+              "enchantments": [
+                {
+                  "enchantment": "fortune",
+                  "levels": {
+                    "range_min": 1,
+                    "range_max": 1
+                  }
+                }
+              ]
+            },
+            {
+              "condition": "random_chance",
+              "chance": 0.002267574
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:stick",
+              "functions": [
+                {
+                  "function": "set_count",
+                  "count": {
+                    "min": 1,
+                    "max": 2
+                  }
+                },
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "match_tool",
+              "enchantments": [
+                {
+                  "enchantment": "fortune",
+                  "levels": {
+                    "range_min": 2,
+                    "range_max": 2
+                  }
+                }
+              ]
+            },
+            {
+              "condition": "random_chance",
+              "chance": 0.005102041
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:stick",
+              "functions": [
+                {
+                  "function": "set_count",
+                  "count": {
+                    "min": 1,
+                    "max": 2
+                  }
+                },
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "match_tool",
+              "enchantments": [
+                {
+                  "enchantment": "fortune",
+                  "levels": {
+                    "range_min": 3,
+                    "range_max": 3
+                  }
+                }
+              ]
+            },
+            {
+              "condition": "random_chance",
+              "chance": 0.013605444
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:stick",
+              "functions": [
+                {
+                  "function": "set_count",
+                  "count": {
+                    "min": 1,
+                    "max": 2
+                  }
+                },
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "tint": "default_foliage"
+  },
+  "minecraft:mangrove_leaves": {
+    "loot": {
+      "pools": [
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "match_tool",
+              "item": "minecraft:shears"
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:mangrove_leaves"
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "random_chance",
+              "chance": 0.02
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:stick",
+              "functions": [
+                {
+                  "function": "set_count",
+                  "count": {
+                    "min": 1,
+                    "max": 2
+                  }
+                },
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "match_tool",
+              "enchantments": [
+                {
+                  "enchantment": "fortune",
+                  "levels": {
+                    "range_min": 1,
+                    "range_max": 1
+                  }
+                }
+              ]
+            },
+            {
+              "condition": "random_chance",
+              "chance": 0.002267574
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:stick",
+              "functions": [
+                {
+                  "function": "set_count",
+                  "count": {
+                    "min": 1,
+                    "max": 2
+                  }
+                },
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "match_tool",
+              "enchantments": [
+                {
+                  "enchantment": "fortune",
+                  "levels": {
+                    "range_min": 2,
+                    "range_max": 2
+                  }
+                }
+              ]
+            },
+            {
+              "condition": "random_chance",
+              "chance": 0.005102041
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:stick",
+              "functions": [
+                {
+                  "function": "set_count",
+                  "count": {
+                    "min": 1,
+                    "max": 2
+                  }
+                },
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "match_tool",
+              "enchantments": [
+                {
+                  "enchantment": "fortune",
+                  "levels": {
+                    "range_min": 3,
+                    "range_max": 3
+                  }
+                }
+              ]
+            },
+            {
+              "condition": "random_chance",
+              "chance": 0.013605444
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:stick",
+              "functions": [
+                {
+                  "function": "set_count",
+                  "count": {
+                    "min": 1,
+                    "max": 2
+                  }
+                },
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "tint": "default_foliage"
+  },
+  "minecraft:oak_leaves": {
+    "loot": {
+      "pools": [
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "match_tool",
+              "item": "minecraft:shears"
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:oak_leaves"
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "random_chance",
+              "chance": 0.05
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:oak_sapling",
+              "functions": [
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "match_tool",
+              "enchantments": [
+                {
+                  "enchantment": "fortune",
+                  "levels": {
+                    "range_min": 1,
+                    "range_max": 1
+                  }
+                }
+              ]
+            },
+            {
+              "condition": "random_chance",
+              "chance": 0.013157895
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:oak_sapling",
+              "functions": [
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "match_tool",
+              "enchantments": [
+                {
+                  "enchantment": "fortune",
+                  "levels": {
+                    "range_min": 2,
+                    "range_max": 2
+                  }
+                }
+              ]
+            },
+            {
+              "condition": "random_chance",
+              "chance": 0.035087722
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:oak_sapling",
+              "functions": [
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "match_tool",
+              "enchantments": [
+                {
+                  "enchantment": "fortune",
+                  "levels": {
+                    "range_min": 3,
+                    "range_max": 3
+                  }
+                }
+              ]
+            },
+            {
+              "condition": "random_chance",
+              "chance": 0.052631579
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:oak_sapling",
+              "functions": [
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "random_chance",
+              "chance": 0.02
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:stick",
+              "functions": [
+                {
+                  "function": "set_count",
+                  "count": {
+                    "min": 1,
+                    "max": 2
+                  }
+                },
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "match_tool",
+              "enchantments": [
+                {
+                  "enchantment": "fortune",
+                  "levels": {
+                    "range_min": 1,
+                    "range_max": 1
+                  }
+                }
+              ]
+            },
+            {
+              "condition": "random_chance",
+              "chance": 0.002267574
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:stick",
+              "functions": [
+                {
+                  "function": "set_count",
+                  "count": {
+                    "min": 1,
+                    "max": 2
+                  }
+                },
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "match_tool",
+              "enchantments": [
+                {
+                  "enchantment": "fortune",
+                  "levels": {
+                    "range_min": 2,
+                    "range_max": 2
+                  }
+                }
+              ]
+            },
+            {
+              "condition": "random_chance",
+              "chance": 0.005102041
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:stick",
+              "functions": [
+                {
+                  "function": "set_count",
+                  "count": {
+                    "min": 1,
+                    "max": 2
+                  }
+                },
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "match_tool",
+              "enchantments": [
+                {
+                  "enchantment": "fortune",
+                  "levels": {
+                    "range_min": 3,
+                    "range_max": 3
+                  }
+                }
+              ]
+            },
+            {
+              "condition": "random_chance",
+              "chance": 0.013605444
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:stick",
+              "functions": [
+                {
+                  "function": "set_count",
+                  "count": {
+                    "min": 1,
+                    "max": 2
+                  }
+                },
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "random_chance",
+              "chance": 0.005
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:apple",
+              "functions": [
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "match_tool",
+              "enchantments": [
+                {
+                  "enchantment": "fortune",
+                  "levels": {
+                    "range_min": 1,
+                    "range_max": 1
+                  }
+                }
+              ]
+            },
+            {
+              "condition": "random_chance",
+              "chance": 0.000558347
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:apple",
+              "functions": [
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "match_tool",
+              "enchantments": [
+                {
+                  "enchantment": "fortune",
+                  "levels": {
+                    "range_min": 2,
+                    "range_max": 2
+                  }
+                }
+              ]
+            },
+            {
+              "condition": "random_chance",
+              "chance": 0.001256281
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:apple",
+              "functions": [
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "match_tool",
+              "enchantments": [
+                {
+                  "enchantment": "fortune",
+                  "levels": {
+                    "range_min": 3,
+                    "range_max": 3
+                  }
+                }
+              ]
+            },
+            {
+              "condition": "random_chance",
+              "chance": 0.003350084
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:apple",
+              "functions": [
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "tint": "default_foliage"
+  },
+  "minecraft:orange_poplar_leaves": {
+    "loot": {
+      "pools": [
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "match_tool",
+              "item": "minecraft:shears"
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:orange_poplar_leaves"
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "random_chance",
+              "chance": 0.05
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:poplar_sapling",
+              "functions": [
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "match_tool",
+              "enchantments": [
+                {
+                  "enchantment": "fortune",
+                  "levels": {
+                    "range_min": 1,
+                    "range_max": 1
+                  }
+                }
+              ]
+            },
+            {
+              "condition": "random_chance",
+              "chance": 0.013157895
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:poplar_sapling",
+              "functions": [
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "match_tool",
+              "enchantments": [
+                {
+                  "enchantment": "fortune",
+                  "levels": {
+                    "range_min": 2,
+                    "range_max": 2
+                  }
+                }
+              ]
+            },
+            {
+              "condition": "random_chance",
+              "chance": 0.035087722
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:poplar_sapling",
+              "functions": [
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "match_tool",
+              "enchantments": [
+                {
+                  "enchantment": "fortune",
+                  "levels": {
+                    "range_min": 3,
+                    "range_max": 3
+                  }
+                }
+              ]
+            },
+            {
+              "condition": "random_chance",
+              "chance": 0.052631579
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:poplar_sapling",
+              "functions": [
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "random_chance",
+              "chance": 0.02
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:stick",
+              "functions": [
+                {
+                  "function": "set_count",
+                  "count": {
+                    "min": 1,
+                    "max": 2
+                  }
+                },
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "match_tool",
+              "enchantments": [
+                {
+                  "enchantment": "fortune",
+                  "levels": {
+                    "range_min": 1,
+                    "range_max": 1
+                  }
+                }
+              ]
+            },
+            {
+              "condition": "random_chance",
+              "chance": 0.002267574
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:stick",
+              "functions": [
+                {
+                  "function": "set_count",
+                  "count": {
+                    "min": 1,
+                    "max": 2
+                  }
+                },
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "match_tool",
+              "enchantments": [
+                {
+                  "enchantment": "fortune",
+                  "levels": {
+                    "range_min": 2,
+                    "range_max": 2
+                  }
+                }
+              ]
+            },
+            {
+              "condition": "random_chance",
+              "chance": 0.005102041
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:stick",
+              "functions": [
+                {
+                  "function": "set_count",
+                  "count": {
+                    "min": 1,
+                    "max": 2
+                  }
+                },
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "match_tool",
+              "enchantments": [
+                {
+                  "enchantment": "fortune",
+                  "levels": {
+                    "range_min": 3,
+                    "range_max": 3
+                  }
+                }
+              ]
+            },
+            {
+              "condition": "random_chance",
+              "chance": 0.013605444
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:stick",
+              "functions": [
+                {
+                  "function": "set_count",
+                  "count": {
+                    "min": 1,
+                    "max": 2
+                  }
+                },
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "tint": null
+  },
+  "minecraft:pale_oak_leaves": {
+    "loot": {
+      "pools": [
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "match_tool",
+              "item": "minecraft:shears"
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:pale_oak_leaves"
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "random_chance",
+              "chance": 0.05
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:pale_oak_sapling",
+              "functions": [
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "match_tool",
+              "enchantments": [
+                {
+                  "enchantment": "fortune",
+                  "levels": {
+                    "range_min": 1,
+                    "range_max": 1
+                  }
+                }
+              ]
+            },
+            {
+              "condition": "random_chance",
+              "chance": 0.013157895
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:pale_oak_sapling",
+              "functions": [
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "match_tool",
+              "enchantments": [
+                {
+                  "enchantment": "fortune",
+                  "levels": {
+                    "range_min": 2,
+                    "range_max": 2
+                  }
+                }
+              ]
+            },
+            {
+              "condition": "random_chance",
+              "chance": 0.035087722
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:pale_oak_sapling",
+              "functions": [
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "match_tool",
+              "enchantments": [
+                {
+                  "enchantment": "fortune",
+                  "levels": {
+                    "range_min": 3,
+                    "range_max": 3
+                  }
+                }
+              ]
+            },
+            {
+              "condition": "random_chance",
+              "chance": 0.052631579
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:pale_oak_sapling",
+              "functions": [
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "random_chance",
+              "chance": 0.02
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:stick",
+              "functions": [
+                {
+                  "function": "set_count",
+                  "count": {
+                    "min": 1,
+                    "max": 2
+                  }
+                },
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "match_tool",
+              "enchantments": [
+                {
+                  "enchantment": "fortune",
+                  "levels": {
+                    "range_min": 1,
+                    "range_max": 1
+                  }
+                }
+              ]
+            },
+            {
+              "condition": "random_chance",
+              "chance": 0.002267574
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:stick",
+              "functions": [
+                {
+                  "function": "set_count",
+                  "count": {
+                    "min": 1,
+                    "max": 2
+                  }
+                },
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "match_tool",
+              "enchantments": [
+                {
+                  "enchantment": "fortune",
+                  "levels": {
+                    "range_min": 2,
+                    "range_max": 2
+                  }
+                }
+              ]
+            },
+            {
+              "condition": "random_chance",
+              "chance": 0.005102041
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:stick",
+              "functions": [
+                {
+                  "function": "set_count",
+                  "count": {
+                    "min": 1,
+                    "max": 2
+                  }
+                },
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "match_tool",
+              "enchantments": [
+                {
+                  "enchantment": "fortune",
+                  "levels": {
+                    "range_min": 3,
+                    "range_max": 3
+                  }
+                }
+              ]
+            },
+            {
+              "condition": "random_chance",
+              "chance": 0.013605444
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:stick",
+              "functions": [
+                {
+                  "function": "set_count",
+                  "count": {
+                    "min": 1,
+                    "max": 2
+                  }
+                },
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "tint": null
+  },
+  "minecraft:red_poplar_leaves": {
+    "loot": {
+      "pools": [
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "match_tool",
+              "item": "minecraft:shears"
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:red_poplar_leaves"
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "random_chance",
+              "chance": 0.05
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:poplar_sapling",
+              "functions": [
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "match_tool",
+              "enchantments": [
+                {
+                  "enchantment": "fortune",
+                  "levels": {
+                    "range_min": 1,
+                    "range_max": 1
+                  }
+                }
+              ]
+            },
+            {
+              "condition": "random_chance",
+              "chance": 0.013157895
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:poplar_sapling",
+              "functions": [
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "match_tool",
+              "enchantments": [
+                {
+                  "enchantment": "fortune",
+                  "levels": {
+                    "range_min": 2,
+                    "range_max": 2
+                  }
+                }
+              ]
+            },
+            {
+              "condition": "random_chance",
+              "chance": 0.035087722
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:poplar_sapling",
+              "functions": [
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "match_tool",
+              "enchantments": [
+                {
+                  "enchantment": "fortune",
+                  "levels": {
+                    "range_min": 3,
+                    "range_max": 3
+                  }
+                }
+              ]
+            },
+            {
+              "condition": "random_chance",
+              "chance": 0.052631579
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:poplar_sapling",
+              "functions": [
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "random_chance",
+              "chance": 0.02
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:stick",
+              "functions": [
+                {
+                  "function": "set_count",
+                  "count": {
+                    "min": 1,
+                    "max": 2
+                  }
+                },
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "match_tool",
+              "enchantments": [
+                {
+                  "enchantment": "fortune",
+                  "levels": {
+                    "range_min": 1,
+                    "range_max": 1
+                  }
+                }
+              ]
+            },
+            {
+              "condition": "random_chance",
+              "chance": 0.002267574
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:stick",
+              "functions": [
+                {
+                  "function": "set_count",
+                  "count": {
+                    "min": 1,
+                    "max": 2
+                  }
+                },
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "match_tool",
+              "enchantments": [
+                {
+                  "enchantment": "fortune",
+                  "levels": {
+                    "range_min": 2,
+                    "range_max": 2
+                  }
+                }
+              ]
+            },
+            {
+              "condition": "random_chance",
+              "chance": 0.005102041
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:stick",
+              "functions": [
+                {
+                  "function": "set_count",
+                  "count": {
+                    "min": 1,
+                    "max": 2
+                  }
+                },
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "match_tool",
+              "enchantments": [
+                {
+                  "enchantment": "fortune",
+                  "levels": {
+                    "range_min": 3,
+                    "range_max": 3
+                  }
+                }
+              ]
+            },
+            {
+              "condition": "random_chance",
+              "chance": 0.013605444
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:stick",
+              "functions": [
+                {
+                  "function": "set_count",
+                  "count": {
+                    "min": 1,
+                    "max": 2
+                  }
+                },
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "tint": null
+  },
+  "minecraft:spruce_leaves": {
+    "loot": {
+      "pools": [
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "match_tool",
+              "item": "minecraft:shears"
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:spruce_leaves"
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "random_chance",
+              "chance": 0.05
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:spruce_sapling",
+              "functions": [
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "match_tool",
+              "enchantments": [
+                {
+                  "enchantment": "fortune",
+                  "levels": {
+                    "range_min": 1,
+                    "range_max": 1
+                  }
+                }
+              ]
+            },
+            {
+              "condition": "random_chance",
+              "chance": 0.013157895
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:spruce_sapling",
+              "functions": [
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "match_tool",
+              "enchantments": [
+                {
+                  "enchantment": "fortune",
+                  "levels": {
+                    "range_min": 2,
+                    "range_max": 2
+                  }
+                }
+              ]
+            },
+            {
+              "condition": "random_chance",
+              "chance": 0.035087722
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:spruce_sapling",
+              "functions": [
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "match_tool",
+              "enchantments": [
+                {
+                  "enchantment": "fortune",
+                  "levels": {
+                    "range_min": 3,
+                    "range_max": 3
+                  }
+                }
+              ]
+            },
+            {
+              "condition": "random_chance",
+              "chance": 0.052631579
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:spruce_sapling",
+              "functions": [
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "random_chance",
+              "chance": 0.02
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:stick",
+              "functions": [
+                {
+                  "function": "set_count",
+                  "count": {
+                    "min": 1,
+                    "max": 2
+                  }
+                },
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "match_tool",
+              "enchantments": [
+                {
+                  "enchantment": "fortune",
+                  "levels": {
+                    "range_min": 1,
+                    "range_max": 1
+                  }
+                }
+              ]
+            },
+            {
+              "condition": "random_chance",
+              "chance": 0.002267574
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:stick",
+              "functions": [
+                {
+                  "function": "set_count",
+                  "count": {
+                    "min": 1,
+                    "max": 2
+                  }
+                },
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "match_tool",
+              "enchantments": [
+                {
+                  "enchantment": "fortune",
+                  "levels": {
+                    "range_min": 2,
+                    "range_max": 2
+                  }
+                }
+              ]
+            },
+            {
+              "condition": "random_chance",
+              "chance": 0.005102041
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:stick",
+              "functions": [
+                {
+                  "function": "set_count",
+                  "count": {
+                    "min": 1,
+                    "max": 2
+                  }
+                },
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "match_tool",
+              "enchantments": [
+                {
+                  "enchantment": "fortune",
+                  "levels": {
+                    "range_min": 3,
+                    "range_max": 3
+                  }
+                }
+              ]
+            },
+            {
+              "condition": "random_chance",
+              "chance": 0.013605444
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:stick",
+              "functions": [
+                {
+                  "function": "set_count",
+                  "count": {
+                    "min": 1,
+                    "max": 2
+                  }
+                },
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "tint": "evergreen_foliage"
+  },
+  "minecraft:yellow_poplar_leaves": {
+    "loot": {
+      "pools": [
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "match_tool",
+              "item": "minecraft:shears"
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:yellow_poplar_leaves"
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "random_chance",
+              "chance": 0.05
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:poplar_sapling",
+              "functions": [
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "match_tool",
+              "enchantments": [
+                {
+                  "enchantment": "fortune",
+                  "levels": {
+                    "range_min": 1,
+                    "range_max": 1
+                  }
+                }
+              ]
+            },
+            {
+              "condition": "random_chance",
+              "chance": 0.013157895
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:poplar_sapling",
+              "functions": [
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "match_tool",
+              "enchantments": [
+                {
+                  "enchantment": "fortune",
+                  "levels": {
+                    "range_min": 2,
+                    "range_max": 2
+                  }
+                }
+              ]
+            },
+            {
+              "condition": "random_chance",
+              "chance": 0.035087722
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:poplar_sapling",
+              "functions": [
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "match_tool",
+              "enchantments": [
+                {
+                  "enchantment": "fortune",
+                  "levels": {
+                    "range_min": 3,
+                    "range_max": 3
+                  }
+                }
+              ]
+            },
+            {
+              "condition": "random_chance",
+              "chance": 0.052631579
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:poplar_sapling",
+              "functions": [
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "random_chance",
+              "chance": 0.02
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:stick",
+              "functions": [
+                {
+                  "function": "set_count",
+                  "count": {
+                    "min": 1,
+                    "max": 2
+                  }
+                },
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "match_tool",
+              "enchantments": [
+                {
+                  "enchantment": "fortune",
+                  "levels": {
+                    "range_min": 1,
+                    "range_max": 1
+                  }
+                }
+              ]
+            },
+            {
+              "condition": "random_chance",
+              "chance": 0.002267574
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:stick",
+              "functions": [
+                {
+                  "function": "set_count",
+                  "count": {
+                    "min": 1,
+                    "max": 2
+                  }
+                },
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "match_tool",
+              "enchantments": [
+                {
+                  "enchantment": "fortune",
+                  "levels": {
+                    "range_min": 2,
+                    "range_max": 2
+                  }
+                }
+              ]
+            },
+            {
+              "condition": "random_chance",
+              "chance": 0.005102041
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:stick",
+              "functions": [
+                {
+                  "function": "set_count",
+                  "count": {
+                    "min": 1,
+                    "max": 2
+                  }
+                },
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "match_tool",
+              "enchantments": [
+                {
+                  "enchantment": "fortune",
+                  "levels": {
+                    "range_min": 3,
+                    "range_max": 3
+                  }
+                }
+              ]
+            },
+            {
+              "condition": "random_chance",
+              "chance": 0.013605444
+            }
+          ],
+          "entries": [
+            {
+              "type": "item",
+              "name": "minecraft:stick",
+              "functions": [
+                {
+                  "function": "set_count",
+                  "count": {
+                    "min": 1,
+                    "max": 2
+                  }
+                },
+                {
+                  "function": "explosion_decay"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "tint": null
+  }
+}

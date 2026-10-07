@@ -1,5 +1,52 @@
 # Changelog
 
+## 1.1.0
+
+Bedrock pack authors:
+- A pack made for Bedrock can use BCT with no Java pack. Its data goes in
+  `scripts/bct.js`, and the engine reads it when the world loads.
+- If the data has a mistake, players see which entry is wrong in chat.
+- Patterns: a block can show a fixed pattern (such as 3x3 stone) or random
+  tiles that never turn.
+- 3D leaves: a pack's own leaf models take the place of vanilla leaves. They
+  can use other models far from logs. Leaves still decay and drop as in
+  vanilla.
+- Edges: grass, sand or any ground can spread onto the tops of the blocks
+  next to it.
+- Overlays: the 17-tile overlay sets from Java packs, on any side of a block.
+- Connected blocks: glass and other blocks join their neighbours, in every
+  graphics mode, ray tracing too. Inner corners are not drawn.
+- Carriers: the full 47-tile connected look, inner corners too, in Classic and
+  Vibrant Visuals.
+- `bct.py`, run from a copy of this repository, writes the blocks a pack
+  needs, with the vanilla block's mining, drops and sounds filled in.
+- `python bct.py check` lists what is wrong with a pack before you load a
+  world.
+- A guide for pack authors: `docs/AUTHORING.md`.
+
+Engine:
+- Connected-texture rules for some biomes only were never drawn. They draw.
+- Converted leaves next to another tree's trunk decay as vanilla leaves do.
+  Only a log their own leaves reach keeps them alive.
+- Leaves whose pack picks models by distance from logs convert.
+- An entity removed as it loads no longer causes an error.
+
+Converter:
+- Converted leaves drop what vanilla leaves drop. Before, breaking them gave
+  the leaf block, a sapling, sticks and an apple every time.
+- Converted mob models no longer flood the content log every frame, which
+  could drop the game to 1 fps. Their animations play again.
+- Zombies, husks, creepers, iron golems, phantoms and zombie pigmen keep
+  their vanilla animations.
+- Mob parts placed at negative positions show in the right place.
+- No block texture is larger than the pack's own size.
+- Textures that are exactly the same are kept once, so a pack uses less
+  memory (about a fifth less for a large 64x pack).
+
+Site:
+- A website with guides for players, pack makers and pack authors, with
+  search across all the docs.
+
 ## 1.0.0
 
 First release.

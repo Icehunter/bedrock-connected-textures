@@ -364,7 +364,11 @@ export function createTerrain({ api, limits, inReach = () => true, log = () => {
     blockTypes: () => [...new Set([...providers.flatMap(provider => provider.scan_sources ?? provider.rules.flatMap(rule => rule.neighbors))
       .flatMap(type => [type, ...aliasesOf(type)]), ...native.ids()])],
     onEntityLoad(entity) {
-      if (providers.length && entity.hasTag(TAG) && !recoveryPending) { recoveryPending = true; system.run(() => { recoveryPending = false; recover(); }); }
+      // The entity can be gone again before the event reaches scripts (a chunk loading and unloading at once).
+      if (!providers.length || recoveryPending) return;
+      let ours = false;
+      try { ours = entity.isValid !== false && entity.hasTag(TAG); } catch { return; }
+      if (ours) { recoveryPending = true; system.run(() => { recoveryPending = false; recover(); }); }
     },
     setEnabled(value) {
       enabled = value;

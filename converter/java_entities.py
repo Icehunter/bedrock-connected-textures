@@ -706,6 +706,16 @@ def _write_entity(identifier, entity_plan, reference, staged):
                 scripts.setdefault('initialize', []).extend(result['initialize'])
             else:
                 initial_values.extend(result['initialize'])
+    # Every variable the models' scripts and animations use starts at 0, as an unset variable reads in Java:
+    # the game errors on reading one (a frame counter adding to itself, the animation of a variant not drawn,
+    # which plays every frame with its condition only as a blend weight) on every frame.
+    unset = _unset_variables(animation_file, scripts.get('pre_animation', [])[vanilla_line_count:],
+                             scripts.get('initialize', []) + initial_values)
+    if unset:
+        if scripted:
+            scripts.setdefault('initialize', []).extend(unset)
+        else:
+            initial_values.extend(unset)
     if initial_values:
         # Ahead of the models' own lines, so their first frame already reads the initial values.
         scripts.setdefault('pre_animation', []).insert(vanilla_line_count, _run_once(initial_values))
@@ -719,6 +729,17 @@ def _write_entity(identifier, entity_plan, reference, staged):
         controller_id, controller_file = _write_animation_controller(entity_name, controller_animations, staged)
         files.append(controller_file)
         description.setdefault('animation_controllers', []).append({'bct_cem_controller': controller_id})
+    if scripted and description.get('animation_controllers'):
+        # Some vanilla entities of the newer formats still list animation_controllers, which the game accepts
+        # only in its own packs; restated in a pack it rejects the list ("not valid here"). The newer form
+        # names each controller under animations and plays it from scripts.animate.
+        animate = scripts.setdefault('animate', [])
+        for controller in description.pop('animation_controllers'):
+            pairs = controller.items() if isinstance(controller, dict) else [(controller, controller)]
+            for key, controller_id in pairs:
+                animations[key] = controller_id
+                if key not in animate and not any(isinstance(item, dict) and key in item for item in animate):
+                    animate.append(key)
     original = entry['description']
     for section in ('geometry', 'textures', 'animations', 'scripts'):
         if section not in original and not description.get(section):
@@ -785,10 +806,19 @@ def _write_animation_controller(entity_name, played_animations, staged):
     return controller_id, _staged_file(path, ALL_RENDERERS)
 
 
+def _unset_variables(animation_file, script_lines, initial_lines):
+    """'v.name = 0;' for each variable the models' scripts or animations use that no initial line gives a value."""
+    used = json.dumps(animation_file['animations']) + ' ' + ' '.join(script_lines)
+    read = set(re.findall(r'\b(?:v|variable)\.([a-z_][a-z0-9_]*)', used, re.IGNORECASE))
+    read.discard(INITIALIZED_FLAG.split('.', 1)[1])
+    initialized = set(re.findall(r'\b(?:v|variable)\.([a-z_][a-z0-9_]*)\s*=(?!=)', ' '.join(initial_lines), re.IGNORECASE))
+    return ['v.%s = 0;' % name for name in sorted(read - initialized)]
+
+
 def _run_once(statements):
     """One pre_animation statement that runs statements on the entity's first frame only."""
-    # The flag was never set before the first frame, so it reads as 0 there.
-    return '(!%s) ? { %s %s = 1; };' % (INITIALIZED_FLAG, ' '.join(statements), INITIALIZED_FLAG)
+    # The flag is not set before the first frame; the game errors on reading an unset variable, so ?? reads it as 0.
+    return '(!(%s ?? 0)) ? { %s %s = 1; };' % (INITIALIZED_FLAG, ' '.join(statements), INITIALIZED_FLAG)
 
 
 def _write_textures(stack, planner, staged):

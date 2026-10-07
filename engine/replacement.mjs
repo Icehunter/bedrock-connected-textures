@@ -50,7 +50,10 @@
  *
  * Per-block policies from the pack data: leafGuard (logs: vanilla leaves keep
  * their decay state), pane (connection states refreshed when neighbors
- * change), models (weighted Java models picked per position), strip and xp.
+ * change), connect (a connected block's six neighbour states: 1 where the
+ * neighbour is one of its `with` blocks, read as vanilla, set when it swaps in
+ * and again when a neighbour changes), models (weighted Java models picked per
+ * position), strip and xp.
  */
 import { createBulkWriter } from './bulk.mjs';
 import { javaRandom, javaModelIndex } from './tiles.mjs';
@@ -60,6 +63,7 @@ const INDEX = 'bct:replace:index';
 const PART_SIZE = 30000;
 const SIDES = [[1, 0, 0], [-1, 0, 0], [0, 1, 0], [0, -1, 0], [0, 0, 1], [0, 0, -1]];
 const PANE_SIDES = { north: [0, 0, -1], south: [0, 0, 1], west: [-1, 0, 0], east: [1, 0, 0] };
+const CONNECT_SIDES = { ...PANE_SIDES, up: [0, 1, 0], down: [0, -1, 0] };
 const REVEAL_BUDGET = 64;
 // Where a block that needs another sits, seen from the block it needs: on top of it (it needs the block
 // below it), under it (the block above it), beside it, or on any side.
@@ -102,6 +106,8 @@ function validate(data) {
       if (typeof model.state !== 'string' || !Array.isArray(model.weights) || !model.weights.length) throw new Error('Invalid replacement model state');
     if (entry.leafGuard && (!Number.isInteger(entry.leafGuard.radius) || !Array.isArray(entry.leafGuard.leaves))) throw new Error('Invalid leaf guard');
     if (entry.pane && Object.keys(PANE_SIDES).some(side => typeof entry.pane[side] !== 'string')) throw new Error('Invalid pane states');
+    if (entry.connect && (!entry.connect.states || Object.keys(CONNECT_SIDES).some(side => typeof entry.connect.states[side] !== 'string') ||
+      !Array.isArray(entry.connect.with) || !entry.connect.with.every(type => id.test(type)))) throw new Error('Invalid connect states');
     if (entry.strip && !id.test(entry.strip)) throw new Error('Invalid strip target');
     if (entry.xp && (!Array.isArray(entry.xp) || entry.xp.length !== 2 || !entry.xp.every(Number.isInteger))) throw new Error('Invalid experience range');
     if (entry.tool && (!Array.isArray(entry.tool.all) || !Array.isArray(entry.tool.any) || ![...entry.tool.all, ...entry.tool.any].every(tag => id.test(tag))))
@@ -129,7 +135,7 @@ export function createReplacements({ api, limits, log = () => {}, rescan = () =>
   const sources = new Map();
   let byVanilla = new Map(), byCustom = new Map(), open = [], solid = [], solidSet = new Set(), paneConnect = new Set();
   let needers = new Map(), needyRules = new Map(), needyTypes = [];  // needed vanilla type -> rules, needy type -> rules, every needy type
-  let vanillaTypes = [], customTypes = [], paneTypes = [];             // the types a scan asks for
+  let vanillaTypes = [], customTypes = [], paneTypes = [], connectTypes = [];             // the types a scan asks for
   const owned = new Map();          // chunk key -> { dimension, cx, cz, positions: Set<packed> }
   const urgent = new Map();         // position key -> swap of a block a dig or an explosion uncovered
   const queue = new Map();          // position key -> { swap: 'in' | 'out' | 'adopt', dimension, location, shown?, need? }
@@ -189,6 +195,7 @@ export function createReplacements({ api, limits, log = () => {}, rescan = () =>
     vanillaTypes = [...byVanilla].filter(([, entry]) => !entry.broken).map(([type]) => type);
     customTypes = [...byCustom].filter(([, entry]) => !entry.broken).map(([type]) => type);
     paneTypes = [...byCustom].filter(([, entry]) => entry.pane && !entry.broken).map(([type]) => type);
+    connectTypes = [...byCustom].filter(([, entry]) => entry.connect && !entry.broken).map(([type]) => type);
   }
 
   const resolve = (type, states) => {
@@ -237,7 +244,29 @@ export function createReplacements({ api, limits, log = () => {}, rescan = () =>
       const value = vanilla[name];
       states[mirrored] = typeof value === 'boolean' ? (value ? 1 : 0) : value;
     }
+    if (entry.connect) Object.assign(states, connectionStates(entry, block.dimension, location));
     return resolve(entry.block, positionStates(entry, location, states));
+  }
+
+  /** A connected block's six neighbour states at a location: 1 where the neighbour is one it joins (an unloaded one does not). */
+  function connectionStates(entry, dimension, location) {
+    const states = {}, joins = entry.connect.withSet ??= new Set(entry.connect.with);
+    for (const [side, delta] of Object.entries(CONNECT_SIDES)) {
+      const neighbor = getBlock(dimension, offset(location, delta));
+      const type = neighbor && (byCustom.get(neighbor.typeId)?.vanilla ?? neighbor.typeId);
+      states[entry.connect.states[side]] = type && joins.has(type) ? 1 : 0;
+    }
+    return states;
+  }
+
+  /** Works out a connected block's neighbour states again and writes them when they changed. */
+  function refreshConnect(block) {
+    const entry = block && byCustom.get(block.typeId);
+    if (!entry?.connect || entry.broken) return false;
+    const states = block.permutation.getAllStates?.() ?? {}, next = { ...states, ...connectionStates(entry, block.dimension, block.location) };
+    if (Object.keys(next).every(name => next[name] === states[name])) return false;
+    try { block.setPermutation(resolve(block.typeId, next)); return true; }
+    catch (error) { log('connect refresh ' + String(error)); return false; }
   }
 
   /** The vanilla states a replacement stands for, from its mirrored states. */
@@ -429,6 +458,12 @@ export function createReplacements({ api, limits, log = () => {}, rescan = () =>
           refreshPane(getBlock(dimension, at));
           if (++reads % 4 === 0) yield;
         }
+      // Connected blocks swapped in beside a chunk that had not loaded yet join it once it has.
+      if (connectTypes.length && dimension.containsBlock(section, { includeTypes: connectTypes }, true))
+        for (const at of dimension.getBlocks(section, { includeTypes: connectTypes }, true).getBlockLocationIterator()) {
+          refreshConnect(getBlock(dimension, at));
+          if (++reads % 4 === 0) yield;
+        }
     }
     // Owned places this scan no longer found hold something else now (broken, moved, a command).
     const mine = owned.get(dimensionId + '|' + chunk.x + '|' + chunk.z);
@@ -500,7 +535,7 @@ export function createReplacements({ api, limits, log = () => {}, rescan = () =>
   }
 
   /** A replacement that is only its position's pattern: no mirrored vanilla states and no leaves to look after. */
-  const bulkable = entry => !entry.broken && !entry.leafGuard && Object.keys(entry.mirror).length === 0;
+  const bulkable = entry => !entry.broken && !entry.leafGuard && !entry.connect && Object.keys(entry.mirror).length === 0;
 
   /** Sends a scan's bulk writes and does for each block what swapIn does for one. */
   function finishBulk(writer) {
@@ -837,11 +872,13 @@ export function createReplacements({ api, limits, log = () => {}, rescan = () =>
       if (cost < 0) parked.set(key, item);
       return cost > 0;
     },
-    /** A block changed next to these positions: panes around it reconnect. */
+    /** A block changed next to these positions: panes and connected blocks around it reconnect. */
     changed(block) {
-      for (const delta of Object.values(PANE_SIDES)) {
+      for (const delta of Object.values(CONNECT_SIDES)) {
         const neighbor = getBlock(block.dimension, offset(block.location, delta));
-        if (neighbor && byCustom.get(neighbor.typeId)?.pane) refreshPane(neighbor);
+        const entry = neighbor && byCustom.get(neighbor.typeId);
+        if (entry?.pane && delta[1] === 0) refreshPane(neighbor);
+        if (entry?.connect) refreshConnect(neighbor);
       }
     },
   };

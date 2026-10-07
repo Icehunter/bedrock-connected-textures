@@ -26,10 +26,13 @@ The engine is one behavior pack, `BCT_BP`, built by `python converter/engine_pac
 | `budget.mjs` | The per-tick time budget the parts share; the part that goes first changes every tick. |
 | `bulk.mjs` | Bulk block writes: one `fillBlocks` call over a `ListBlockVolume` per distinct permutation. |
 | `leaves.mjs` | Leaf model blocks: bulk conversion of loaded chunks, decay and drops. |
+| `authored.mjs`, `vanilla-blocks.mjs` | Packs written for Bedrock (docs/AUTHORING.md): their `scripts/bct.js` data compiled into the same replace, leaf, terrain and connected data converted packs send, with the engine's own tables of vanilla full cubes, see-through blocks, leaves, logs and decay distances (written by `converter/engine_block_table.py`). |
 
 ## Sources
 
 A converted pack's `scripts/source-data.js` holds one packet per part (`connected`, `terrain` and `replace`), named by the pack key, with a checksum. When the pack has overlay rules, its `terrain` packet ends with one `{"overlay": ...}` entry: the data of its overlay surfaces. The publisher sends packets in chunks of 750 characters until the engine acknowledges them, and again whenever the engine restarts. Several converted packs can be active together: each keeps its own entity types and data, and when two packs draw the same block the one with the higher `sourcePriority` (then key order) owns it.
+
+A pack written for Bedrock sends one `authored` packet: its `bct.js` data, with the overlay and carrier data `bct.py` built from it. The engine compiles it (`authored.mjs`): patterns, leaves and connected blocks become replace data, edges become a terrain provider drawn by the pack's edge blocks, overlays join the terrain data and carriers become the pack's connected-texture data, all under the name `authored:<pack>`. A mistake stops the pack and is shown to players in chat, naming the entry. A connected block's six neighbour states (`connect`) are set when it swaps in and again whenever a neighbour is placed or broken, and when its chunk is scanned.
 
 ## Selection
 

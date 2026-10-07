@@ -444,7 +444,8 @@ class Translator:
         if text is None:
             self.unresolved.add(name)
             return '0'
-        return text
+        # A negative value (a part's fixed position) is parenthesised so it can follow any operator: -(-7), not --7.
+        return '(' + text + ')' if text.startswith('-') else text
 
     def _emit_binary(self, operator, left, right):
         left_text = self.emit(left)

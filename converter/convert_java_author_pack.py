@@ -82,8 +82,9 @@ from native_replacement import build_replacements, fallback_patterns, load_polic
 from overlay_surfaces import build as build_overlays, prune_generated_edges
 from pack_identity import identity as pack_identity, pack_title, reference_version
 from sand_edges import write_sand_edge_layer
+from texture_dedupe import dedupe_addon
 from texture_load import WARN_MIB, load_report, measure
-from texture_size import cap_block_textures
+from texture_size import cap_addon_block_textures, cap_block_textures, most_common_width
 from top_decals import bake_top_decals, find_top_decals
 from vv_scene_profile import WATER_TEXTURES, apply_scene_profile, read_scene_profile, read_water_textures
 
@@ -255,6 +256,12 @@ def convert(archives, destination, *, vanilla=None, samples=None, key='author-pa
     report['overlay_surfaces'] = overlay_summary(overlay_report, published['terrain_provider'])
     for warning in report['texture_load']['warnings']:
         print('Warning: ' + warning)
+    # Nothing in the pack is drawn finer than the author's own textures (generated edges are made at 256).
+    pack_width = most_common_width(Path(next(item for item in base if item['renderer'] == 'rtx')['resource_pack']) / 'textures/blocks')
+    if pack_width:
+        report['scaled_to_pack_resolution'] = cap_addon_block_textures(published['installable_packs'][0]['archive'], pack_width)
+    # Identical images are kept once (texture_dedupe.py): the game loads every copy into texture memory.
+    report['deduplicated_textures'] = dedupe_addon(Path(published['installable_packs'][0]['archive']))
     if bedrock_grade:
         # The author's Bedrock colour grade over every block texture (bedrock_grade.py), before the final checks.
         report['bedrock_grade'] = grade_addon(Path(published['installable_packs'][0]['archive']), vv_scene)

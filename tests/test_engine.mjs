@@ -42,6 +42,19 @@ test('published pack data reaches the engine and the scanner draws found blocks'
   assert.ok(env.entities.every(entity => entity.getDynamicProperty('bct:source') === 'pack'));
 });
 
+test('connected rules limited to biomes draw in those biomes only', () => {
+  for (const [biome, carriers] of [['minecraft:plains', 6], ['minecraft:desert', 0]]) {
+    const rules = { rules: [{ ...stoneRules.rules[0], biomes: { ids: ['minecraft:plains'], exclude: false } }] };
+    const fake = fakeBedrock({ blocks: new Map([['8,70,8', 'minecraft:stone']]) });
+    fake.dimension.getBiome = () => ({ id: biome });
+    startEngine(fake.api);
+    publishSources({ system: fake.system, world: fake.world, sources: [packet('connected', 'pack', rules)] });
+    fake.player({ x: 8, y: 70, z: 8 });
+    fake.step(3);
+    assert.equal(fake.entities.filter(entity => entity.isValid).length, carriers, biome);
+  }
+});
+
 test('chunk scans ask for the union of both block sets, one 16-block section of the band at a time', () => {
   const env = setup({ sources: [['connected', 'pack', stoneRules], ['terrain', 'pack', grassProvider]] });
   const radius = DEFAULT_SETTINGS.connected.chunkRadius, terrainRadius = DEFAULT_SETTINGS.terrain.chunkRadius;

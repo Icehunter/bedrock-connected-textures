@@ -1,6 +1,6 @@
 {
   "name": "Bedrock Connected Textures",
-  "version": [1, 0, 0],
+  "version": [1, 1, 0],
   "min_engine_version": [1, 26, 50],
   "header_uuid": "2286eae6-39b3-5e23-9a2d-919e4da1bcaa",
   "data_module_uuid": "d767177c-c5a5-5879-8165-7a0e31804fdd",

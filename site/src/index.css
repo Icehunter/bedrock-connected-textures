@@ -1,0 +1,35 @@
+@import "tailwindcss";
+@import "@heroui/styles";
+@import "@heroui-pro/react/css";
+
+html { scroll-behavior: smooth; scroll-padding-top: 5rem; }
+body { background: var(--background); color: var(--foreground); }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+.skip-link {
+  position: absolute; left: 1rem; top: -4rem; z-index: 100;
+  padding: .5rem 1rem; border-radius: .5rem;
+  background: var(--accent); color: var(--accent-foreground);
+}
+.skip-link:focus { top: 1rem; }
+
+/* Rendered markdown */
+.doc { line-height: 1.7; max-width: 52rem; overflow-wrap: anywhere; }
+.doc h1 { font-size: 2rem; font-weight: 700; margin: 0 0 1rem; line-height: 1.2; }
+.doc h2 { font-size: 1.5rem; font-weight: 650; margin: 2.5rem 0 .75rem; padding-top: .5rem; border-top: 1px solid var(--border); line-height: 1.25; }
+.doc h3 { font-size: 1.2rem; font-weight: 650; margin: 1.75rem 0 .5rem; }
+.doc p { margin: .75rem 0; }
+.doc ul { list-style: disc; padding-left: 1.5rem; margin: .75rem 0; }
+.doc ol { list-style: decimal; padding-left: 1.5rem; margin: .75rem 0; }
+.doc li { margin: .3rem 0; }
+.doc a { color: var(--accent); text-decoration: underline; text-underline-offset: 3px; }
+.doc code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .875em; background: var(--default); padding: .1em .35em; border-radius: .35rem; }
+.doc pre { background: var(--default); border: 1px solid var(--border); border-radius: .75rem; padding: 1rem; overflow-x: auto; margin: 1rem 0; }
+.doc pre code { background: none; padding: 0; font-size: .85rem; }
+.doc .table-wrap { overflow-x: auto; margin: 1rem 0; border: 1px solid var(--border); border-radius: .75rem; }
+.doc table { border-collapse: collapse; width: 100%; font-size: .9rem; }
+.doc th, .doc td { text-align: left; vertical-align: top; padding: .55rem .75rem; border-bottom: 1px solid var(--border); }
+.doc th { background: var(--default); font-weight: 600; white-space: nowrap; }
+.doc tr:last-child td { border-bottom: 0; }
+.doc strong { font-weight: 650; }
+

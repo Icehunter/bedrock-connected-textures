@@ -103,7 +103,9 @@ function validate(data) {
   const id = /^[a-z0-9_.-]+:[a-z0-9_./-]+$/;
   for (const entry of data.blocks) {
     if (!id.test(entry.vanilla) || !id.test(entry.block) || typeof entry.mirror !== 'object') throw new Error('Invalid leaf block');
-    if (entry.turn && (typeof entry.turn.state !== 'string' || !Array.isArray(entry.turn.weights))) throw new Error('Invalid leaf turn');
+    if (entry.turn && (typeof entry.turn.state !== 'string' || !Array.isArray(entry.turn.weights) ||
+      (entry.turn.byLook !== undefined && (!entry.look || !Array.isArray(entry.turn.byLook) || !entry.turn.byLook.every(Array.isArray)))))
+      throw new Error('Invalid leaf turn');
     if (entry.look && (typeof entry.look.state !== 'string' || !Array.isArray(entry.look.table) || entry.look.table.length !== 2)) throw new Error('Invalid leaf look');
   }
   return data;
@@ -169,13 +171,22 @@ export function createLeaves({ api, limits, log = () => {}, logAliases = () => [
 
   /** The model group a Java distance picks (1-6, 7 for none) for persistent or decaying leaves. */
   const lookOf = (entry, persistent, distance) => entry.look.table[persistent ? 1 : 0][Math.min(Math.max(distance, 1), 7) - 1];
+  /** The weighted model pick for a position, with the weights of the leaf's look when each look has its own. */
+  const turnOf = (entry, location, look) =>
+    javaModelIndex(location, entry.turn.byLook?.[look] ?? entry.turn.weights, entry.turn.selection);
+  /** A converted leaf's states with a new look, and the model pick that look's weights give. */
+  function withLook(entry, block, states, look) {
+    const next = { ...states, [entry.look.state]: look };
+    if (entry.turn?.byLook) next[entry.turn.state] = turnOf(entry, block.location, look);
+    return next;
+  }
 
   /** Converted states for a vanilla leaf with these vanilla states at a location; boolean vanilla states become 0 or 1. */
   function convertedStates(entry, vanilla, location, distance) {
     const states = {};
     for (const [name, mirrored] of Object.entries(entry.mirror)) if (name in vanilla) states[mirrored] = vanilla[name] === true || vanilla[name] === 1 ? 1 : 0;
-    if (entry.turn) states[entry.turn.state] = javaModelIndex(location, entry.turn.weights, entry.turn.selection);
     if (entry.look) states[entry.look.state] = lookOf(entry, states[entry.mirror.persistent_bit] === 1, distance);
+    if (entry.turn) states[entry.turn.state] = turnOf(entry, location, states[entry.look?.state]);
     return states;
   }
 
@@ -220,7 +231,7 @@ export function createLeaves({ api, limits, log = () => {}, logAliases = () => [
       const states = block.permutation.getAllStates?.() ?? {};
       const look = lookOf(custom, states[custom.mirror.persistent_bit] === 1, distance);
       if (states[custom.look.state] === look) return false;
-      try { block.setPermutation(resolve(block.typeId, { ...states, [custom.look.state]: look })); stats.looks++; return true; }
+      try { block.setPermutation(resolve(block.typeId, withLook(custom, block, states, look))); stats.looks++; return true; }
       catch (error) { log('leaf look ' + String(error)); return false; }
     }
     const entry = byVanilla.get(block.typeId);
@@ -609,13 +620,40 @@ export function createLeaves({ api, limits, log = () => {}, logAliases = () => [
     return unknown ? undefined : limit + 1;
   }
 
-  /** Whether any log (vanilla or replaced) lies in the box of `radius` blocks around a location; true when it cannot be read. */
+  /**
+   * Whether a log (vanilla or replaced) is within `radius` steps of a location through leaves, a step reaching
+   * any of the 26 blocks around (so a log touching the canopy only by an edge or corner counts, but the trunk
+   * of a separate tree does not); true when the area cannot be read.
+   */
   function logWithin(dimension, location, radius) {
+    let logs, leafCells;
     try {
       const volume = new api.BlockVolume({ x: location.x - radius, y: location.y - radius, z: location.z - radius },
         { x: location.x + radius, y: location.y + radius, z: location.z + radius });
-      return !dimension.getBlocks(volume, { includeTypes: logTypes }, true).getBlockLocationIterator().next().done;
+      const cells = types => {
+        const found = new Set();
+        const locations = dimension.getBlocks(volume, { includeTypes: types }, true).getBlockLocationIterator();
+        for (let item = locations.next(); !item.done; item = locations.next()) found.add(key(item.value.x, item.value.y, item.value.z));
+        return found;
+      };
+      logs = cells(logTypes);
+      if (!logs.size) return false;
+      leafCells = cells(leafTypes);
     } catch { return true; }
+    const visited = new Set([key(location.x, location.y, location.z)]);
+    let frontier = [location];
+    for (let step = 1; step <= radius && frontier.length; step++) {
+      const next = [];
+      for (const at of frontier) for (let dx = -1; dx <= 1; dx++) for (let dy = -1; dy <= 1; dy++) for (let dz = -1; dz <= 1; dz++) {
+        const name = key(at.x + dx, at.y + dy, at.z + dz);
+        if (visited.has(name)) continue;
+        visited.add(name);
+        if (logs.has(name)) return true;
+        if (leafCells.has(name)) next.push({ x: at.x + dx, y: at.y + dy, z: at.z + dz });
+      }
+      frontier = next;
+    }
+    return false;
   }
 
   /** Removes a decayed leaf with the drops its loot table gives without a tool; leaves next to it check again. */
@@ -645,16 +683,17 @@ export function createLeaves({ api, limits, log = () => {}, logAliases = () => [
     const distance = distanceFrom(block.dimension, block.location, decay.javaDistance);
     // Next to an unloaded chunk the log may lie there: nothing is decided.
     if (distance === undefined) return;
-    // A leaf only decays with no log anywhere within bedrockDistance: the path through leaves can miss a log
-    // the leaf touches only by an edge or corner, and a wrong decay drops apples and saplings onto healthy trees.
+    // A leaf only decays with no log within bedrockDistance through leaves counting edge and corner steps too:
+    // the face-to-face path can miss a log the canopy touches only by a corner, and a wrong decay drops apples
+    // and saplings onto healthy trees; a separate tree's trunk nearby keeps nothing alive, as in vanilla.
     if (marked && distance > decay.bedrockDistance && !logWithin(block.dimension, block.location, decay.bedrockDistance)) {
       decayLeaf(block);
       return;
     }
-    const next = { ...states };
+    let next = { ...states };
     if (marked) next[entry.mirror.update_bit] = 0;
     else if (distance > decay.javaDistance) next[entry.mirror.update_bit] = 1;
-    if (entry.look) next[entry.look.state] = lookOf(entry, false, distance);
+    if (entry.look) next = withLook(entry, block, next, lookOf(entry, false, distance));
     if (Object.keys(next).every(name => next[name] === states[name])) return;
     try { block.setPermutation(resolve(block.typeId, next)); if (marked) stats.unmarked++; else if (next[entry.mirror.update_bit] === 1) stats.marked++; }
     catch (error) { log('leaf tick ' + String(error)); }

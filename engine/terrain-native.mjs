@@ -81,11 +81,14 @@ export class NativeSurfaces {
     }
     if(!this.staleGroups) this.staleGroups=new Map([...this.owners.values()].map(entry=>[entry.type,entry.offset ?? 1]));
     for(const [type,offset] of this.staleGroups) if(!groups.has(type)) groups.set(type,offset);
+    // A cell holds one block: where edges of different blocks meet one host, the highest priority one draws.
+    const winners = new Map();
+    for (const item of wanted) { const offset = item.effect.native_offset ?? 1; if (!winners.has(offset)) winners.set(offset, item.effect.native_block); }
     for (const [type,offset] of groups) {
       const cell = offset === 1 ? base : dimension.getBlock({x:location.x,y:location.y+offset,z:location.z});
       if (!cell) continue;
       const key = this.key(dimension,location,offset);
-      const selected = wanted.filter(item => item.effect.native_block === type);
+      const selected = winners.get(offset) === type ? wanted.filter(item => item.effect.native_block === type) : [];
       const available = cell.isAir || ids.has(cell.typeId);
       if (!exposed || !available || !selected.length) {
         if (cell.typeId === type) cell.setType('minecraft:air');

@@ -1,4 +1,17 @@
-/** Runs in each converted pack's behavior pack and sends its data to the engine (sources.mjs) until acknowledged. */
+/** The engine's checksum of a packet's text (FNV-1a, as sources.mjs checks it). */
+function checksum(text) {
+  let hash=2166136261;
+  for(let i=0;i<text.length;i++)hash=Math.imul(hash^text.charCodeAt(i),16777619)>>>0;
+  return hash.toString(16).padStart(8,'0');
+}
+
+/** A hand-written pack's data (scripts/bct.js) as a source the engine compiles: checksummed and cut into parts. */
+export function authoredSource(data) {
+  const text=JSON.stringify(data);
+  return {engine:'authored',provider:String(data?.pack),digest:checksum(text),parts:text.match(/[\s\S]{1,750}/g)??['']};
+}
+
+/** Runs in each BCT pack's behavior pack and sends its data to the engine (sources.mjs) until acknowledged. */
 export function publishSources({system,world,sources}) {
   const states=sources.map(source=>({...source,index:0,acknowledged:false,nonce:null}));
   let started=false;

@@ -10,10 +10,12 @@ version 3, as published by the Free Software Foundation (see LICENSE).
 
 As an additional permission under section 7 of the GNU General Public License,
 version 3, you may use, modify and distribute files that the Bedrock Connected
-Textures converter writes into a converted pack ("Converter Output") under terms of
-your choice, without the GNU General Public License applying to the Converter Output.
+Textures converter writes into a converted pack, or that its pack authoring tool
+(bct.py) writes into a pack ("Converter Output"), under terms of your choice, without
+the GNU General Public License applying to the Converter Output.
 This holds even where the Converter Output contains material copied from this
-program, such as the publisher script (engine/publisher.mjs), data tables, templates,
+program, such as the publisher script (engine/publisher.mjs), the main script that
+starts it, data tables, templates,
 geometry, block, entity and texture definitions that the converter emits.
 
 This permission does not cover the engine or the converter themselves, or modified

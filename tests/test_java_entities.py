@@ -197,7 +197,7 @@ class FormatTests(unittest.TestCase):
             # The initial values come after the vanilla lines and before the model's own, and run once.
             lines = description['scripts']['pre_animation']
             self.assertEqual(lines[0], 'v.vanilla = 1;')
-            self.assertTrue(lines[1].startswith('(!v.bct_initialized) ? {'), lines[1])
+            self.assertTrue(lines[1].startswith('(!(v.bct_initialized ?? 0)) ? {'), lines[1])
             self.assertIn('v.cem_id = math.random(0, 1000000);', lines[1])
             self.assertTrue(all(molang_valid(line) for line in lines))
             environment = {}
@@ -232,6 +232,37 @@ class FormatTests(unittest.TestCase):
             restated = read_json(staged / 'render_controllers/bct_mob.render_controllers.json')
             self.assertEqual(restated['format_version'], '1.10.0')
             self.assertTrue(restated['render_controllers']['controller.render.bct.mob']['filter_lighting'])
+
+
+
+
+class UnsetVariableTests(unittest.TestCase):
+    def test_every_variable_a_script_or_animation_uses_gets_a_start_value(self):
+        from java_entities import _unset_variables
+        animations = {'animations': {'animation.bct.cem.cold_pig': {'bones': {'root': {
+            'rotation': [0, 'v.cem_cold_pig_root_ry * 57.3', 'variable.cem_cold_pig_tilt'], 'position': ['query.v_x', 0, 0]}}}}}
+        scripts = ['v.cem_cold_pig_frame_counter = v.cem_cold_pig_frame_counter + 1;', '(!(v.bct_initialized ?? 0)) ? {};']
+        self.assertEqual(_unset_variables(animations, scripts, ['v.cem_cold_pig_tilt = 1;', 'v.other == 2;']),
+                         ['v.cem_cold_pig_frame_counter = 0;', 'v.cem_cold_pig_root_ry = 0;'])
+
+
+class ControllerTests(unittest.TestCase):
+    def test_a_newer_format_entity_plays_its_vanilla_controllers_from_animate(self):
+        # Some vanilla entities of format 1.10+ still list animation_controllers; restated in a pack the game
+        # rejects that list, so the controllers move to animations and scripts.animate.
+        with tempfile.TemporaryDirectory() as folder:
+            fixture = Fixture(folder, {'mob': MODEL_WITH_INITIAL_VALUES}, share=False)
+            document = legacy_entity('test:mob', {'default': 'textures/entity/mob/mob'}, {'default': 'geometry.mob'},
+                                     ['controller.render.mob'])
+            document['format_version'] = '1.10.0'
+            document['minecraft:client_entity']['description']['scripts']['animate'] = ['walk']
+            write_json(fixture.samples / 'entity/mob.entity.json', document)
+            staged = Path(fixture.prepare()['staged'])
+            description = read_json(staged / 'entity/mob.entity.json')['minecraft:client_entity']['description']
+            self.assertNotIn('animation_controllers', description)
+            self.assertEqual(description['animations']['move'], 'controller.animation.mob.move')
+            self.assertIn('move', description['scripts']['animate'])
+            self.assertIn('walk', description['scripts']['animate'])
 
 
 if __name__ == '__main__':

@@ -249,7 +249,12 @@ export function fakeBedrock({ blocks = new Map(), states = new Map(), height = {
   const api = { world, system, BlockVolume: class { constructor(from, to) { this.from = from; this.to = to; } },
     ListBlockVolume: class { constructor(locations) { this.locations = locations.map(at => ({ x: at.x, y: at.y, z: at.z })); }
       getBlockLocationIterator() { return this.locations[Symbol.iterator](); } },
-    BlockTypes: { get: id => (!registry || registry.has(id) ? { id } : undefined) }, BlockPermutation: { resolve: (type, states = {}) => { checkStates(type, states); return { type, states }; } },
+    BlockTypes: { get: id => (!registry || registry.has(id) ? { id } : undefined) }, BlockPermutation: { resolve: (type, states = {}) => {
+      checkStates(type, states);
+      // Like the game: states not given take their first value, which getAllStates reports.
+      const all = { ...Object.fromEntries([...(registry?.get(type) ?? new Map())].map(([name, values]) => [name, values[0]])), ...states };
+      return { type, states, getAllStates: () => ({ ...all }) };
+    } },
     GraphicsMode: { RayTraced: 'RayTraced', Fancy: 'Fancy', Deferred: 'Deferred', Simple: 'Simple' },
     ItemStack, ModalFormData: class {},
     // The engine's time budgets read this clock: it stands still unless a test moves it or game calls cost time (costs),

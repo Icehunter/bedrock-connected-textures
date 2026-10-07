@@ -99,6 +99,8 @@ const fullCubes=new Set(configuration.fullCubeBlocks??[]),opaque=new Set(configu
 const customTintBlocks=new Set(configuration.customTintBlocks??[]);
 const hasOrientationProvider=Object.keys(configuration.textureOrientations??{}).length>0 || Object.keys(configuration.baseTextureVariants??{}).length>0;
 const providers={dialect:configuration.dialect??'optifine',stateOf:stateValue,
+  // Rules limited to biomes read the block's biome (undefined while its chunk is not readable).
+  biomeOf:block=>{try{return block.dimension.getBiome(block.location)?.id;}catch{return undefined;}},
   logicalBlockOf:block=>variantOf(block)?.javaBlock??configuration.nativeBlockJavaIds?.[block.typeId]??block.typeId,
   ...(hasOrientationProvider?{orientationOf:(block,face)=>variantOf(block)?.orientations?.[face]??configuration.textureOrientations?.[block.typeId]?.[face]}:{}),
   tintOf:(block,tintBlock,index)=>{

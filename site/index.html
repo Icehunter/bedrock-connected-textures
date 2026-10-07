@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Java texture pack features on Minecraft Bedrock: connected textures, repeat patterns, random textures, overlays, 3D leaves, held items, mob models and PBR." />
+    <meta name="color-scheme" content="light dark" />
+    <title>Bedrock Connected Textures</title>
+    <link rel="icon" type="image/png" href="./pack-icon.png" />
+    <script>
+      (function () {
+        try {
+          var t = localStorage.getItem("bct-theme");
+          var dark = t ? t === "dark" : window.matchMedia("(prefers-color-scheme: dark)").matches;
+          var r = document.documentElement;
+          r.classList.add(dark ? "dark" : "light");
+          r.setAttribute("data-theme", dark ? "dark" : "light");
+        } catch (e) {}
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

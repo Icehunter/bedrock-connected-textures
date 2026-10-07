@@ -69,27 +69,31 @@ def plan_model_block(models, bedrock, java, behavior):
 
     models: java_block_bindings._Models over the author stack and the vanilla
     jar. Returns {'looks': [[(model, y rotation) per weighted choice]],
-    'look_of': {(persistent, distance): look index}, 'weights', 'selection',
-    'models': {path: resolved model}, ...} or raises ValueError.
+    'look_weights': [[weight per choice] per look], 'look_of': {(persistent, distance): look index},
+    'selection', 'models': {path: resolved model}, ...} or raises ValueError. Each look keeps its
+    own weighted choices (a pack can weigh its models differently by log distance).
     """
     blockstate = _resource(java, 'blockstates')
     document = models.read(blockstate)
-    looks, look_of, weights, selection = [], {}, None, None
+    looks, look_weights, look_of, selection = [], [], {}, None
     for states in JAVA_STATES[behavior]:
         parts, state_selection = _selected_parts(document, states)
         if len(parts) != 1:
             raise ValueError(f'{len(parts)} model parts at once for {states} (one part per state is supported)')
         choices = parts[0]
-        # One weighted pick per position works only when every state weighs its choices alike.
-        if weights not in (None, [choice['weight'] for choice in choices]):
-            raise ValueError('weighted choices differ between Java states')
-        weights, selection = [choice['weight'] for choice in choices], state_selection
+        selection = state_selection
         if any(choice['x'] or choice['uvlock'] for choice in choices):
             raise ValueError('x rotations and uvlock are not supported for model blocks yet')
         look = [(choice['model'], choice['y']) for choice in choices]
-        if look not in looks:
+        weights = [choice['weight'] for choice in choices]
+        # A look is its choices with their weights: the same models weighed differently are another look.
+        known = next((index for index, (other, other_weights) in enumerate(zip(looks, look_weights))
+                      if other == look and other_weights == weights), None)
+        if known is None:
             looks.append(look)
-        look_of[(states['persistent'] == 'true', int(states['distance']))] = looks.index(look)
+            look_weights.append(weights)
+            known = len(looks) - 1
+        look_of[(states['persistent'] == 'true', int(states['distance']))] = known
     resolved = {}
     for look in looks:
         for path, _ in look:
@@ -101,7 +105,8 @@ def plan_model_block(models, bedrock, java, behavior):
                                   'ambientocclusion': model.get('ambientocclusion', True)}
     return {'bedrock': bedrock, 'java': java, 'behavior': behavior, 'blockstate': blockstate,
             'authored': models.stack is not None and blockstate in models.stack.files,
-            'looks': looks, 'look_of': look_of, 'weights': weights, 'selection': selection, 'models': resolved}
+            'looks': looks, 'look_weights': look_weights, 'look_of': look_of, 'selection': selection,
+            'models': resolved}
 
 
 def build(item, *, materials, namespace, schemas, known_items, sounds, display_name, tints, files):
@@ -143,12 +148,12 @@ def build(item, *, materials, namespace, schemas, known_items, sounds, display_n
     files['out'][bp_folder / f'blocks/{stem}.json'] = definition
     files['out'][bp_folder / loot_path] = loot
     entry = _engine_entry(item, identifier)
-    looks, weights = item['looks'], item['weights']
+    looks, weights = item['looks'], item['look_weights']
     report = {'block': bedrock, 'replacement': identifier, 'java_blockstate': item['blockstate'],
               'blockstate_from': 'author' if item['authored'] else 'vanilla', 'models': report_models,
               'tint_method': tint or 'none', 'states': sorted(states), 'permutations': len(permutations),
               'looks': [[{'model': path, 'y': y} for path, y in look] for look in looks],
-              'turn_weights': weights, 'selection': item['selection']}
+              'turn_weights': weights if len(weights) > 1 else weights[0], 'selection': item['selection']}
     sound = sounds.get(bedrock.removeprefix('minecraft:'), {}).get('sound')
     return definition, entry, report, sound
 
@@ -172,7 +177,7 @@ def bedrock_loot(java_table, item_ids, leaf_item):
             entries += entry['children'] if entry.get('type', '').endswith('alternatives') else [entry]
         for entry in entries:
             conditions = {condition['condition'].removeprefix('minecraft:'): condition
-                          for condition in entry.get('conditions', [])}
+                          for condition in _loot_conditions(entry)}
             if 'any_of' in conditions:
                 continue  # the block itself for shears or Silk Touch
             item = item_ids(entry.get('name'))
@@ -397,11 +402,12 @@ def _states_and_permutations(item, geometries):
     bct:t is the weighted pick and bct:look the model the Java states choose
     (each only when there is more than one).
     """
-    looks, weights = item['looks'], item['weights']
+    looks = item['looks']
+    choices = max(len(look) for look in looks)
     states = {'bct:persistent_bit': {'values': {'min': 0, 'max': 1}},
               'bct:update_bit': {'values': {'min': 0, 'max': 1}}}
-    if len(weights) > 1:
-        states['bct:t'] = {'values': {'min': 0, 'max': len(weights) - 1}}
+    if choices > 1:
+        states['bct:t'] = {'values': {'min': 0, 'max': choices - 1}}
     if len(looks) > 1:
         states['bct:look'] = {'values': {'min': 0, 'max': len(looks) - 1}}
     permutations = []
@@ -410,7 +416,7 @@ def _states_and_permutations(item, geometries):
             terms = []
             if len(looks) > 1:
                 terms.append(f"q.block_state('bct:look') == {look_index}")
-            if len(weights) > 1:
+            if choices > 1:
                 terms.append(f"q.block_state('bct:t') == {turn}")
             components = {'minecraft:geometry': geometries[path]}
             if y:
@@ -451,12 +457,15 @@ def _block_components(item, geometries, instances, loot_path, display_name, tint
 
 def _engine_entry(item, identifier):
     """The engine's data for a model block: the mirrored leaf states, the weighted turn and the look by state."""
-    looks, weights = item['looks'], item['weights']
+    looks, look_weights = item['looks'], item['look_weights']
     entry = {'vanilla': item['bedrock'], 'block': identifier,
              'mirror': {'persistent_bit': 'bct:persistent_bit', 'update_bit': 'bct:update_bit'},
              'bools': ['persistent_bit', 'update_bit']}
-    if len(weights) > 1:
-        entry['turn'] = {'state': 'bct:t', 'weights': weights, 'selection': item['selection']}
+    if max(len(weights) for weights in look_weights) > 1:
+        entry['turn'] = {'state': 'bct:t', 'weights': look_weights[0], 'selection': item['selection']}
+        if any(weights != look_weights[0] for weights in look_weights):
+            # The pick uses the weights of the leaf's look (by persistence and log distance).
+            entry['turn']['byLook'] = look_weights
     if len(looks) > 1:
         # Rows: not persistent, then persistent; columns: log distance 1 to 7.
         table = [[item['look_of'][(persistent, distance)] for distance in LEAF_DISTANCES]
@@ -465,10 +474,40 @@ def _engine_entry(item, identifier):
     return entry
 
 
+def _loot_conditions(entry):
+    """A Java loot entry's conditions as [{'condition': name, ...}], from either loot table format.
+
+    Before Java 26 an entry lists `conditions`, each named by `condition`; from
+    26 on it has one `condition` named by `type`, all_of holding several, and a
+    term may be a named predicate (a string such as minecraft:tool/can_shear).
+    """
+    found = list(entry.get('conditions', []))
+    single = entry.get('condition')
+    if single is not None:
+        found += single.get('terms', []) if single.get('type', '').removeprefix('minecraft:') == 'all_of' else [single]
+    result = []
+    for condition in found:
+        if isinstance(condition, str):
+            result.append({'condition': 'predicate', 'id': condition})
+        elif 'type' in condition and 'condition' not in condition:
+            result.append({'condition': condition['type'], **{k: v for k, v in condition.items() if k != 'type'}})
+        else:
+            result.append(condition)
+    return result
+
+
+def _loot_functions(entry):
+    """A Java loot entry's functions as [{'function': name, ...}]: `functions` before Java 26, `modifier` from 26 on."""
+    modifiers = entry.get('modifier', [])
+    modifiers = modifiers if isinstance(modifiers, list) else [modifiers]
+    return list(entry.get('functions', [])) + [
+        {'function': item['type'], **{k: v for k, v in item.items() if k != 'type'}} for item in modifiers]
+
+
 def _bedrock_loot_functions(entry, conditions):
     """A Java loot entry's functions in Bedrock form; survives_explosion becomes explosion_decay."""
     functions = []
-    for function in entry.get('functions', []):
+    for function in _loot_functions(entry):
         kind = function['function'].removeprefix('minecraft:')
         if kind == 'set_count':
             count = function['count']

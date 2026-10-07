@@ -55,6 +55,27 @@ def java_leaf_loot(leaves, sapling, apple=False):
     return {'type': 'minecraft:block', 'pools': pools}
 
 
+def java_26_leaf_loot(leaves, sapling):
+    """Java 26.3's leaves loot table shape: one `condition` named by `type`, named tool predicates, `modifier`."""
+    shears_or_silk_touch = {'type': 'minecraft:any_of', 'terms': ['minecraft:tool/can_shear', 'minecraft:tool/can_silk_touch']}
+    not_shears = {'type': 'minecraft:inverted', 'term': shears_or_silk_touch}
+
+    def bonus(chances):
+        return {'type': 'minecraft:table_bonus', 'chances': chances, 'enchantment': 'minecraft:fortune'}
+    return {'type': 'minecraft:block', 'pools': [
+        {'rolls': 1, 'entries': [{'type': 'minecraft:alternatives', 'children': [
+            {'type': 'minecraft:item', 'name': leaves, 'condition': shears_or_silk_touch},
+            {'type': 'minecraft:item', 'name': sapling, 'condition': {'type': 'minecraft:all_of', 'terms': [
+                {'type': 'minecraft:survives_explosion'}, bonus(SAPLING_CHANCES)]}}]}]},
+        {'rolls': 1, 'condition': not_shears, 'entries': [
+            {'type': 'minecraft:item', 'name': 'minecraft:stick', 'condition': bonus(STICK_CHANCES),
+             'modifier': [{'type': 'minecraft:set_count', 'count': {'type': 'minecraft:uniform', 'max': 2, 'min': 1}},
+                          {'type': 'minecraft:explosion_decay'}]}]},
+        {'rolls': 1, 'condition': not_shears, 'entries': [
+            {'type': 'minecraft:item', 'name': 'minecraft:apple', 'condition': {'type': 'minecraft:all_of', 'terms': [
+                {'type': 'minecraft:survives_explosion'}, bonus(APPLE_CHANCES)]}}]}]}
+
+
 def cube_faces(texture, tint=0):
     return {face: {'uv': [0, 0, 16, 16], 'texture': texture, 'tintindex': tint, 'cullface': face} for face in FACES}
 
@@ -67,7 +88,7 @@ def write_fixture(root):
         archive.writestr('assets/minecraft/models/block/leaves.json', json.dumps({
             'textures': {'particle': '#all'},
             'elements': [{'from': [0, 0, 0], 'to': [16, 16, 16], 'faces': cube_faces('#all')}]}))
-        for wood in ('oak', 'birch'):
+        for wood in ('oak', 'birch', 'jungle'):
             archive.writestr(f'assets/minecraft/blockstates/{wood}_leaves.json',
                              json.dumps({'variants': {'': {'model': f'minecraft:block/{wood}_leaves'}}}))
             archive.writestr(f'assets/minecraft/models/block/{wood}_leaves.json', json.dumps({
@@ -93,8 +114,17 @@ def write_fixture(root):
             'elements': [{'from': [0, 0, 0], 'to': [16, 16, 16], 'faces': cube_faces('#leaves')}, leaf]}))
         archive.writestr('assets/minecraft/models/block/oak_outer.json', json.dumps({
             'textures': {'leaves': 'minecraft:block/oak_leaves', 'particle': '#leaves'}, 'elements': [wide]}))
+        # Jungle weighs the same two turns differently by log distance (1:1 near a log, 1:3 farther out).
+        archive.writestr('assets/minecraft/blockstates/jungle_leaves.json', json.dumps({'multipart': [
+            {'when': {'OR': [{'persistent': 'true'}, {'distance': '1|2|3|4'}]},
+             'apply': [{'model': 'minecraft:block/jungle_leafy'}, {'model': 'minecraft:block/jungle_leafy', 'y': 90}]},
+            {'when': {'persistent': 'false', 'distance': '5|6|7'},
+             'apply': [{'model': 'minecraft:block/jungle_leafy'},
+                       {'model': 'minecraft:block/jungle_leafy', 'y': 90, 'weight': 3}]}]}))
+        archive.writestr('assets/minecraft/models/block/jungle_leafy.json', json.dumps({
+            'textures': {'leaves': 'minecraft:block/jungle_leaves', 'particle': '#leaves'}, 'elements': [leaf]}))
     compiled = root / 'compiled'
-    for wood in ('oak', 'birch'):
+    for wood in ('oak', 'birch', 'jungle'):
         material(compiled, TEXTURES + f'{wood}_leaves.png', (60, 140, 40, 200))
     return jar, pack, compiled
 
@@ -123,15 +153,14 @@ class ModelBlockTests(unittest.TestCase):
         return json.loads((self.bp / 'blocks/m_oak_leaves.json').read_text())['minecraft:block']
 
     def test_only_leaves_with_their_own_models_become_model_blocks(self):
-        self.assertEqual([plan['bedrock'] for plan in self.plans], ['minecraft:oak_leaves'])
+        self.assertEqual(sorted(plan['bedrock'] for plan in self.plans), ['minecraft:jungle_leaves', 'minecraft:oak_leaves'])
         reasons = {item['block']: item['reason'] for item in self.skipped}
         self.assertEqual(reasons['minecraft:birch_leaves'], 'the blockstate shows full cubes; the base pack draws them')
         self.assertIn('minecraft:spruce_leaves', reasons, 'a leaf the reference jar does not have is reported')
         self.assertEqual(self.report['model_blocks_not_built'], [])
 
     def test_states_pick_the_inner_or_outer_model_and_a_weighted_turn(self):
-        entry = self.data['leaves']['blocks'][0]
-        self.assertEqual(entry['vanilla'], 'minecraft:oak_leaves')
+        entry = next(entry for entry in self.data['leaves']['blocks'] if entry['vanilla'] == 'minecraft:oak_leaves')
         self.assertEqual(entry['mirror'], {'persistent_bit': 'bct:persistent_bit', 'update_bit': 'bct:update_bit'})
         self.assertEqual(entry['look'], {'state': 'bct:look', 'table': [[0, 0, 0, 0, 1, 1, 1], [0, 0, 0, 0, 0, 0, 0]]},
                          'inner while persistent or within 4 of a log, outer at 5 to 7')
@@ -149,8 +178,18 @@ class ModelBlockTests(unittest.TestCase):
         unturned = permutations["q.block_state('bct:look') == 0 && q.block_state('bct:t') == 0"]
         self.assertNotIn('minecraft:transformation', unturned)
 
+    def test_each_look_keeps_its_own_weighted_turns(self):
+        entry = next(entry for entry in self.data['leaves']['blocks'] if entry['vanilla'] == 'minecraft:jungle_leaves')
+        self.assertEqual(entry['look'], {'state': 'bct:look', 'table': [[0, 0, 0, 0, 1, 1, 1], [0, 0, 0, 0, 0, 0, 0]]},
+                         'the same models weighed differently are another look')
+        self.assertEqual(entry['turn']['byLook'], [[1, 1], [1, 3]])
+        block = json.loads((self.bp / 'blocks/m_jungle_leaves.json').read_text())['minecraft:block']
+        self.assertEqual(block['description']['states']['bct:t'], {'values': {'min': 0, 'max': 1}})
+        self.assertEqual(len(block['permutations']), 4)
+
     def test_geometry_fits_bedrock_and_never_names_the_default_material(self):
-        fits = {item['model'].rsplit('/', 1)[1]: item['fit_scale'] for item in self.report['model_blocks'][0]['models']}
+        oak = next(block for block in self.report['model_blocks'] if block['block'] == 'minecraft:oak_leaves')
+        fits = {item['model'].rsplit('/', 1)[1]: item['fit_scale'] for item in oak['models']}
         self.assertEqual(fits['oak_inner.json'], 1.0, 'a model inside the limit keeps its size')
         self.assertLess(fits['oak_outer.json'], 1.0, 'a model past the 30 pixel limit is shrunk just enough')
         for path in (self.rp / 'models/blocks').glob('*.geo.json'):
@@ -225,6 +264,16 @@ class BedrockLootTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'enchantment other than Fortune'):
             looting = {'condition': 'minecraft:table_bonus', 'enchantment': 'minecraft:looting', 'chances': [0.5]}
             self.loot({**stick, 'conditions': [looting]})
+
+    def test_java_26_loot_tables_give_the_same_drops_as_the_older_format(self):
+        # Read as the older format, the 26 form lost every chance: leaves, a sapling, sticks and an apple each break.
+        newer = bedrock_loot(java_26_leaf_loot('minecraft:oak_leaves', 'minecraft:oak_sapling'), lambda java: java,
+                             'minecraft:oak_leaves')
+        older = bedrock_loot(java_leaf_loot('minecraft:oak_leaves', 'minecraft:oak_sapling', apple=True),
+                             lambda java: java, 'minecraft:oak_leaves')
+        self.assertEqual(newer, older)
+        self.assertFalse(any(entry['name'] == 'minecraft:oak_leaves' for pool in newer['pools'][1:]
+                             for entry in pool['entries']), 'the leaf block drops only for shears')
 
     def test_counts_and_explosion_decay_carry_over(self):
         loot = self.loot({'type': 'minecraft:item', 'name': 'minecraft:stick',

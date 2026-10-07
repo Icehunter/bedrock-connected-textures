@@ -1,10 +1,10 @@
 /**
- * Receives the data converted packs publish (publisher.mjs) over script
- * events. Each packet names its part of the engine (`connected`, `terrain` or
- * `replace`), its pack and a checksum; data arrives in chunks of up to 750
+ * Receives the data BCT packs publish (publisher.mjs) over script
+ * events. Each packet names its part of the engine (`connected`, `terrain`,
+ * `replace`, or `authored` for a hand-written pack's data), its pack and a checksum; data arrives in chunks of up to 750
  * characters.
  */
-export const SOURCE_PARTS = Object.freeze(['connected', 'terrain', 'replace']);
+export const SOURCE_PARTS = Object.freeze(['connected', 'terrain', 'replace', 'authored']);
 
 export function checksum(text) {
   let hash = 2166136261;

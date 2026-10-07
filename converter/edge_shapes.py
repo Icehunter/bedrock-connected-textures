@@ -69,6 +69,11 @@ def _edge_texture_set(root, effect, pack):
     return pack / f'textures/blocks/{effect["material"]}.texture_set.json'
 
 
+def edge_alpha_from_image(image):
+    """256 square 'L' cutout cut from a plain texture's own brightness (a pack written for Bedrock)."""
+    return _material_edge(_image_field(image))
+
+
 def _material_field(source):
     """The material's height map, else its luminance, as a 256 square of standard scores."""
     descriptor = read_json(source)['minecraft:texture_set']
@@ -76,6 +81,11 @@ def _material_field(source):
     image = _open_texture(source.parent / height) if isinstance(height, str) else None
     if image is None:
         image = _open_texture(source.parent / descriptor['color'])
+    return _image_field(image)
+
+
+def _image_field(image):
+    """An image's brightness as a 256 square of standard scores."""
     grey = image.convert('L').resize((SIZE, SIZE), Image.Resampling.LANCZOS)
     field = np.asarray(grey, dtype=np.float32) / 255
     spread = field.std()

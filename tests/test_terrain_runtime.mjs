@@ -124,3 +124,12 @@ test('a scan of an exposed source updates the eight hosts around it', () => {
   host.found(host.dimension, { x: 5, y: -1, z: 5 }, 'minecraft:grass_block');
   assert.equal(updated.filter(location => location.y === -1 && (location.x !== 5 || location.z !== 5)).length, 8);
 });
+
+test('an entity removed before its load event reaches scripts is passed over', () => {
+  const host = runtime([source('example')]);
+  const gone = { typeId: 'bct_example:moss', isValid: false, hasTag() { throw new Error('InvalidEntityError: Entity being invalid'); } };
+  assert.doesNotThrow(() => host.onEntityLoad(gone));
+  const removedLate = { typeId: 'bct_example:moss', hasTag() { throw new Error('InvalidEntityError: Entity being invalid'); } };
+  assert.doesNotThrow(() => host.onEntityLoad(removedLate), 'removed between the validity check and hasTag');
+  assert.equal(host.scheduled.length, 0, 'no recovery for an entity that is gone');
+});
