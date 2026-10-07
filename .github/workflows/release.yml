@@ -40,7 +40,12 @@ jobs:
           test "v$version" = "${GITHUB_REF_NAME}" || { echo "Tag ${GITHUB_REF_NAME} does not match engine version $version"; exit 1; }
       - run: python converter/engine_package.py --output dist
       - run: python converter/package_converter.py
+      # The notes are this version's section of CHANGELOG.md: from its "## <version>" heading to the next "## " heading.
+      - name: Release notes
+        run: |
+          awk -v heading="## ${GITHUB_REF_NAME#v}" '$0 == heading {found = 1; next} found && /^## / {exit} found' CHANGELOG.md > notes.md
+          test -s notes.md || { echo "CHANGELOG.md has no section ## ${GITHUB_REF_NAME#v}"; exit 1; }
       - name: Publish the release
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release create "${GITHUB_REF_NAME}" dist/*.mcaddon dist/*.zip --title "${GITHUB_REF_NAME}" --notes-file CHANGELOG.md
+        run: gh release create "${GITHUB_REF_NAME}" dist/*.mcaddon dist/*.zip --title "${GITHUB_REF_NAME}" --notes-file notes.md
