@@ -33,7 +33,8 @@
           "xp": { "type": "array", "items": { "type": "integer" }, "minItems": 2, "maxItems": 2 },
           "tool": { "type": "object" },
           "leafGuard": { "type": "object" },
-          "cost": { "type": "integer" }
+          "cost": { "type": "integer" },
+          "shape": { "enum": ["slab", "stairs", "fence", "wall"], "description": "Written by bct.py block: the block is drawn by its shape states (a slab, stairs, a fence or a wall)." }
         }
       }
     },

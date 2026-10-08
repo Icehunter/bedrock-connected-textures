@@ -78,7 +78,7 @@ from java_pack_api import PackStack
 from java_rtx_compatibility import native_rtx_compatibility
 from model_blocks import plan_all
 from mosaic_random import kept_vanilla_patterns, only_vanilla_blocks, random_looks_authored
-from native_replacement import build_replacements, fallback_patterns, load_policy
+from native_replacement import WORLD_PERMUTATIONS, build_replacements, fallback_patterns, load_policy, shaped_over_budget
 from overlay_surfaces import build as build_overlays, prune_generated_edges
 from pack_identity import identity as pack_identity, pack_title, reference_version
 from sand_edges import write_sand_edge_layer
@@ -139,7 +139,8 @@ CONVERSION_LIMITATIONS = (
 
 
 def convert(archives, destination, *, vanilla=None, samples=None, key='author-pack', title=None, workers=4,
-            vv_scene=None, carrier_filter='bilinear', carrier_budget=None, version=None, authors=None, bedrock_grade=False):
+            vv_scene=None, carrier_filter='bilinear', carrier_budget=None, version=None, authors=None, bedrock_grade=False,
+            max_permutations=WORLD_PERMUTATIONS):
     """Convert a Java pack stack into one add-on for the Bedrock Connected Textures engine.
 
     archives: the Java pack ZIPs, lowest priority first. vanilla: the Java client jar; without one,
@@ -216,16 +217,23 @@ def convert(archives, destination, *, vanilla=None, samples=None, key='author-pa
     include_base_materials(archives, vanilla, destination, compiled, bindings)
     with PackStack(archives) as stack:
         copy_model_tint_images(stack, vanilla, compiled, bindings)
-    replacement_data, replacement_report = build_replacement_blocks(
-        archives, vanilla, samples, destination, compiled, key, authored_rules, replacement_policy,
-        native_variation_rules(variation_report))
-    replaced_blocks = {entry['vanilla'] for entry in (replacement_data or {}).get('blocks', [])}
-
     # 8. The pack's overlay rules draw as native surface blocks in front of the faces they cover,
-    # in every graphics mode; carriers leave them out so nothing draws twice.
-    overlay_data, overlay_report = build_overlays(authored_rules, compiled, destination / 'overlay', key=key,
-                                                  samples=samples, replacement_data=replacement_data,
-                                                  replacement_report=replacement_report)
+    # in every graphics mode; carriers leave them out so nothing draws twice. When the custom blocks
+    # together pass the game's permutation limit, the costliest shaped blocks are left out and both
+    # are built again (the overlay surfaces name the replacement blocks they rest on).
+    skip = set()
+    for _ in range(2):
+        replacement_data, replacement_report = build_replacement_blocks(
+            archives, vanilla, samples, destination, compiled, key, authored_rules, replacement_policy,
+            native_variation_rules(variation_report), skip=skip)
+        overlay_data, overlay_report = build_overlays(authored_rules, compiled, destination / 'overlay', key=key,
+                                                      samples=samples, replacement_data=replacement_data,
+                                                      replacement_report=replacement_report)
+        dropped = shaped_over_budget(replacement_report, overlay_report['permutations'], max_permutations)
+        if not dropped:
+            break
+        skip |= dropped
+    replaced_blocks = {entry['vanilla'] for entry in (replacement_data or {}).get('blocks', [])}
     overlay_hosts = {item['rule']: item['host_blocks'] for item in overlay_report['rules_drawn']}
 
     # 9. Entity carriers draw what is left, within the carrier budget.
@@ -1326,7 +1334,8 @@ def material_family(image):
     return family
 
 
-def build_replacement_blocks(archives, vanilla, samples, destination, compiled, key, rules, policy, variation_rules):
+def build_replacement_blocks(archives, vanilla, samples, destination, compiled, key, rules, policy, variation_rules,
+                             skip=()):
     """Write the replacement blocks and the leaf model blocks into destination/replacement.
 
     Rules already drawn as atlas variations never cause a replacement; they ride along on blocks
@@ -1343,7 +1352,7 @@ def build_replacement_blocks(archives, vanilla, samples, destination, compiled, 
         model_plans, model_skipped = plan_all(models, policy, known_blocks(samples), java_id, jar)
     replacement_data, report = build_replacements(rules, candidates, policy, source=compiled, samples=samples, key=key,
                                                   output=destination / 'replacement', passengers=passengers,
-                                                  model_blocks=model_plans)
+                                                  model_blocks=model_plans, skip=skip)
     report['model_blocks_skipped'] = model_skipped
     write_json(destination / 'replacement-report.json', report)
     return replacement_data, report
@@ -1675,6 +1684,9 @@ def parse_arguments():
     parser.add_argument('--carrier-budget', type=Path,
                         help='JSON budget: entity_allowlist, native_only and carrier_types '
                              '(default converter/data/carrier-budget.json)')
+    parser.add_argument('--max-permutations', type=int, default=WORLD_PERMUTATIONS,
+                        help='Custom block permutations the pack may have before the costliest slabs and stairs are '
+                             f'left out (default {WORLD_PERMUTATIONS}, the number the game warns about)')
     parser.add_argument('--version',
                         help="The pack's own version, such as 4.1.0 "
                              '(default: a tag like R4.1.0 in the file name, else 1.0.0)')
@@ -1697,7 +1709,7 @@ def main():
                          key=options.key, title=options.title, workers=options.workers,
                          vv_scene=options.vv_scene, carrier_filter=options.carrier_filter,
                          carrier_budget=options.carrier_budget, version=options.version, authors=options.author,
-                         bedrock_grade=options.bedrock_grade)
+                         bedrock_grade=options.bedrock_grade, max_permutations=options.max_permutations)
         print(f"Imported {report['rule_count']} connected-texture rules.")
         for item in report['installable_packs']:
             print('Converted pack: ' + item['archive'])

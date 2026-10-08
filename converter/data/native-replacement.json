@@ -53,6 +53,37 @@
     ],
     "reason": "Panes and bars connect to other panes and bars, walls and full blocks; the engine reads the vanilla connection states on swap-in and works them out again when a neighbor changes."
   },
+  "shaped": {
+    "blocks": ["minecraft:*_slab", "minecraft:*_stairs", "minecraft:*_fence", "minecraft:*_wall"],
+    "base": {
+      "minecraft:normal_stone_slab": "minecraft:stone",
+      "minecraft:normal_stone_stairs": "minecraft:stone",
+      "minecraft:stone_stairs": "minecraft:cobblestone",
+      "minecraft:end_stone_brick_wall": "minecraft:end_bricks"
+    },
+    "overrides": [
+      {
+        "blocks": [
+          "minecraft:normal_stone_slab", "minecraft:normal_stone_double_slab",
+          "minecraft:smooth_stone_slab", "minecraft:smooth_stone_double_slab",
+          "minecraft:cobblestone_slab", "minecraft:cobblestone_double_slab",
+          "minecraft:stone_brick_slab", "minecraft:stone_brick_double_slab",
+          "minecraft:brick_slab", "minecraft:brick_double_slab",
+          "minecraft:sandstone_slab", "minecraft:sandstone_double_slab",
+          "minecraft:cut_sandstone_slab", "minecraft:cut_sandstone_double_slab",
+          "minecraft:red_sandstone_slab", "minecraft:red_sandstone_double_slab",
+          "minecraft:cut_red_sandstone_slab", "minecraft:cut_red_sandstone_double_slab",
+          "minecraft:nether_brick_slab", "minecraft:nether_brick_double_slab",
+          "minecraft:quartz_slab", "minecraft:quartz_double_slab",
+          "minecraft:purpur_slab", "minecraft:purpur_double_slab"
+        ],
+        "destroy": 2,
+        "resistance": 6,
+        "reason": "Java gives these older slabs strength 2.0 and resistance 6.0 of their own instead of their full block's."
+      }
+    ],
+    "reason": "Slabs, double slabs, stairs, fences and walls borrow the gameplay profile of their full block (oak_slab, oak_stairs and oak_fence from oak_planks), drop themselves (a double slab two slabs), and are drawn by the shape their states pick (vertical_half; facing, upside down and corner; the four fence connections; the wall sides and post). Fence gates open and close and stay vanilla."
+  },
   "open_blocks": [
     "minecraft:air",
     "minecraft:water",
@@ -99,6 +130,7 @@
       "cherry": "#D1B1A1",
       "bamboo": "#E5E533",
       "pale_oak": "#FFFCF5",
+      "poplar": "#999999",
       "crimson": "#943F61",
       "warped": "#3A8E8C"
     },

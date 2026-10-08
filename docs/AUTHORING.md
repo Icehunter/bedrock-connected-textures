@@ -59,9 +59,16 @@ MyPack_BP/
 
 When a world loads, the engine reads your data, finds the vanilla blocks it
 names in the loaded chunks around players and swaps them for your blocks,
-nearest first. Blocks players place swap at once. The world beyond the
-simulation distance is converted in the background, one area at a time.
-Swapped blocks stay swapped: a world played with your pack keeps needing it.
+nearest first. Blocks players place swap at once. Beyond the simulation
+distance, leaves change in the background, one area at a time; other blocks
+change when a player comes near.
+Swapped blocks stay swapped. To take your pack out of a world, players run
+`/scriptevent bct:control restore`. They wait until it says the world is back
+to vanilla blocks, then remove the packs. If they remove the pack first, its
+blocks show as unknown blocks until the pack is added back.
+`python bct.py restore` works with the game closed, but it only knows the
+blocks of converted packs, not yours. So players of your pack need the
+command. Tell them this where you share the pack.
 
 Your blocks keep the vanilla block's gameplay: mining time and tool, drops
 (Fortune, Silk Touch), explosion resistance, map colour, sounds,
@@ -171,6 +178,32 @@ What the block gets: the vanilla block's own states as `bct:<name>`
 face for every place in the pattern, and the gameplay listed above.
 See-through blocks (glass) hide their faces against each other and take
 `alpha_test` or `blend` from your tiles' alpha.
+
+Slabs, stairs, fences and walls take patterns too:
+
+```
+python bct.py block minecraft:oak_slab mypack:oak_slab --repeat 2 2 ...
+```
+
+Each face shows the tile that a full block in the same place would show. So a
+slab or a stair lines up with the planks next to it. The side of a bottom slab
+shows the lower half of the tile.
+
+The block gets its own geometry, with a part for each shape. Its states pick
+the part that shows:
+
+| Block | States |
+| --- | --- |
+| Slab | `bct:vertical_half` (2 shapes) |
+| Stairs | `bct:weirdo_direction`, `bct:upside_down_bit`, `bct:corner` (40 shapes) |
+| Fence | `bct:connection_north`, `_east`, `_south`, `_west` (16 shapes) |
+| Wall | `bct:wall_connection_type_north`, `_east`, `_south`, `_west`, `bct:wall_post_bit` |
+
+The collision and selection boxes follow the shape, and the block can hold
+water. The engine works out a stair's corner, and how a fence or a wall joins
+the blocks next to it. `bct.py` adds `shape: "slab"`, `"stairs"`, `"fence"` or
+`"wall"` to the entry. Fence gates stay vanilla. Double slabs
+(`minecraft:oak_double_slab`) are full cubes and drop two slabs.
 
 The block file is yours afterwards: change its textures, add components, or
 write your own from scratch. The engine needs only the states your entry
@@ -324,9 +357,10 @@ python bct.py connected minecraft:glass mypack:glass --ctm textures/blocks/glass
 
 | Option | Meaning |
 | --- | --- |
-| `--ctm` | A standard 47-tile set (`glass_ctm_0` to `_46`); tiles 0, 2, 24 and 26 are used. |
-| `--alone`, `--across`, `--along`, `--joined` | Or the four tiles one by one. |
+| `--ctm` | A standard 47-tile set (`glass_ctm_0` to `_46`); tiles 0, 2, 24 and 26 are used. Several sets are random variants. |
+| `--alone`, `--across`, `--along`, `--joined` | Or the four tiles one by one; several paths per tile are random variants. |
 | `--faces` | The faces that join (default all six). |
+| `--face-texture FACE=PATH` | A face that does not join shows this texture instead of the alone tile, such as `up=textures/blocks/sandstone_top`. `PATH,PATH` gives random variants. Repeat for each face. |
 | `--joins` | `horizontal` or `vertical` to join only along the texture's left/right or up/down edges. |
 | `--connect` | The blocks it joins (default the same block). |
 
@@ -338,6 +372,9 @@ connected: {
   "minecraft:oak_planks": { block: "mypack:planks", connect: ["minecraft:oak_planks", "minecraft:spruce_planks"] }
 }
 ```
+
+Random variants become `variations` in your `terrain_texture.json`: Bedrock
+picks one per block position, as it does for vanilla blocks, at no cost.
 
 The block has the states `bct:n`, `bct:s`, `bct:w`, `bct:e`, `bct:u` and
 `bct:d` (1 where that neighbour joins) and 64 permutations. A block is either
@@ -476,7 +513,7 @@ a newer engine can use your pack.
 | --- | --- |
 | Patterns, leaves and connected blocks swap blocks in the world; they stay swapped. | Bedrock cannot change a vanilla block's look per position or neighbour. |
 | Grass, dirt, sand, gravel, farmland, bookshelves and similar stay vanilla. | Their gameplay needs the real block. Use texture variations, edges and overlays. |
-| Pattern and connected blocks are full cubes. | Custom block geometry is drawn by state, not by the vanilla model. |
+| Pattern blocks are full cubes, slabs, stairs, fences and walls; connected blocks are full cubes. Fence gates and buttons stay vanilla. | Custom block geometry is drawn by state, not by the vanilla model; each shape needs its own geometry. |
 | Connected blocks draw no inner corners. | 64 states hold six neighbours; diagonals would need more than a block can have. Carriers draw them. |
 | Carriers do not draw in ray tracing. | Entity materials have no ray-traced PBR. |
 | One edge block per cell. | A cell holds one block. |

@@ -43,6 +43,9 @@ export function createFar({ api, limits, log = () => {}, idle = () => true }) {
   const { world, system } = api;
   const done = new Set();
   let current, loadedDone = false, enabled = true, statusTick = 0, failures = 0, size;
+  // While restoring: () => the chunks still to bring back [{ dimension (id), cx, cz }], and how often each area was loaded.
+  let targets;
+  const tries = new Map();
 
   function loadDone() {
     if (loadedDone) return;
@@ -72,29 +75,72 @@ export function createFar({ api, limits, log = () => {}, idle = () => true }) {
     return size;
   }
 
-  /** The areas within chunkRadius of a player that are not done, nearest first. */
+  /**
+   * The areas within chunkRadius of a player that are not done, nearest first, and the ones in front of the
+   * player before the ones beside and behind: an area straight behind counts as one and a half rings farther.
+   */
   function areasAround(player) {
     const area = areaSize(), radius = Math.ceil(limits().chunkRadius / area);
     const ax = Math.floor(Math.floor(player.location.x / 16) / area), az = Math.floor(Math.floor(player.location.z / 16) / area);
+    let view;
+    try { view = player.getViewDirection?.(); } catch { /* not a real player */ }
+    const length = view ? Math.hypot(view.x, view.z) : 0;
     const dimensionId = player.dimension.id, found = [];
     for (let dx = -radius; dx <= radius; dx++) for (let dz = -radius; dz <= radius; dz++) {
       const name = areaKey(dimensionId, area, ax + dx, az + dz);
-      if (!done.has(name)) found.push({ name, dimension: player.dimension, ax: ax + dx, az: az + dz, distance: Math.max(Math.abs(dx), Math.abs(dz)) * 2 + (dx * dx + dz * dz) / 100 });
+      if (done.has(name)) continue;
+      const away = Math.hypot(dx, dz);
+      const facing = length > 0.01 && away > 0 ? (dx * view.x + dz * view.z) / (away * length) : 1;
+      const distance = Math.max(Math.abs(dx), Math.abs(dz)) * 2 + (dx * dx + dz * dz) / 100 + (1 - facing) * 1.5;
+      found.push({ name, dimension: player.dimension, ax: ax + dx, az: az + dz, distance });
     }
     return found.sort((a, b) => a.distance - b.distance);
   }
+
+  /**
+   * While restoring: the areas holding chunks still to bring back, in any dimension, the ones nearest a player
+   * first. An area loaded three times without finishing is left.
+   */
+  function restoreAreas(players) {
+    const side = areaSize(), byName = new Map();
+    for (const chunk of targets()) {
+      const ax = Math.floor(chunk.cx / side), az = Math.floor(chunk.cz / side), name = areaKey(chunk.dimension, side, ax, az);
+      if ((tries.get(name) ?? 0) >= 3) continue;
+      if (!byName.has(name)) byName.set(name, { name, dimensionId: chunk.dimension, ax, az, chunks: 0 });
+      byName.get(name).chunks++;
+    }
+    const areas = [...byName.values()];
+    for (const area of areas) {
+      area.distance = Infinity;
+      for (const player of players) {
+        if (player.dimension.id !== area.dimensionId) continue;
+        const dx = area.ax - Math.floor(Math.floor(player.location.x / 16) / side), dz = area.az - Math.floor(Math.floor(player.location.z / 16) / side);
+        area.distance = Math.min(area.distance, Math.max(Math.abs(dx), Math.abs(dz)));
+      }
+      try { area.dimension = world.getDimension(area.dimensionId); } catch { area.dimension = undefined; }
+    }
+    return areas.filter(area => area.dimension).sort((a, b) => a.distance - b.distance);
+  }
+
+  /** Whether the loaded area has nothing left to bring back. */
+  const restored = area => !targets().some(chunk => chunk.dimension === area.dimensionId &&
+    Math.floor(chunk.cx / size) === area.ax && Math.floor(chunk.cz / size) === area.az);
 
   /**
    * The action bar line, like Distant Horizons shows its work: the chunks converted so far out of all the
    * chunks within reach of a player, counting up with every area done. Nothing when all of it is done.
    */
   function progressText(player) {
+    if (targets) {
+      const chunks = targets().length;
+      return chunks ? `§7Restoring the world: ${chunks.toLocaleString('en-US')} chunks to go` : undefined;
+    }
     const left = areasAround(player).length;
     if (!left) return undefined;
     const side = areaSize(), across = 2 * Math.ceil(limits().chunkRadius / side) + 1;
     const total = across * across * side * side, converted = total - left * side * side;
     const percent = Math.floor(converted * 100 / total);
-    return `§7Converting the world around you: ${converted.toLocaleString('en-US')} / ${total.toLocaleString('en-US')} chunks (${percent}%)`;
+    return `§7Loading the pack in the distance: ${converted.toLocaleString('en-US')} / ${total.toLocaleString('en-US')} chunks (${percent}%)`;
   }
 
   function release() {
@@ -136,7 +182,7 @@ export function createFar({ api, limits, log = () => {}, idle = () => true }) {
     /** Once per engine pass with the real players. */
     tick(players) {
       const { chunkRadius, holdTicks, status } = limits();
-      if (!enabled || !chunkRadius || !players.length || !manager() || !areaSize()) { release(); return; }
+      if (!enabled || (!chunkRadius && !targets) || !players.length || !manager() || !areaSize()) { release(); return; }
       loadDone();
       // The progress line first, refreshed before the game fades it, so it stays up while work remains.
       if (status && system.currentTick - statusTick >= STATUS_TICKS) {
@@ -157,11 +203,22 @@ export function createFar({ api, limits, log = () => {}, idle = () => true }) {
           release();
         } else {
           const held = system.currentTick - current.readyTick;
-          if (held < MIN_HOLD_TICKS || (held < holdTicks && !idle())) return;
-          done.add(current.name);
-          saveDone();
-          release();
+          if (targets) {
+            if (held < MIN_HOLD_TICKS || (held < holdTicks && !restored(current))) return;
+            tries.set(current.name, (tries.get(current.name) ?? 0) + 1);
+            release();
+          } else {
+            if (held < MIN_HOLD_TICKS || (held < holdTicks && !idle())) return;
+            done.add(current.name);
+            saveDone();
+            release();
+          }
         }
+      }
+      if (targets) {
+        const [next] = restoreAreas(players);
+        if (next) start(next);
+        return;
       }
       let next;
       for (const player of players) {
@@ -171,6 +228,9 @@ export function createFar({ api, limits, log = () => {}, idle = () => true }) {
       if (next) start(next);
     },
     setEnabled(value) { enabled = value; if (!value) release(); },
+    /** Restoring: load the areas holding these chunks (a function giving the chunks still to bring back) until none
+     * are left, ignoring chunkRadius and the areas already done. Without one the worker converts again. */
+    setTargets(list) { targets = list; tries.clear(); release(); },
     get status() {
       loadDone();
       return { areaChunks: size ?? null, done: done.size, loading: current ? current.name : null, ready: Boolean(current?.ready), failures };

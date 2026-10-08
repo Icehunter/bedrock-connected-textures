@@ -142,6 +142,16 @@ export class NativeSurfaces {
     } catch { return false; }
   }
   clear() { this.recover(); for (const entry of [...this.owners.values()]) this.remove(entry); }
+  /** The chunks holding surface blocks: [{ dimension (id), cx, cz }]. */
+  ownedChunks() {
+    this.recover();
+    const chunks = new Map();
+    for (const entry of this.owners.values()) {
+      const cx = Math.floor(entry.x / 16), cz = Math.floor(entry.z / 16);
+      chunks.set(entry.dimension + '|' + cx + '|' + cz, { dimension: entry.dimension, cx, cz });
+    }
+    return [...chunks.values()];
+  }
 }
 
 /**
@@ -765,6 +775,19 @@ export function createOverlaySurfaces({ api, limits, log = () => {}, vanillaType
       else cleanup = null;
     },
     get enabled() { return enabled; },
+    /** The chunks holding overlay surfaces: [{ dimension (id), cx, cz }]. */
+    ownedChunks() {
+      loadIndex();
+      const result = [];
+      for (const [region, chunks] of index) {
+        const [namespace, name] = region.split(':');
+        for (const chunk of chunks) {
+          const [cx, cz] = chunk.split(',').map(Number);
+          result.push({ dimension: namespace + ':' + name, cx, cz });
+        }
+      }
+      return result;
+    },
     get status() {
       loadIndex();
       return { packs: providers.length, rules: providers.reduce((sum, provider) => sum + provider.rules.length, 0),

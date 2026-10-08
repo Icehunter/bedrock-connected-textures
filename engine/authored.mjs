@@ -82,7 +82,7 @@ function compileBlock(api, vanilla, entry, where) {
     if (typeof vanillaStates[name] === 'boolean') (compiled.bools ??= []).push(name);
   }
   // Vanilla behaviour `python bct.py block` writes into the entry from the engine's gameplay tables.
-  for (const field of ['strip', 'xp', 'tool', 'open', 'leafGuard', 'cost']) if (entry[field] !== undefined) compiled[field] = entry[field];
+  for (const field of ['strip', 'xp', 'tool', 'open', 'leafGuard', 'cost', 'shape']) if (entry[field] !== undefined) compiled[field] = entry[field];
   return compiled;
 }
 

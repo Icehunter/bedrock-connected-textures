@@ -8,6 +8,7 @@ function setup({ maxChunkCount = 100, idle = () => true } = {}) {
   const system = { currentTick: 0 };
   const dimension = { id: 'minecraft:overworld', heightRange: { min: -64, max: 320 }, getTopmostBlock: ({ x, z }) => ({ location: { x, y: 70, z } }) };
   const world = {
+    getDimension: () => dimension,
     getDynamicProperty: name => properties.get(name), setDynamicProperty: (name, value) => { if (value === undefined) properties.delete(name); else properties.set(name, value); },
     tickingAreaManager: {
       maxChunkCount,
@@ -91,4 +92,38 @@ test('an area the game never finishes loading is skipped after a while', () => {
   assert.ok(!env.areas.has(first), 'released');
   assert.equal(env.areas.size, 1, 'the next area is loading');
   assert.equal(env.far.status.failures, 1);
+});
+
+test('beyond the simulation distance only leaves convert unless far.blocks is on', async () => {
+  const { blockConverters } = await import('../engine/engine.mjs');
+  const { resolveSettings } = await import('../engine/settings.mjs');
+  const real = [{ id: 'p' }], all = [...real, { id: 'bct:far', virtual: true }];
+  assert.deepEqual(blockConverters(all, real, resolveSettings()), real, 'by default blocks convert near real players only');
+  assert.deepEqual(blockConverters(all, real, resolveSettings({ far: { blocks: 1 } })), all);
+});
+
+test('areas in front of the player go before the ones behind', async () => {
+  const env = setup();
+  env.player.getViewDirection = () => ({ x: 0, y: 0, z: -1 });   // looking north
+  env.step();
+  await env.loadAll();
+  env.step(41);   // the player's own area is done; the next one loads
+  const options = [...env.areas.values()].at(-1);
+  assert.ok(options.from.z + options.to.z < 0, 'the second area is north of the player, where they look: ' + JSON.stringify(options));
+});
+
+test('restoring, it loads the areas holding changed chunks, wherever they are, until none are left', async () => {
+  const env = setup();
+  const left = [{ dimension: 'minecraft:overworld', cx: 200, cz: 3 }];   // far beyond chunkRadius
+  env.far.setTargets(() => left);
+  env.step();
+  const [options] = env.areas.values();
+  assert.ok(options.from.x <= 200 * 16 && options.to.x >= 200 * 16, 'the area holding the changed chunk loads: ' + JSON.stringify(options));
+  await env.loadAll();
+  env.step(41);
+  assert.equal(env.areas.size, 1, 'held while the chunk still holds changes');
+  left.length = 0;
+  env.step(1);
+  assert.equal(env.areas.size, 0, 'released once the chunk is back to vanilla, and nothing else to load');
+  assert.match(env.messages.at(-1) ?? '', /Restoring the world/);
 });

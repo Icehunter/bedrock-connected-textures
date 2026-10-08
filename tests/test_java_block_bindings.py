@@ -155,6 +155,25 @@ class BindingTests(unittest.TestCase):
             self.assertEqual(report['textureOrientations']['minecraft:stone']['north'], 0)
             self.assertNotIn('minecraft:rotated', report['textureOrientations'])
 
+    def test_a_double_slab_is_a_full_cube_when_the_java_slab_draws_double_as_one(self):
+        with tempfile.TemporaryDirectory() as folder:
+            faces = {face: {'texture': '#all', 'uv': [0, 0, 16, 16]} for face in FACES}
+            cube = {'textures': {'all': 'minecraft:block/stone'}, 'elements': [{**FULL_CUBE, 'faces': faces}]}
+            slab = {**cube, 'elements': [{'from': [0, 0, 0], 'to': [16, 8, 16], 'faces': faces}]}
+            blocks = {name: {'textures': 'stone'} for name in ('stone_slab', 'stone_double_slab', 'odd_double_slab')}
+            jar, samples = self.fixture(Path(folder), blocks, {'stone': {'textures': 'textures/blocks/stone'}},
+                                        {'stone': png((1, 0, 0, 255))}, {'stone': png((1, 0, 0, 255))},
+                                        {'cube': cube, 'slab': slab})
+            with zipfile.ZipFile(jar, 'a') as archive:
+                archive.writestr(f'{BLOCKSTATES}stone_slab.json', json.dumps({'variants': {
+                    'type=bottom': {'model': 'minecraft:block/slab'}, 'type=double': {'model': 'minecraft:block/cube'}}}))
+                archive.writestr(f'{BLOCKSTATES}odd_slab.json', json.dumps({'variants': {
+                    'type=bottom': {'model': 'minecraft:block/slab'}, 'type=double': {'model': 'minecraft:block/slab'}}}))
+            report = resolve_bindings(Stack({}), jar, samples)
+            self.assertEqual(report['fullCubeBlocks'], ['minecraft:stone_double_slab'],
+                             'the slab is not a cube, and a double slab only when Java draws it as one')
+            self.assertEqual(report['opaqueBlocks'], ['minecraft:stone_double_slab'])
+
     def test_author_cube_face_override_does_not_replace_another_blocks_material(self):
         with tempfile.TemporaryDirectory() as folder:
             faces = {face: {'texture': '#all'} for face in FACES}

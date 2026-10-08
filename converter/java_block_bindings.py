@@ -21,7 +21,8 @@ import zipfile
 
 from PIL import Image
 
-from block_ids import known_blocks, legacy_key_id
+from block_ids import java_id, known_blocks, legacy_key_id
+from block_shapes import single_slab
 from java_block_states import states_java_to_bedrock, state_reference
 
 FACES = ('north', 'east', 'south', 'west', 'up', 'down')
@@ -908,6 +909,15 @@ def _cube_metadata(stack, vanilla, blocks, bindings, terrain, samples):
     alternate_cubes, alternate_opaque = set(), set()
     for identifier, face_bindings in sorted(bindings.items()):
         block = identifier.removeprefix('minecraft:')
+        slab_blockstate = _double_slab_blockstate(block)
+        if slab_blockstate:
+            # Bedrock keeps a double slab as a block of its own; Java draws it as the slab's type=double model.
+            if slab_blockstate in reference.names and _double_slab_cube(reference, slab_blockstate):
+                full_cubes.append(identifier)
+                materials = _block_materials(blocks, block, identifier, terrain)
+                if _all_opaque(materials, set(face_bindings.values()), opacity) and len(face_bindings) == 6:
+                    opaque.append(identifier)
+            continue
         java_name = BLOCK_ALIASES.get(block, block)
         blockstate = f'{JAVA_BLOCKSTATES}{java_name}.json'
         if blockstate not in reference.names or not _vanilla_full_cube(reference, blockstate):
@@ -961,6 +971,24 @@ def _vanilla_full_cube(reference, blockstate):
         return bool(state_models) and all(
             _cube_element(reference.resolve(_resource(item['model'], 'models'))) is not None
             for _, item in state_models)
+    except (KeyError, ValueError):
+        return False
+
+
+def _double_slab_blockstate(block):
+    """The Java slab blockstate of a Bedrock double slab (oak_double_slab, double_cut_copper_slab), else None."""
+    single = single_slab(block)
+    if single is None:
+        return None
+    return f"{JAVA_BLOCKSTATES}{java_id(single).removeprefix('minecraft:')}.json"
+
+
+def _double_slab_cube(reference, blockstate):
+    """Whether every type=double model of a vanilla slab blockstate holds a complete cube."""
+    try:
+        doubles = [item for state, item in _state_models(reference.read(blockstate)) or [] if 'type=double' in state]
+        return bool(doubles) and all(
+            _cube_element(reference.resolve(_resource(item['model'], 'models'))) is not None for item in doubles)
     except (KeyError, ValueError):
         return False
 

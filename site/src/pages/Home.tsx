@@ -20,7 +20,7 @@ const ICON = `${import.meta.env.BASE_URL}pack-icon.png`;
 
 const FEATURES: { icon: LucideIcon; title: string; text: string }[] = [
   { icon: Link2, title: "Connected textures", text: "Glass, bricks and other blocks join into one surface, using the pack's own ctm, horizontal, vertical and top rules." },
-  { icon: Grid3x3, title: "Repeat patterns", text: "Big mosaics that span many blocks and keep their place in the pattern, including at negative coordinates." },
+  { icon: Grid3x3, title: "Repeat patterns", text: "Big mosaics that span many blocks and keep their place in the pattern, on full blocks, slabs, stairs, fences and walls." },
   { icon: Dices, title: "Random textures", text: "Weighted random tiles, picked per position the way Java picks them." },
   { icon: Layers, title: "Overlays and edges", text: "Grass and sand spreading over other blocks, fallen leaves and similar decals, drawn as thin see-through blocks." },
   { icon: Leaf, title: "3D leaves", text: "Leaves drawn with the pack's own models, biome tinted, with vanilla decay and drops." },
@@ -130,6 +130,7 @@ export default function Home() {
         <p className="mt-6 max-w-3xl leading-7">
           The engine swaps blocks for look-alike copies that can show the pack's patterns. They work
           like the normal blocks: mining, drops, tools, explosions and redstone behave the same.
+          One command puts the world back to vanilla blocks before you take a pack out.
           Details are on the <a className="text-accent underline underline-offset-4" href="#/players">players page</a>.
         </p>
       </section>

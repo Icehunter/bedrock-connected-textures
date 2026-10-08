@@ -45,6 +45,12 @@ END_BIOME_UNION = {'the_end', 'small_end_islands', 'end_midlands', 'end_highland
 # Bedrock's trapdoor direction numbers differ from its usual horizontal direction numbers;
 # checked against PyMCTranslate.
 TRAPDOOR_DIRECTIONS = {'north': 3, 'east': 0, 'south': 2, 'west': 1}
+# Java stair facing as Bedrock's weirdo_direction, and Java stair shape as Bedrock's corner.
+STAIR_DIRECTIONS = {'east': 0, 'west': 1, 'south': 2, 'north': 3}
+STAIR_SHAPES = {'straight': 'none', 'inner_left': 'inner_left', 'inner_right': 'inner_right', 'outer_left': 'outer_left',
+                'outer_right': 'outer_right'}
+# Java wall side heights as Bedrock's wall_connection_type values.
+WALL_SIDES = {'none': 'none', 'low': 'short', 'tall': 'tall'}
 
 
 def resolve_environment(stack, metadata):
@@ -165,4 +171,27 @@ def _translated_state(key, choices, source):
         return {'name': 'direction', 'values': {choice: TRAPDOOR_DIRECTIONS[choice] for choice in choices}}
     if key == 'power' and source == 'minecraft:redstone_wire':
         return {'name': 'redstone_signal', 'values': {choice: int(choice) for choice in choices}}
+    return _shaped_state(key, choices, source)
+
+
+def _shaped_state(key, choices, source):
+    """The Bedrock state of a slab's, stair's, fence's, pane's or wall's Java shape state, or None."""
+    sides = ('north', 'east', 'south', 'west')
+    if key == 'type' and source.endswith('_slab') and set(choices) <= {'bottom', 'top'}:
+        return {'name': 'minecraft:vertical_half', 'values': {choice: choice for choice in choices}}
+    if source.endswith('_stairs'):
+        if key == 'half' and set(choices) <= {'bottom', 'top'}:
+            return {'name': 'upside_down_bit', 'values': {choice: choice == 'top' for choice in choices}}
+        if key == 'facing' and set(choices) <= set(STAIR_DIRECTIONS):
+            return {'name': 'weirdo_direction', 'values': {choice: STAIR_DIRECTIONS[choice] for choice in choices}}
+        if key == 'shape' and set(choices) <= set(STAIR_SHAPES):
+            return {'name': 'minecraft:corner', 'values': {choice: STAIR_SHAPES[choice] for choice in choices}}
+    if source.endswith('_wall'):
+        if key in sides and set(choices) <= set(WALL_SIDES):
+            return {'name': 'wall_connection_type_' + key, 'values': {choice: WALL_SIDES[choice] for choice in choices}}
+        if key == 'up' and set(choices) <= {'true', 'false'}:
+            return {'name': 'wall_post_bit', 'values': {choice: choice == 'true' for choice in choices}}
+    joins = source.endswith('_fence') or source.endswith('glass_pane') or source.endswith('_bars')
+    if joins and key in sides and set(choices) <= {'true', 'false'}:
+        return {'name': 'minecraft:connection_' + key, 'values': {choice: choice == 'true' for choice in choices}}
     return None

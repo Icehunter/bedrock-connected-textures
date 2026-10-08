@@ -40,8 +40,9 @@ export const DEFAULT_SETTINGS = Object.freeze({
   overlay: Object.freeze({ chunkRadius: 4, yBand: 24, sliceMs: 4, refreshTicks: 1200 }),
   // Beyond the simulation distance (far.mjs): areas out to chunkRadius chunks from a player are loaded one at
   // a time and converted, each kept at most holdTicks; status 1 shows the areas left on the action bar.
-  // chunkRadius 0 turns it off.
-  far: Object.freeze({ chunkRadius: 32, holdTicks: 400, status: 1 }),
+  // chunkRadius 0 turns it off. blocks 0 converts only leaves there, the change seen from far away; blocks 1
+  // also swaps blocks and draws overlay surfaces near the surface of each area. Near players everything converts.
+  far: Object.freeze({ chunkRadius: 32, holdTicks: 400, status: 1, blocks: 0 }),
 });
 
 const LIMITS = {
@@ -56,7 +57,7 @@ const LIMITS = {
   'leaves.chunkRadius': [0, 64], 'leaves.sliceMs': [1, 20], 'leaves.probesPerTick': [1, 1024], 'leaves.recheckTicks': [1, 1200],
   'leaves.checkChance': [1, 1000],
   'overlay.chunkRadius': [0, 16], 'overlay.yBand': [4, 384], 'overlay.sliceMs': [1, 20], 'overlay.refreshTicks': [20, 72000],
-  'far.chunkRadius': [0, 128], 'far.holdTicks': [40, 2400], 'far.status': [0, 1],
+  'far.chunkRadius': [0, 128], 'far.holdTicks': [40, 2400], 'far.status': [0, 1], 'far.blocks': [0, 1],
 };
 
 /** Defaults merged with validated overrides; unknown or out-of-range values are rejected. */

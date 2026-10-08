@@ -53,9 +53,12 @@
  * change), connect (a connected block's six neighbour states: 1 where the
  * neighbour is one of its `with` blocks, read as vanilla, set when it swaps in
  * and again when a neighbour changes), models (weighted Java models picked per
- * position), strip and xp.
+ * position), shape (slab, stairs, fence or wall: drawn by its mirrored shape states,
+ * never counted as an opaque full cube, keeps its water when swapped; a
+ * stair's corner, a fence's connections and a wall's sides and post are
+ * worked out from the blocks around it as Java does), strip and xp.
  */
-import { createBulkWriter } from './bulk.mjs';
+import { createBulkWriter, setKeepingWater } from './bulk.mjs';
 import { javaRandom, javaModelIndex } from './tiles.mjs';
 import { createViews, showsAt } from './views.mjs';
 
@@ -64,6 +67,19 @@ const PART_SIZE = 30000;
 const SIDES = [[1, 0, 0], [-1, 0, 0], [0, 1, 0], [0, -1, 0], [0, 0, 1], [0, 0, -1]];
 const PANE_SIDES = { north: [0, 0, -1], south: [0, 0, 1], west: [-1, 0, 0], east: [1, 0, 0] };
 const CONNECT_SIDES = { ...PANE_SIDES, up: [0, 1, 0], down: [0, -1, 0] };
+// Shapes a replacement can have besides the full cube (converter/block_shapes.py).
+const SHAPES = ['slab', 'stairs', 'fence', 'wall'];
+const STAIR_STATES = ['weirdo_direction', 'upside_down_bit', 'minecraft:corner'];
+const FENCE_STATES = Object.keys(PANE_SIDES).map(side => 'minecraft:connection_' + side);
+const WALL_STATES = [...Object.keys(PANE_SIDES).map(side => 'wall_connection_type_' + side), 'wall_post_bit'];
+// Blocks above a wall that raise its post (Java's wall_post_override tag).
+const POST_OVERRIDE = /(^|:)(torch|soul_torch|redstone_torch|copper_torch|trip_wire)$|_sign$|_banner$|pressure_plate$/;
+// A stair's facing by Bedrock's weirdo_direction (the side of its tall back, Java's facing), the side
+// on its left (Java's counter-clockwise turn) and the opposite side.
+const STAIR_FACING = ['east', 'west', 'south', 'north'];
+const LEFT_OF = { north: 'west', west: 'south', south: 'east', east: 'north' };
+const OPPOSITE = { north: 'south', south: 'north', east: 'west', west: 'east' };
+const axisOf = facing => (facing === 'east' || facing === 'west' ? 'x' : 'z');
 const REVEAL_BUDGET = 64;
 // Where a block that needs another sits, seen from the block it needs: on top of it (it needs the block
 // below it), under it (the block above it), beside it, or on any side.
@@ -108,6 +124,10 @@ function validate(data) {
     if (entry.pane && Object.keys(PANE_SIDES).some(side => typeof entry.pane[side] !== 'string')) throw new Error('Invalid pane states');
     if (entry.connect && (!entry.connect.states || Object.keys(CONNECT_SIDES).some(side => typeof entry.connect.states[side] !== 'string') ||
       !Array.isArray(entry.connect.with) || !entry.connect.with.every(type => id.test(type)))) throw new Error('Invalid connect states');
+    if (entry.shape !== undefined && !SHAPES.includes(entry.shape)) throw new Error('Invalid shape');
+    if (entry.shape === 'stairs' && !STAIR_STATES.every(name => typeof entry.mirror[name] === 'string')) throw new Error('Invalid stair states');
+    if (entry.shape === 'fence' && !FENCE_STATES.every(name => typeof entry.mirror[name] === 'string')) throw new Error('Invalid fence states');
+    if (entry.shape === 'wall' && !WALL_STATES.every(name => typeof entry.mirror[name] === 'string')) throw new Error('Invalid wall states');
     if (entry.strip && !id.test(entry.strip)) throw new Error('Invalid strip target');
     if (entry.xp && (!Array.isArray(entry.xp) || entry.xp.length !== 2 || !entry.xp.every(Number.isInteger))) throw new Error('Invalid experience range');
     if (entry.tool && (!Array.isArray(entry.tool.all) || !Array.isArray(entry.tool.any) || ![...entry.tool.all, ...entry.tool.any].every(tag => id.test(tag))))
@@ -135,7 +155,7 @@ export function createReplacements({ api, limits, log = () => {}, rescan = () =>
   const sources = new Map();
   let byVanilla = new Map(), byCustom = new Map(), open = [], solid = [], solidSet = new Set(), paneConnect = new Set();
   let needers = new Map(), needyRules = new Map(), needyTypes = [];  // needed vanilla type -> rules, needy type -> rules, every needy type
-  let vanillaTypes = [], customTypes = [], paneTypes = [], connectTypes = [];             // the types a scan asks for
+  let vanillaTypes = [], customTypes = [], paneTypes = [], connectTypes = [], neighborTypes = [];  // the types a scan asks for
   const owned = new Map();          // chunk key -> { dimension, cx, cz, positions: Set<packed> }
   const urgent = new Map();         // position key -> swap of a block a dig or an explosion uncovered
   const queue = new Map();          // position key -> { swap: 'in' | 'out' | 'adopt', dimension, location, shown?, need? }
@@ -178,8 +198,10 @@ export function createReplacements({ api, limits, log = () => {}, rescan = () =>
     }
     // A block whose definition did not load is unknown to the game.
     for (const entry of byCustom.values()) if (!exists(entry.block)) disable(entry, new Error('the game has no block ' + entry.block));
-    // See-through replacements (glass) show their neighbors just like the vanilla block.
+    // See-through replacements (glass) show their neighbours like the vanilla block. A shaped
+    // replacement (a slab, stair, fence or wall) is neither: it leaves part of each neighbour's face showing, as the vanilla block does.
     for (const entry of byCustom.values()) {
+      if (entry.shape) continue;
       if (entry.broken) { if (entry.open || openTypes.has(entry.vanilla)) openTypes.add(entry.vanilla); else solidTypes.add(entry.vanilla); continue; }
       if (entry.open || openTypes.has(entry.vanilla)) openTypes.add(entry.block);
       else { solidTypes.add(entry.block); solidTypes.add(entry.vanilla); }
@@ -195,6 +217,7 @@ export function createReplacements({ api, limits, log = () => {}, rescan = () =>
     vanillaTypes = [...byVanilla].filter(([, entry]) => !entry.broken).map(([type]) => type);
     customTypes = [...byCustom].filter(([, entry]) => !entry.broken).map(([type]) => type);
     paneTypes = [...byCustom].filter(([, entry]) => entry.pane && !entry.broken).map(([type]) => type);
+    neighborTypes = [...byCustom].filter(([, entry]) => ['stairs', 'fence', 'wall'].includes(entry.shape) && !entry.broken).map(([type]) => type);
     connectTypes = [...byCustom].filter(([, entry]) => entry.connect && !entry.broken).map(([type]) => type);
   }
 
@@ -245,7 +268,154 @@ export function createReplacements({ api, limits, log = () => {}, rescan = () =>
       states[mirrored] = typeof value === 'boolean' ? (value ? 1 : 0) : value;
     }
     if (entry.connect) Object.assign(states, connectionStates(entry, block.dimension, location));
+    if (entry.shape === 'stairs') {
+      const own = stairOf(vanilla);
+      if (own) states[entry.mirror['minecraft:corner']] = stairCorner(block.dimension, location, own);
+    }
+    if (entry.shape === 'fence') Object.assign(states, fenceStates(entry, block.dimension, location));
+    if (entry.shape === 'wall') Object.assign(states, wallStates(entry, block.dimension, location));
     return resolve(entry.block, positionStates(entry, location, states));
+  }
+
+  /** A stair's facing and half from its vanilla states; undefined without them. */
+  const stairOf = states => {
+    const facing = STAIR_FACING[states.weirdo_direction];
+    return facing && { facing, upsideDown: states.upside_down_bit === true || states.upside_down_bit === 1 };
+  };
+
+  /** The stair at a location, vanilla or replaced, as Java reads it; undefined for anything else. */
+  function stairAt(dimension, location) {
+    const block = getBlock(dimension, location);
+    if (!block) return undefined;
+    const entry = byCustom.get(block.typeId);
+    if (entry?.shape === 'stairs') return stairOf(vanillaStates(entry, block));
+    return block.typeId.endsWith('_stairs') ? stairOf(block.permutation.getAllStates?.() ?? {}) : undefined;
+  }
+
+  /**
+   * Java's stair shape (Bedrock's minecraft:corner) from the stairs on either side of a stair's back: a stair
+   * of the same half turned across it on the back side makes an outer corner, one on the front side an inner
+   * corner, unless the stair beside it on that side already continues the run (StairBlock.getStairsShape).
+   */
+  function stairCorner(dimension, location, own) {
+    const across = other => other && other.upsideDown === own.upsideDown && axisOf(other.facing) !== axisOf(own.facing);
+    const canTake = side => {
+      const other = stairAt(dimension, offset(location, PANE_SIDES[side]));
+      return !other || other.facing !== own.facing || other.upsideDown !== own.upsideDown;
+    };
+    const back = stairAt(dimension, offset(location, PANE_SIDES[own.facing]));
+    if (across(back) && canTake(OPPOSITE[back.facing])) return back.facing === LEFT_OF[own.facing] ? 'outer_left' : 'outer_right';
+    const front = stairAt(dimension, offset(location, PANE_SIDES[OPPOSITE[own.facing]]));
+    if (across(front) && canTake(front.facing)) return front.facing === LEFT_OF[own.facing] ? 'inner_left' : 'inner_right';
+    return 'none';
+  }
+
+  /**
+   * A fence's connection states, as Java joins fences: to fences of its kind (wooden fences to each other,
+   * nether brick fences to each other, vanilla or replaced), to a fence gate turned across it, and to
+   * opaque full blocks. An unloaded neighbour leaves its side as it is.
+   */
+  function fenceStates(entry, dimension, location) {
+    const states = {}, own = entry.vanilla === 'minecraft:nether_brick_fence';
+    for (const [side, delta] of Object.entries(PANE_SIDES)) {
+      const neighbor = getBlock(dimension, offset(location, delta));
+      if (!neighbor) continue;
+      const type = byCustom.get(neighbor.typeId)?.vanilla ?? neighbor.typeId;
+      let joins;
+      if (type.endsWith('_fence')) joins = (type === 'minecraft:nether_brick_fence') === own;
+      else if (type.endsWith('fence_gate')) {
+        const facing = neighbor.permutation.getAllStates?.()?.['minecraft:cardinal_direction'];
+        joins = Boolean(facing) && axisOf(facing) !== axisOf(side);
+      } else joins = solidSet.has(neighbor.typeId);
+      states[entry.mirror['minecraft:connection_' + side]] = joins ? 1 : 0;
+    }
+    return states;
+  }
+
+  /** Works out a replaced fence's connections again and writes them when they changed. */
+  function refreshFence(block) {
+    const entry = block && byCustom.get(block.typeId);
+    if (entry?.shape !== 'fence' || entry.broken) return false;
+    const states = block.permutation.getAllStates?.() ?? {}, next = { ...states, ...fenceStates(entry, block.dimension, block.location) };
+    if (Object.keys(next).every(name => next[name] === states[name])) return false;
+    try { write(entry, block, resolve(block.typeId, next)); return true; }
+    catch (error) { log('fence refresh ' + String(error)); return false; }
+  }
+
+  /** What a wall reads from the block above it: a full underside, a wall (its arms and post), or a post override. */
+  function wallAbove(dimension, location) {
+    const block = getBlock(dimension, offset(location, [0, 1, 0]));
+    if (!block) return {};
+    const custom = byCustom.get(block.typeId), type = custom?.vanilla ?? block.typeId;
+    const states = custom ? vanillaStates(custom, block) : (block.permutation.getAllStates?.() ?? {});
+    if (type.endsWith('_wall')) {
+      const sides = Object.fromEntries(Object.keys(PANE_SIDES).map(side => [side, states['wall_connection_type_' + side]]));
+      return { wall: { sides, post: states.wall_post_bit === true || states.wall_post_bit === 1 } };
+    }
+    const full = solidSet.has(block.typeId) || type.includes('double_slab') ||
+      (type.endsWith('_slab') && states['minecraft:vertical_half'] === 'bottom') ||
+      (type.endsWith('_stairs') && (states.upside_down_bit === false || states.upside_down_bit === 0));
+    return { full, override: POST_OVERRIDE.test(type) };
+  }
+
+  /**
+   * A wall's states, as Java works them out (WallBlock): a side joins walls, panes and bars, a fence gate
+   * turned across it and opaque full blocks; a joined side is tall when the block above covers it; the post
+   * shows at ends, corners and lone walls, and on a straight run only when something above needs it.
+   * Any unloaded neighbour leaves the wall as it is.
+   */
+  function wallStates(entry, dimension, location) {
+    const top = wallAbove(dimension, location), sides = {};
+    for (const [side, delta] of Object.entries(PANE_SIDES)) {
+      const neighbor = getBlock(dimension, offset(location, delta));
+      if (!neighbor) return {};
+      const type = byCustom.get(neighbor.typeId)?.vanilla ?? neighbor.typeId;
+      let joins;
+      if (type.endsWith('_wall') || /glass_pane$|_bars$/.test(type)) joins = true;
+      else if (type.endsWith('fence_gate')) {
+        const facing = neighbor.permutation.getAllStates?.()?.['minecraft:cardinal_direction'];
+        joins = Boolean(facing) && axisOf(facing) !== axisOf(side);
+      } else joins = solidSet.has(neighbor.typeId);
+      const covered = top.full || (top.wall && top.wall.sides[side] !== 'none' && (top.wall.post || top.wall.sides[OPPOSITE[side]] !== 'none'));
+      sides[side] = !joins ? 'none' : covered ? 'tall' : 'short';
+    }
+    const none = side => sides[side] === 'none';
+    let post;
+    if (top.override || top.wall?.post) post = true;
+    else if (Object.keys(sides).every(none) || none('north') !== none('south') || none('east') !== none('west')) post = true;
+    else if ((sides.north === 'tall' && sides.south === 'tall') || (sides.east === 'tall' && sides.west === 'tall')) post = false;
+    else post = Boolean(top.full);
+    const states = { [entry.mirror.wall_post_bit]: post ? 1 : 0 };
+    for (const side of Object.keys(PANE_SIDES)) states[entry.mirror['wall_connection_type_' + side]] = sides[side];
+    return states;
+  }
+
+  /** Works out a replaced wall's sides and post again; a wall that changed lets the wall under it look again too. */
+  function refreshWall(block) {
+    const entry = block && byCustom.get(block.typeId);
+    if (entry?.shape !== 'wall' || entry.broken) return false;
+    const states = block.permutation.getAllStates?.() ?? {}, next = { ...states, ...wallStates(entry, block.dimension, block.location) };
+    if (Object.keys(next).every(name => next[name] === states[name])) return false;
+    try { write(entry, block, resolve(block.typeId, next)); }
+    catch (error) { log('wall refresh ' + String(error)); return false; }
+    refreshWall(getBlock(block.dimension, offset(block.location, [0, -1, 0])));
+    return true;
+  }
+
+  /** A stair's corner, a fence's connections or a wall's sides and post, worked out again from its neighbours. */
+  const refreshShape = block => refreshStair(block) || refreshFence(block) || refreshWall(block);
+
+  /** Works out a replaced stair's corner again and writes it when it changed. */
+  function refreshStair(block) {
+    const entry = block && byCustom.get(block.typeId);
+    if (entry?.shape !== 'stairs' || entry.broken) return false;
+    const own = stairOf(vanillaStates(entry, block));
+    if (!own) return false;
+    const states = block.permutation.getAllStates?.() ?? {}, name = entry.mirror['minecraft:corner'];
+    const corner = stairCorner(block.dimension, block.location, own);
+    if (states[name] === corner) return false;
+    try { write(entry, block, resolve(block.typeId, { ...states, [name]: corner })); return true; }
+    catch (error) { log('stair refresh ' + String(error)); return false; }
   }
 
   /** A connected block's six neighbour states at a location: 1 where the neighbour is one it joins (an unloaded one does not). */
@@ -377,6 +547,9 @@ export function createReplacements({ api, limits, log = () => {}, rescan = () =>
     catch (error) { log('leaf reset ' + String(error)); return 0; }
   }
 
+  /** Sets a swapped block; shaped blocks (slabs) can be waterlogged and keep their water. */
+  const write = (entry, block, permutation) => entry.shape ? setKeepingWater(block, permutation) : block.setPermutation(permutation);
+
   /** Swaps one replacement back right now. Returns true when the block changed. */
   function revert(block) {
     if (!block) return false;
@@ -386,7 +559,7 @@ export function createReplacements({ api, limits, log = () => {}, rescan = () =>
     record(dimensionId, block.location, false);
     if (!entry) return false;
     if (entry.leafGuard) guardLeaves(entry, block.dimension, block.location, false);
-    try { block.setPermutation(originalOf(entry, block)); reverts++; return true; }
+    try { write(entry, block, originalOf(entry, block)); reverts++; return true; }
     catch (error) { log('replacement revert ' + JSON.stringify(block.location) + ': ' + String(error)); return false; }
   }
 
@@ -406,7 +579,7 @@ export function createReplacements({ api, limits, log = () => {}, rescan = () =>
     try { permutation = replacementOf(entry, block); }
     catch (error) { disable(entry, error); return false; }
     if (!guardLeaves(entry, block.dimension, block.location, true)) { rescan(block.dimension, block.location); return false; }
-    try { block.setPermutation(permutation); swaps++; record(block.dimension.id, block.location, true); }
+    try { write(entry, block, permutation); swaps++; record(block.dimension.id, block.location, true); }
     catch (error) { log('replacement swap ' + JSON.stringify(block.location) + ': ' + String(error)); return false; }
     try { swapped(block.dimension, block.location); } catch (error) { log('after swap ' + String(error)); }
     return true;
@@ -420,7 +593,7 @@ export function createReplacements({ api, limits, log = () => {}, rescan = () =>
     const current = block.permutation.getAllStates?.() ?? {};
     const next = positionStates(entry, block.location, { ...current });
     if (Object.keys(next).every(name => next[name] === current[name])) return true;
-    try { block.setPermutation(resolve(block.typeId, next)); return true; }
+    try { write(entry, block, resolve(block.typeId, next)); return true; }
     catch (error) { log('replacement adopt ' + String(error)); return false; }
   }
 
@@ -456,6 +629,12 @@ export function createReplacements({ api, limits, log = () => {}, rescan = () =>
       if (paneTypes.length && dimension.containsBlock(section, { includeTypes: paneTypes }, true))
         for (const at of dimension.getBlocks(section, { includeTypes: paneTypes }, true).getBlockLocationIterator()) {
           refreshPane(getBlock(dimension, at));
+          if (++reads % 4 === 0) yield;
+        }
+      // Stairs, fences and walls beside a change no event reported (or a chunk that had not loaded) take their shape again.
+      if (neighborTypes.length && dimension.containsBlock(section, { includeTypes: neighborTypes }, true))
+        for (const at of dimension.getBlocks(section, { includeTypes: neighborTypes }, true).getBlockLocationIterator()) {
+          refreshShape(getBlock(dimension, at));
           if (++reads % 4 === 0) yield;
         }
       // Connected blocks swapped in beside a chunk that had not loaded yet join it once it has.
@@ -826,6 +1005,8 @@ export function createReplacements({ api, limits, log = () => {}, rescan = () =>
 
   return {
     get size() { let total = 0; for (const chunk of owned.values()) total += chunk.positions.size; return total; },
+    /** The chunks holding swapped blocks: [{ dimension (id), cx, cz }]. */
+    ownedChunks: () => { recover(); return [...owned.values()].map(({ dimension, cx, cz }) => ({ dimension, cx, cz })); },
     get status() {
       return { blocks: byCustom.size, owned: this.size, queued: urgent.size + queue.size, waiting: waiting.size, leaving: leaving.size,
         leafResetsPending: leafReset.size, swaps, reverts, adopted, deferred, leafResets, enabled, broken: [...broken] };
@@ -857,6 +1038,8 @@ export function createReplacements({ api, limits, log = () => {}, rescan = () =>
     setEnabled(value) { enabled = value; clearQueues(); },
     flush,
     revert, revertAt, refreshPane, revealed, interact, strip, experience,
+    /** The replacement block types (every pack's). */
+    customTypes: () => [...byCustom.keys()],
     /**
      * A player placed a block: a replaceable one is swapped at once, in the same tick, so it never
      * shows its vanilla look first (with waiting while seen switched on, the scan swaps it instead).
@@ -879,6 +1062,8 @@ export function createReplacements({ api, limits, log = () => {}, rescan = () =>
         const entry = neighbor && byCustom.get(neighbor.typeId);
         if (entry?.pane && delta[1] === 0) refreshPane(neighbor);
         if (entry?.connect) refreshConnect(neighbor);
+        // A wall also reads the block above it.
+        if (entry?.shape && (delta[1] === 0 || (entry.shape === 'wall' && delta[1] === -1))) refreshShape(neighbor);
       }
     },
   };

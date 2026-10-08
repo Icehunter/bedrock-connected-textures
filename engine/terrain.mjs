@@ -380,5 +380,9 @@ export function createTerrain({ api, limits, inReach = () => true, log = () => {
     trace: player => traceSurface(player, providers, (provider, block) => evaluate(provider, view.wrap(block), passable()), [...owned.values()]),
     get suspended() { return suspended; },
     get status() { return { enabled, actors: owned.size, native: native.size, providers: providers.length, capacitySkips }; },
+    /** The chunks holding generated edge blocks, and removing the ones whose chunks are loaded now. */
+    nativeChunks: () => native.ownedChunks(),
+    nativeTypes: () => [...native.ids()],
+    removeNative: () => native.clear(),
   };
 }

@@ -1,5 +1,49 @@
 # Changelog
 
+## 1.2.0
+
+Converted packs:
+- Slabs, stairs, fences and walls show the pack's patterns and random tiles.
+  The pattern lines up with the full blocks next to them.
+- These blocks keep the vanilla shape. You mine them, walk on them and break
+  them like vanilla blocks. They drop the same items, make the same sounds
+  and can hold water.
+- Stairs make corners, and fences and walls join the blocks next to them, as
+  in Java. Fence gates and buttons stay vanilla.
+- A double slab counts as a full block and drops two slabs.
+- The game slows down when a pack has too many block states (more than
+  65,536). The converter counts them the way the game does and keeps the
+  pack under that number. It leaves out dyed blocks first (concrete, wool,
+  terracotta), then the blocks that cost the most. Those blocks keep the
+  pack's plain texture. `--max-permutations` changes the number.
+- A rule can name the state of a slab, stair, fence, wall or pane, such as
+  `oak_slab:type=top`. These rules convert. If Bedrock has no such state, the
+  converter leaves the rule out and says so. Before, it stopped.
+
+Bedrock pack authors:
+- `bct.py block` takes slabs, stairs, fences and walls.
+- Connected blocks: each tile can have random variants. The game picks one
+  for each block.
+- Connected blocks: a face that does not join can show its own texture, such
+  as a sandstone top.
+- Poplar planks can be swapped like the other planks.
+
+Everyone:
+- Far from players, the engine only changes leaves. Leaves are what you see
+  from far away. Other blocks change when a player comes near, so much less
+  of the world changes. `/scriptevent bct:config {"far":{"blocks":1}}`
+  changes blocks far away too, as in 1.1.
+- Far away, the areas in front of you change first.
+- `/scriptevent bct:control restore` puts the whole world back to vanilla
+  blocks: swapped blocks, leaves, overlays and edges, near and far. It goes
+  on after a restart and says when it is done. Then you can remove the packs.
+  `bct:control on` cancels it.
+- `python bct.py restore <world folder>` does the same with the game closed.
+  It works without commands, and after the packs are removed. It zips the
+  world first.
+- A pack removed by mistake is not lost: its blocks show as unknown blocks
+  until the pack is added back.
+
 ## 1.1.0
 
 Bedrock pack authors:

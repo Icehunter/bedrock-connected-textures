@@ -28,7 +28,7 @@ class TextureLoadTests(unittest.TestCase):
             original = texture_load.WARN_MIB
             texture_load.WARN_MIB = 16
             try:
-                report = load_report({'vv': root}, permutations=40000)
+                report = load_report({'vv': root}, permutations=70000)
             finally:
                 texture_load.WARN_MIB = original
             self.assertEqual(report['renderers']['vv']['images'], 1)

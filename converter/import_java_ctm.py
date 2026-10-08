@@ -258,8 +258,13 @@ class _RuleImporter:
         if 'orient' in data:
             rule['orient'] = data['orient'].lower()
         _match_by_file_name(data, path)
-        apply_block_mapping(rule, data, path, self.block_names, self.state_names, self.double_slab_blocks,
-                            self.block_state_resolver)
+        try:
+            apply_block_mapping(rule, data, path, self.block_names, self.state_names, self.double_slab_blocks,
+                                self.block_state_resolver)
+        except UnmappedState as error:
+            # Dropping the state would widen the rule to every state of the block, so the rule is left out.
+            self.excluded.append({'filename': filename, 'reason': str(error)})
+            return None
         for key in ('matchTiles', 'connectTiles'):
             if key in data:
                 rule[key] = [resolve_texture(token, filename, True) for token in data[key].split()]
@@ -508,13 +513,17 @@ def _parse_block_matcher(item):
     return block, selection
 
 
+class UnmappedState(ValueError):
+    """A rule names a Java block state Bedrock has no counterpart for; the rule is left out, not guessed."""
+
+
 def _state_mapping(block, key, values, path, state_names):
     """The {name, values} translation of one Java state, checked to cover every value asked for."""
     mapping = (state_names or {}).get(block, {}).get(key)
     if key == 'snowy':
         mapping = SNOWY_STATE
     if not mapping:
-        raise ValueError(f'{path}: {block}:{key} requires explicit Bedrock state mapping')
+        raise UnmappedState(f'{block}:{key} has no Bedrock state')
     if not values or any(value not in mapping['values'] for value in values):
         raise ValueError('Unmapped Java state value: ' + key)
     return mapping

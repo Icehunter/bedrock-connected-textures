@@ -17,6 +17,15 @@ const data = {
     block('minecraft:packed_mud', { models: [{ state: 'bct:g0', weights: [2, 2, 1, 4], selection: 'java-26.2-multipart-block-position' }] }),
     block('minecraft:glass_pane', { open: true, pane: PANE, bools: Object.keys(PANE).map(side => 'minecraft:connection_' + side),
       mirror: Object.fromEntries(Object.entries(PANE).map(([side, state]) => ['minecraft:connection_' + side, state])) }),
+    block('minecraft:cobblestone_slab', { shape: 'slab', mirror: { 'minecraft:vertical_half': 'bct:vertical_half' },
+      axes: [['bct:x', 'x', 2]] }),
+    block('minecraft:oak_fence', { shape: 'fence', bools: ['north', 'east', 'south', 'west'].map(side => 'minecraft:connection_' + side),
+      mirror: Object.fromEntries(['north', 'east', 'south', 'west'].map(side => ['minecraft:connection_' + side, 'bct:connection_' + side])) }),
+    block('minecraft:cobblestone_wall', { shape: 'wall', bools: ['wall_post_bit'],
+      mirror: Object.fromEntries([...['north', 'east', 'south', 'west'].map(side => 'wall_connection_type_' + side), 'wall_post_bit']
+        .map(name => [name, 'bct:' + name])) }),
+    block('minecraft:oak_stairs', { shape: 'stairs', bools: ['upside_down_bit'],
+      mirror: { weirdo_direction: 'bct:weirdo_direction', upside_down_bit: 'bct:upside_down_bit', 'minecraft:corner': 'bct:corner' } }),
   ],
   open: ['minecraft:air', 'minecraft:water', 'minecraft:oak_leaves', 'minecraft:glass_pane'],
   solid: ['minecraft:stone', 'minecraft:bedrock', 'minecraft:oak_log', 'minecraft:packed_mud'],
@@ -102,6 +111,105 @@ test('a torch only needs a sturdy face: the block under it is replaced and stays
   const event = { block: env.dimension.getBlock({ x: 9, y: 61, z: 9 }), permutationToPlace: { type: 'minecraft:torch' }, cancel: false };
   env.world.beforeEvents.playerPlaceBlock.emit(event);
   assert.equal(event.cancel, false, 'placing on a replacement is never cancelled');
+});
+
+test('slabs swap with their half and their water, and do not hide the faces next to them', () => {
+  const env = setup({ extra: [['4,61,4', 'minecraft:cobblestone_slab', { 'minecraft:vertical_half': 'top' }],
+    ['5,61,4', 'minecraft:cobblestone_slab', { 'minecraft:vertical_half': 'bottom' }],
+    // Stone wrapped in stone on every side but one, where a slab is: the slab leaves part of its face open.
+    ['10,61,10', 'minecraft:stone'], ['10,62,10', 'minecraft:stone'], ['9,61,10', 'minecraft:stone'], ['11,61,10', 'minecraft:stone'],
+    ['10,61,9', 'minecraft:stone'], ['10,61,11', 'minecraft:cobblestone_slab', { 'minecraft:vertical_half': 'bottom' }]] });
+  env.wet.add('5,61,4');
+  settle(env);
+  assert.equal(env.blocks.get('4,61,4'), 'bct_t:r_cobblestone_slab');
+  assert.deepEqual(env.states.get('4,61,4'), { 'bct:vertical_half': 'top', 'bct:x': 0 }, 'the half and the pattern place');
+  assert.ok(env.wet.has('5,61,4'), 'a waterlogged slab keeps its water');
+  assert.equal(env.blocks.get('10,61,10'), 'bct_t:r_stone', 'a block next to a slab shows and is swapped');
+  env.player.location = { x: 500, y: 61, z: 500 };
+  settle(env, 30);
+  assert.deepEqual(env.states.get('4,61,4'), { 'minecraft:vertical_half': 'top' }, 'swapping back restores the half');
+  assert.ok(env.wet.has('5,61,4'), 'and keeps the water');
+});
+
+test('stairs take Java\'s corner from the stairs around them and change it when a neighbour goes', () => {
+  // weirdo_direction 3 faces north, 0 east. A faces north with B, facing east, on its front side: an inner
+  // corner. C faces north with D, facing east, on its back side: an outer corner.
+  const stairs = (direction, upsideDown = false) => ({ weirdo_direction: direction, upside_down_bit: upsideDown, 'minecraft:corner': 'none' });
+  const env = setup({ extra: [['6,61,6', 'minecraft:oak_stairs', stairs(3)], ['6,61,7', 'minecraft:oak_stairs', stairs(0)],
+    ['10,61,6', 'minecraft:oak_stairs', stairs(3)], ['10,61,5', 'minecraft:oak_stairs', stairs(0)],
+    // An upside-down stair does not turn a corner with a stair the right way up.
+    ['3,61,10', 'minecraft:oak_stairs', stairs(3)], ['3,61,11', 'minecraft:oak_stairs', stairs(0, true)]] });
+  settle(env);
+  assert.equal(env.blocks.get('6,61,6'), 'bct_t:r_oak_stairs');
+  assert.equal(env.states.get('6,61,6')['bct:corner'], 'inner_right', 'as vanilla shapes the same pair');
+  assert.equal(env.states.get('10,61,6')['bct:corner'], 'outer_right');
+  assert.equal(env.states.get('3,61,10')['bct:corner'], 'none');
+  assert.equal(env.states.get('3,61,11')['bct:upside_down_bit'], 1);
+  env.blocks.delete('6,61,7');
+  env.world.afterEvents.playerBreakBlock.emit({ block: env.dimension.getBlock({ x: 6, y: 61, z: 7 }), dimension: env.dimension, player: env.player,
+    brokenBlockPermutation: { type: { id: 'bct_t:r_oak_stairs' } } });
+  assert.equal(env.states.get('6,61,6')['bct:corner'], 'none', 'the corner goes with the stair that made it');
+  env.player.location = { x: 500, y: 61, z: 500 };
+  settle(env, 30);
+  assert.deepEqual(env.states.get('10,61,6'), { weirdo_direction: 3, upside_down_bit: false, 'minecraft:corner': 'outer_right' },
+    'swapping back keeps the corner');
+});
+
+test('fences join wooden fences, gates turned across them and full blocks, as Java does', () => {
+  const none = { 'minecraft:connection_north': false, 'minecraft:connection_east': false, 'minecraft:connection_south': false, 'minecraft:connection_west': false };
+  const env = setup({ extra: [['5,61,12', 'minecraft:oak_fence', none], ['4,61,12', 'minecraft:stone'],
+    ['6,61,12', 'minecraft:spruce_fence', none], ['5,61,13', 'minecraft:nether_brick_fence', none],
+    // A gate facing east spans north to south, so the fence south of it joins; one facing north would not.
+    ['5,61,11', 'minecraft:fence_gate', { 'minecraft:cardinal_direction': 'east', open_bit: false, in_wall_bit: false }]] });
+  settle(env);
+  assert.equal(env.blocks.get('5,61,12'), 'bct_t:r_oak_fence');
+  assert.deepEqual(env.states.get('5,61,12'), { 'bct:connection_north': 1, 'bct:connection_east': 1, 'bct:connection_south': 0, 'bct:connection_west': 1 },
+    'gate, spruce fence and stone join; the nether brick fence does not');
+  env.blocks.delete('4,61,12');
+  env.world.afterEvents.playerBreakBlock.emit({ block: env.dimension.getBlock({ x: 4, y: 61, z: 12 }), dimension: env.dimension, player: env.player,
+    brokenBlockPermutation: { type: { id: 'bct_t:r_stone' } } });
+  assert.equal(env.states.get('5,61,12')['bct:connection_west'], 0, 'the side lets go when the block goes');
+});
+
+test('walls join walls and full blocks, drop their post on a straight run and grow tall under a block, as Java does', () => {
+  const wall = { wall_connection_type_north: 'none', wall_connection_type_east: 'none', wall_connection_type_south: 'none',
+    wall_connection_type_west: 'none', wall_post_bit: true };
+  const env = setup({ extra: [['3,61,14', 'minecraft:cobblestone_wall', wall], ['4,61,14', 'minecraft:cobblestone_wall', wall],
+    ['5,61,14', 'minecraft:cobblestone_wall', wall], ['8,61,14', 'minecraft:cobblestone_wall', wall], ['9,61,14', 'minecraft:stone']] });
+  settle(env);
+  const sides = key => ['north', 'east', 'south', 'west'].map(side => env.states.get(key)['bct:wall_connection_type_' + side]).join(' ');
+  assert.equal(env.blocks.get('4,61,14'), 'bct_t:r_cobblestone_wall');
+  assert.equal(sides('4,61,14'), 'none short none short');
+  assert.equal(env.states.get('4,61,14')['bct:wall_post_bit'], 0, 'the middle of a straight run has no post');
+  assert.equal(env.states.get('3,61,14')['bct:wall_post_bit'], 1, 'the end of a run has one');
+  assert.equal(sides('8,61,14'), 'none short none none', 'a wall joins the stone beside it');
+  env.blocks.set('4,62,14', 'minecraft:stone');
+  env.world.afterEvents.playerPlaceBlock.emit({ block: env.dimension.getBlock({ x: 4, y: 62, z: 14 }) });
+  assert.equal(sides('4,61,14'), 'none tall none tall', 'a block on top makes the joined sides tall');
+  assert.equal(env.states.get('4,61,14')['bct:wall_post_bit'], 0);
+});
+
+test('restore puts every swapped block back, stops converting for good and says when it is done', () => {
+  const env = setup({ extra: [['4,61,4', 'minecraft:cobblestone_slab', { 'minecraft:vertical_half': 'top' }],
+    ['6,61,6', 'minecraft:oak_stairs', { weirdo_direction: 1, upside_down_bit: true, 'minecraft:corner': 'none' }]] });
+  settle(env);
+  assert.equal(env.blocks.get('4,61,4'), 'bct_t:r_cobblestone_slab');
+  assert.equal(env.blocks.get('5,60,5'), 'bct_t:r_stone');
+  // A replacement no chunk list knows about (moved by something the engine did not see) is found by the sweep.
+  env.blocks.set('12,61,12', 'bct_t:r_stone'); env.states.set('12,61,12', {});
+  env.system.sendScriptEvent('bct:control', 'restore');
+  settle(env, 40);
+  assert.equal(env.blocks.get('12,61,12'), 'minecraft:stone', 'a stray replacement is put back too');
+  assert.equal(env.blocks.get('4,61,4'), 'minecraft:cobblestone_slab');
+  assert.deepEqual(env.states.get('4,61,4'), { 'minecraft:vertical_half': 'top' });
+  assert.equal(env.blocks.get('6,61,6'), 'minecraft:oak_stairs');
+  assert.ok(![...env.blocks.values()].some(type => type.startsWith('bct_t:')), 'no replacement block is left');
+  assert.ok(env.player.messages.some(message => message.includes('back to vanilla')), 'the players are told when it is done');
+  assert.equal(env.world.getDynamicProperty('bct:enabled'), false, 'the engine stays off, so nothing converts again');
+  env.blocks.set('9,61,9', 'minecraft:cobblestone_slab');
+  env.world.afterEvents.playerPlaceBlock.emit({ block: env.dimension.getBlock({ x: 9, y: 61, z: 9 }) });
+  settle(env);
+  assert.equal(env.blocks.get('9,61,9'), 'minecraft:cobblestone_slab', 'a block placed afterwards stays vanilla');
 });
 
 test('panes keep the vanilla connections and refresh them when a neighbor changes', () => {

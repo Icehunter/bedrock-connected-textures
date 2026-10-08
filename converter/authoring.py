@@ -27,6 +27,7 @@ from PIL import Image
 
 from bedrock_schema import Schemas, block_errors, check_tree
 from block_gameplay import block_tags, components as gameplay_components, loot_table, mining, needed_tool
+from block_shapes import shape_components, shape_of, shaped_block, single_slab
 from common import BLOCKS_FORMAT, read_json, write_json
 from edge_shapes import edge_alpha_from_image
 from java_block_geometry import cube, default_uv
@@ -130,19 +131,24 @@ def _swap_target(vanilla, identifier, *, samples, policy, root, kind):
     if reason:
         raise AuthoringError(vanilla + ' stays vanilla: ' + reason)
     profile = profile_of(vanilla, policy)
-    solid = vanilla_solid(root)
+    # Double slabs are full cubes the engine's cube table leaves out; slabs are drawn by their shape.
+    # Connected blocks draw on whole faces, so only pattern blocks take shapes.
+    cube_like = vanilla in vanilla_solid(root) or single_slab(vanilla) is not None
+    shape = shape_of(vanilla) if kind == 'pattern' else None
+    refusal = (f'{vanilla} is not a full cube or a slab; pattern blocks are full cubes or slabs' if kind == 'pattern'
+               else f'{vanilla} is not a full cube; {kind} blocks are full cubes')
     if profile is None:
-        if vanilla not in solid:
-            raise AuthoringError(f'{vanilla} is not a full cube; {kind} blocks are full cubes')
+        if not cube_like and not shape:
+            raise AuthoringError(refusal)
         raise AuthoringError(vanilla + ' has no gameplay profile in converter/data/native-replacement.json yet')
     transparent = bool(profile.get('transparent'))
-    if not transparent and vanilla not in solid:
-        raise AuthoringError(f'{vanilla} is not a full cube; {kind} blocks are full cubes')
+    if not transparent and not cube_like and not shape:
+        raise AuthoringError(refusal)
     state_values = {item['name']: [entry['value'] for entry in item['values']] for item in game_blocks['block_properties']}
     vanilla_states = [prop['name'] for prop in known[vanilla].get('properties', [])]
     mirror = {state: 'bct:' + state.split(':')[-1] for state in vanilla_states}
     return {'vanilla': vanilla, 'identifier': identifier, 'pack': pack, 'name': name, 'samples': samples, 'policy': policy,
-            'known': known, 'profile': profile, 'transparent': transparent, 'mirror': mirror,
+            'known': known, 'profile': profile, 'transparent': transparent, 'mirror': mirror, 'shape': shape,
             'states': {mirror[state]: _state_values(state_values[state]) for state in vanilla_states}}
 
 
@@ -242,11 +248,36 @@ def build_block(vanilla, identifier, pattern, *, samples, policy=None, root=ROOT
                 permutations.append({'condition': f"q.block_state('{axis_state}') == '{axis}'",
                                      'components': {'minecraft:transformation': {'rotation': rotation}}})
     files, geometry = {}, 'minecraft:geometry.full_block'
-    if target['transparent']:
+    shape = target['shape']
+    if shape:
+        files, geometry, extra = _shaped_geometry(target, permutations)
+    elif target['transparent']:
         files, geometry = _see_through_geometry(target)
     components = _swap_components(target, geometry, permutations[0]['components']['minecraft:material_instances'])
+    if shape:
+        components.update(extra)
     definition = _swap_definition(target, components, permutations)
-    return _swap_result(target, definition, _swap_entry(target, {'pattern': pattern}), textures=textures, files=files)
+    fields = {'pattern': pattern, **({'shape': shape} if shape else {})}
+    return _swap_result(target, definition, _swap_entry(target, fields), textures=textures, files=files)
+
+
+def _shaped_geometry(target, permutations):
+    """(files, geometry component, extra components) of a slab: the parts its shape state shows, and their boxes.
+
+    Adds a permutation per shape state value carrying its collision and selection boxes.
+    """
+    pack, stem = target['pack'], target['name'].replace('/', '_')
+    identifier = f'geometry.{pack}.{stem}'
+    try:
+        built = shaped_block(identifier, target['shape'], target['mirror'])
+    except ValueError as error:
+        raise AuthoringError(str(error)) from None
+    culling = f'{pack}:{stem}_culling'
+    files = {f'models/blocks/{pack}_{stem}.geo.json': built['geometry'],
+             f'block_culling/{pack}_{stem}.json': _culling_rules(culling, built['parts'], target['transparent'])}
+    permutations += built['permutations']
+    extra = {**built['boxes'], **shape_components(target['shape'], target['vanilla'])}
+    return files, {'identifier': identifier, 'culling': culling, 'bone_visibility': built['visibility']}, extra
 
 
 def cut_grid(image_path, pattern, texture_folder, textures):
@@ -939,14 +970,16 @@ def _quarter_tile(face, quarter, joined, faces, joins):
     return {(False, False): 'alone', (True, False): 'across', (False, True): 'along', (True, True): 'joined'}[(across, along)]
 
 
-def build_connected(vanilla, identifier, tiles, *, faces=None, joins='all', connect='same', rp=None, samples,
-                    policy=None, root=ROOT):
+def build_connected(vanilla, identifier, tiles, *, faces=None, joins='all', connect='same', textures=None, rp=None,
+                    samples, policy=None, root=ROOT):
     """The connected copy of a vanilla block: {'definition', 'geometry', 'culling', 'loot', 'sound', 'entry', 'tiles'}.
 
-    tiles: {'alone', 'across', 'along', 'joined'} texture paths in the resource pack. faces: the faces that
-    join (default all six); joins: 'all', or 'horizontal' / 'vertical' to join only along the texture's
-    left and right, or up and down, edges (bookshelves: sides, horizontal). connect: 'same' or the blocks
-    it joins. The engine sets the six neighbour states; inner corners are not drawn.
+    tiles: {'alone', 'across', 'along', 'joined'} texture paths in the resource pack; a list of paths is random
+    variants, picked per block position. faces: the faces that join (default all six); joins: 'all', or
+    'horizontal' / 'vertical' to join only along the texture's left and right, or up and down, edges
+    (bookshelves: sides, horizontal). connect: 'same' or the blocks it joins. textures: {face: path or list}
+    for faces that do not join (default the alone tile), such as a top and bottom of their own. The engine
+    sets the six neighbour states; inner corners are not drawn.
     """
     target = _swap_target(vanilla, identifier, samples=samples, policy=policy or load_policy(), root=root,
                           kind='connected')
@@ -955,6 +988,11 @@ def build_connected(vanilla, identifier, tiles, *, faces=None, joins='all', conn
         raise AuthoringError('--faces names faces from up, north, south, west, east and down')
     if joins not in JOINS:
         raise AuthoringError('--joins is all, horizontal or vertical')
+    textures = dict(textures or {})
+    if any(face not in OVERLAY_FACES for face in textures):
+        raise AuthoringError('a face texture names a face from up, north, south, west, east and down')
+    if any(face in faces for face in textures):
+        raise AuthoringError('a face with its own texture does not join: leave it out of --faces')
     known = target['known']
     if connect != 'same' and (not isinstance(connect, list) or not connect or any(block not in known for block in connect)):
         raise AuthoringError('--connect is same or a list of Bedrock block ids')
@@ -962,9 +1000,10 @@ def build_connected(vanilla, identifier, tiles, *, faces=None, joins='all', conn
     stem = name.replace('/', '_')
     method = 'opaque'
     if target['transparent']:
-        files = [_texture_file(rp, path) for path in tiles.values()] if rp else []
+        files = [_texture_file(rp, path) for path in _texture_paths([*tiles.values(), *textures.values()])] if rp else []
         method = see_through_method(files) if files else 'blend'
     aliases = {kind: f'{pack}_{stem}_{kind}' for kind in CONNECTED_TILES}
+    aliases.update({face: f'{pack}_{stem}_{face}' for face in textures})
     quarters = _quarter_elements()
     names = [f'{face}_{quarter[0]}{quarter[1]}' for face, quarter, _ in quarters]
     bone = {'name': 'quarters', 'pivot': [0, 0, 0],
@@ -984,7 +1023,7 @@ def build_connected(vanilla, identifier, tiles, *, faces=None, joins='all', conn
         joined = {side for bit, side in enumerate(sides) if combination & (1 << bit)}
         instances = {'*': {'texture': aliases['alone'], 'render_method': method}}
         for (face, quarter, _), instance in zip(quarters, names):
-            kind = _quarter_tile(face, quarter, joined, faces, joins)
+            kind = face if face in textures else _quarter_tile(face, quarter, joined, faces, joins)
             instances[instance] = {'texture': aliases[kind], 'render_method': method}
         condition = ' && '.join(f"q.block_state('{CONNECT_STATES[side]}') == {int(side in joined)}" for side in sides)
         permutations.append({'condition': condition, 'components': {'minecraft:material_instances': instances}})
@@ -993,28 +1032,49 @@ def build_connected(vanilla, identifier, tiles, *, faces=None, joins='all', conn
     definition = _swap_definition(target, components, permutations)
     entry = _swap_entry(target, {} if connect == 'same' else {'connect': list(connect)})
     return _swap_result(target, definition, entry, geometry=geometry, culling=culling,
-                        tiles={aliases[kind]: path for kind, path in tiles.items()}, stem=stem)
+                        tiles={aliases[kind]: path for kind, path in {**tiles, **textures}.items()}, stem=stem)
+
+
+def _texture_paths(values):
+    """Every path of these textures, counting each random variant."""
+    return [path for value in values for path in (value if isinstance(value, list) else [value])]
+
+
+def atlas_entry(value):
+    """The terrain_texture.json entry of a texture path, or of a list of random variants."""
+    if isinstance(value, list):
+        return {'textures': {'variations': [{'path': path} for path in value]}}
+    return {'textures': value}
 
 
 def connected_tiles(ctm=None, alone=None, across=None, along=None, joined=None):
-    """The four tile paths: picked from a 47-tile set (<ctm>_0 to _46), or given one by one."""
+    """The four tile paths: picked from a 47-tile set (<ctm>_0 to _46), or given one by one.
+
+    Several 47-tile sets, or several paths for each tile, are random variants of each tile.
+    """
     given = {'alone': alone, 'across': across, 'along': along, 'joined': joined}
     if ctm:
         if any(given.values()):
             raise AuthoringError('give --ctm or the four tiles, not both')
-        return {kind: f'{ctm}_{tile}' for kind, tile in CONNECTED_TILES.items()}
+        sets = ctm if isinstance(ctm, list) else [ctm]
+        return {kind: _one_or_variants([f'{name}_{tile}' for name in sets]) for kind, tile in CONNECTED_TILES.items()}
     if not all(given.values()):
         raise AuthoringError('give --ctm (a 47-tile set) or all of --alone, --across, --along and --joined')
-    return given
+    return {kind: _one_or_variants(value if isinstance(value, list) else [value]) for kind, value in given.items()}
 
 
-def write_connected(bp, rp, vanilla, identifier, tiles, *, faces=None, joins='all', connect='same', samples):
+def _one_or_variants(paths):
+    return paths[0] if len(paths) == 1 else list(paths)
+
+
+def write_connected(bp, rp, vanilla, identifier, tiles, *, faces=None, joins='all', connect='same', textures=None,
+                    samples):
     """Writes the connected block into the author's packs; returns its bct.js entry."""
     bp, rp = Path(bp), Path(rp)
-    for path in tiles.values():
+    for path in _texture_paths([*tiles.values(), *(textures or {}).values()]):
         _texture_file(rp, path)
-    built = build_connected(vanilla, identifier, tiles, faces=faces, joins=joins, connect=connect, rp=rp,
-                            samples=samples)
+    built = build_connected(vanilla, identifier, tiles, faces=faces, joins=joins, connect=connect, textures=textures,
+                            rp=rp, samples=samples)
     pack, name = identifier.split(':', 1)
     write_json(bp / f'blocks/{name}.json', built['definition'])
     write_json(bp / built['definition']['minecraft:block']['components']['minecraft:loot'], built['loot'])
@@ -1023,7 +1083,7 @@ def write_connected(bp, rp, vanilla, identifier, tiles, *, faces=None, joins='al
     atlas_path = rp / 'textures/terrain_texture.json'
     atlas = read_json(atlas_path) if atlas_path.exists() else {
         'resource_pack_name': pack, 'texture_name': 'atlas.terrain', 'padding': 8, 'num_mip_levels': 4}
-    atlas.setdefault('texture_data', {}).update({alias: {'textures': path} for alias, path in built['tiles'].items()})
+    atlas.setdefault('texture_data', {}).update({alias: atlas_entry(path) for alias, path in built['tiles'].items()})
     write_json(atlas_path, atlas)
     if built['sound']:
         blocks_path = rp / 'blocks.json'

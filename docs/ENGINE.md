@@ -75,6 +75,10 @@ The look of a replacement follows the Java model:
 - Biome tints use the material `tint_method` (`grass`, `default_foliage`), so tinted faces and decorations take the biome color in every graphics mode. A tinted Java layer over an untinted face is drawn as a separate plane with its own tint, as in Java; rules whose `matchTiles` name the layer texture pick its tile.
 - Weighted Java models (random turns) become a `bct:m` state, and weighted multipart groups (a pack's decorations on a block) a `bct:g<n>` state; the engine picks both per position with Java's model random. Decoration parts are extra bones. A random rule on a decoration texture picks its tile from the block's x and z pattern cell, so it adds no state. Texture turns between looks are bones with `uv_rotation`.
 - Glazed terracotta carries `facing_direction`; each face turns its texture per facing the way the Java model does.
+- Slabs show the tile that a full block in the same place would show, on half a block. The geometry has a bottom part and a top part. The mirrored `vertical_half` picks which one shows. The UVs are Java's slab UVs, so the side of a bottom slab shows the lower half of the tile. Collision and selection follow the half. A replaced slab never counts as an opaque full cube, so the blocks next to it still show and are swapped. A slab keeps its water when it is swapped in or back. A double slab is a full cube. A slab drops itself, and a double slab drops two slabs. The rest of their gameplay comes from their full block (`shaped` in the policy).
+- Stairs work the same way. The geometry has one part for each facing, half and corner (40 parts). The parts are drawn the way the world faces, with Java's default UVs, which is what Java's uvlock does for a turned stair. The engine works out the corner (`minecraft:corner`) with Java's rule (StairBlock). A stair of the same half, turned across it behind its tall back, makes an outer corner. One in front makes an inner corner. There is no corner when the stair beside it on that side already continues the line. Vanilla and replaced stairs both count. The engine sets the corner when the stair is swapped in, when a block next to it changes, and on every rescan. A vanilla stair next to a replaced one keeps the corner the game gives it, and the game does not see the replaced stair.
+- Fences get a post and two bars for each side that joins. The geometry has one part for each of the 16 ways the four sides can join. Collision is 24 high, as in Java, and the selection box is one block high. The engine works out which sides join with Java's rule. Wooden fences join wooden fences, and nether brick fences join nether brick fences, vanilla or replaced. A fence also joins a fence gate turned across it, and opaque full blocks. A replaced fence only lets the vanilla fences join it that join it in Java (`minecraft:connection_rule`: other wooden fences for a wooden fence, none for nether brick). Fence gates open and close, which a replacement cannot do, so they stay vanilla.
+- Walls get a post, and a short arm and a tall arm for each side. Each of these is its own part of the geometry, shown by its own state, because the 162 ways a wall can look are more than the 64 parts a block can switch. Collision is 24 high, and there is one selection box. The engine works out the sides and the post with Java's rule (WallBlock). A side joins walls, panes, bars, a fence gate turned across it, and opaque full blocks. A side that joins is tall when the block above covers it: a full block, a bottom slab, an upright stair, or a wall above with an arm on that side. The post shows at the ends of a wall, at corners and on a wall that stands alone. On a straight line it only shows when something above needs it: a torch, sign, banner or pressure plate, or a full block on a line that is not tall. The wall looks again when a block next to it or above it changes.
 - Panes and iron bars get a post and four arms. The arms follow the mirrored connection states: the engine copies the vanilla states on swap-in and works them out again from the neighbors (other panes and bars, walls, glass and full blocks) when a neighbor changes or the chunk is rescanned. Collision and selection are one box around the post and the connected arms (Bedrock allows one box per block): an L, T or cross-shaped pane collides as the box around it, so the inner corner of an L blocks movement where vanilla does not.
 - A block with any cut-out material (layers, decorations) draws every material `alpha_test_single_sided`, because a block uses one render method.
 
@@ -99,7 +103,7 @@ Blocks whose vanilla behavior a custom block cannot carry are never replaced (`k
 
 Outside the swap range the native base pack draws the author's base textures, as Java does without a connected-texture mod. The author's own `random` rules become native atlas variations; repeat rules are never shuffled into random tiles.
 
-Swapped blocks stay swapped, like converted leaves, so nothing changes back and forth while players move about. They are swapped back when a neighbor needs the vanilla block, when the engine is turned off, and, with `replace.swapBack` 1, when no player is within the radius plus one chunk or the band plus 8 blocks. Ownership is saved per chunk in world dynamic properties, so a later session finds every swapped block. Replacements found where the engine did not put them (pistons, structures, clones) are adopted with the pattern states of their new position.
+Swapped blocks stay swapped, like converted leaves, so nothing changes back and forth while players move about. They are swapped back when a neighbour needs the vanilla block, when the engine is turned off (only in chunks near a player; `restore` does the whole world), and, with `replace.swapBack` 1, when no player is within the radius plus one chunk or the band plus 8 blocks. Ownership is saved per chunk in world dynamic properties, so a later session finds every swapped block. Replacements found where the engine did not put them (pistons, structures, clones) are adopted with the pattern states of their new position.
 
 ## Leaves
 
@@ -149,6 +153,10 @@ Defaults (`settings.mjs`):
 | `overlay.yBand` | 24 blocks, plus a top-surface pass with `getTopmostBlock` |
 | `overlay.sliceMs` | 4 milliseconds of each tick for overlay surfaces, and as much for their scan |
 | `overlay.refreshTicks` | 1200 ticks between full rescans |
+| `far.chunkRadius` | 32 chunks: beyond the simulation distance, areas out to this far from a player are loaded one at a time and converted (0 turns it off) |
+| `far.blocks` | 0: only leaves convert out there, the change players see from far away. 1 also swaps blocks and draws overlay surfaces near the surface of each area. Near players everything converts |
+| `far.holdTicks` | 400 ticks an area stays loaded at most |
+| `far.status` | 1: the action bar shows how many chunks are done |
 | `intervalTicks` | 4 |
 
 A chunk scan makes one `getBlocks` call with every block type that some part wants in that chunk. Scans run as jobs that together use at most their slice of each tick, however often the game resumes them. Chunks are scanned nearest first and again when a player moves more than half the band up or down. Carriers outside the radius or band are removed and drawn again on return. Entity properties are written only when their value changes. Native surface ownership is saved per chunk.
@@ -160,13 +168,22 @@ With commands on:
 ```mcfunction
 /scriptevent bct:control status
 /scriptevent bct:control off
+/scriptevent bct:control restore
 /scriptevent bct:control on
 /scriptevent bct:config {"connected":{"chunkRadius":4,"maxCarriers":2000}}
 /scriptevent bct:config {"debug":true}
 /scriptevent bct:settings
 ```
 
-`off` removes the engine's carriers and overlay surfaces, swaps replacement blocks back as players stop seeing them, and is saved in the world; use it before taking the engine out of a world. `bct:config` merges the given values over the defaults, rejects unknown names and out-of-range values, and saves them in the world. `bct:settings` opens the terrain edge height form. Converted blocks and leaves stay in the world; a world played with a converted pack keeps needing it. With `debug` on, the engine logs scan errors and `/scriptevent bct:probe` logs the selection for the face under the crosshair; with it off, the engine writes nothing to the log.
+`off` stops converting. It removes the carriers and overlay surfaces and swaps blocks back, but only in the chunks near players. It is saved in the world.
+
+`restore` puts the whole world back to vanilla blocks. It turns the engine off. The far worker then loads every chunk the engine changed, one area at a time, and each part of the engine puts its blocks back there: swapped blocks, leaves, overlay surfaces and edges. The world keeps the list of these chunks. Restore goes on after a restart and shows the chunks left on the action bar. When it is done, it tells the players, and the packs can be removed. `on` cancels it.
+
+If a pack is removed first, its blocks show as unknown blocks, but they keep their names. Add the pack back and they come back; restore can run then.
+
+`python bct.py restore <world folder>` does the same for converted packs with the game closed, and with no packs needed. It zips the world first. Then it reads the save and writes each `bct_*` block back as its vanilla block, with the states the block kept. Overlay surfaces and edges become air. At the end it checks that no BCT block is left.
+
+`bct:config` merges the given values over the defaults, rejects unknown names and out-of-range values, and saves them in the world. `bct:settings` opens the terrain edge height form. Converted blocks and leaves stay in the world until it is restored. With `debug` on, the engine logs scan errors and `/scriptevent bct:probe` logs the selection for the face under the crosshair; with it off, the engine logs only restore progress.
 
 ## Known limits
 

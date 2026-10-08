@@ -101,6 +101,28 @@ test('every leaf in covered chunks converts, with the Java model choice for its 
   assert.equal(JSON.stringify([...env.states].filter(([key]) => env.blocks.get(key)?.startsWith('bct_t:')).sort()), first, 'the same every time');
 });
 
+test('restore turns converted leaves back into vanilla leaves with their states and water', () => {
+  const env = setup();
+  settle(env);
+  const leaves = [...env.blocks].filter(([, type]) => type === 'bct_t:m_oak_leaves').map(([key]) => key);
+  assert.ok(leaves.length > 0);
+  env.wet.add(leaves[0]);
+  // A converted leaf in a chunk no list knows about is found by the sweep.
+  env.blocks.set('20,61,20', 'bct_t:m_oak_leaves'); env.states.set('20,61,20', { 'bct:persistent_bit': 1, 'bct:update_bit': 0, 'bct:t': 0 });
+  env.system.sendScriptEvent('bct:control', 'restore');
+  settle(env, 40);
+  for (const key of leaves) {
+    assert.equal(env.blocks.get(key), 'minecraft:oak_leaves', key);
+    assert.equal(env.states.get(key).persistent_bit, false);
+  }
+  assert.ok(env.wet.has(leaves[0]), 'a waterlogged leaf keeps its water');
+  assert.equal(env.blocks.get('20,61,20'), 'minecraft:oak_leaves', 'a stray converted leaf goes back too');
+  assert.equal(env.states.get('20,61,20').persistent_bit, true);
+  assert.equal(env.engine.leaves.status.ownedChunks, 0, 'no chunk is left to restore');
+  settle(env, 400);
+  for (const key of leaves) assert.equal(env.blocks.get(key), 'minecraft:oak_leaves', key + ' stays vanilla after the restore');
+});
+
 test('a chunk converts only while its eight neighbors are loaded, and stays converted when players leave', () => {
   const loaded = new Set(['-1,-1', '-1,0', '-1,1', '0,-1', '0,0', '0,1', '1,-1', '1,0', '1,1']);
   const env = setup({ loaded: (cx, cz) => loaded.has(cx + ',' + cz), extra: [...tree(), ['20,61,8', 'minecraft:birch_leaves', { ...LEAF }]] });

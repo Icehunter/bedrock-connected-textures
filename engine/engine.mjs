@@ -24,6 +24,13 @@ import { createOverlaySurfaces } from './terrain-native.mjs';
 import { createFar } from './far.mjs';
 import { AuthoredError, compileAuthored } from './authored.mjs';
 
+/**
+ * The players blocks and overlay surfaces convert around. Beyond the simulation distance the far worker's
+ * virtual player only converts leaves unless far.blocks is 1: leaves are what players see from far away, and
+ * swapping every block out there changes much more of the world.
+ */
+export const blockConverters = (all, real, settings) => (settings.far.blocks ? all : real);
+
 export function startEngine(api) {
   const { world, system } = api;
   let settings = resolveSettings();
@@ -39,6 +46,11 @@ export function startEngine(api) {
     }
     return players;
   };
+  // The players blocks and overlay surfaces convert around: the virtual player beyond the simulation distance
+  // only when far.blocks is on (leaves always follow it).
+  // While restoring, every part works around the virtual player too, so each chunk it loads goes back to vanilla.
+  const blockPlayers = () => (restoring ? currentPlayers() : blockConverters(currentPlayers(), realPlayers, settings));
+  let restoring = false, restorePasses = 0, sweep;
   const reach = part => (dimension, location) =>
     withinReach(currentPlayers(), dimension, location, settings[part].chunkRadius + 1, settings[part].yBand + 8);
 
@@ -230,6 +242,36 @@ export function startEngine(api) {
     return drawn;
   }
 
+  /** Every chunk the engine changed and has not put back yet: swapped blocks, leaves, overlay surfaces, edges. */
+  function changedChunks() {
+    const chunks = new Map();
+    for (const chunk of [...replacements.ownedChunks(), ...leaves.ownedChunks(), ...overlays.ownedChunks(), ...terrain.nativeChunks()])
+      chunks.set(chunk.dimension + '|' + chunk.cx + '|' + chunk.cz, chunk);
+    return [...chunks.values()];
+  }
+
+  /**
+   * Restoring the world: the engine stops converting (saved in the world) and the far worker loads
+   * every chunk it changed, one area at a time, while the parts put each one back. It goes on after a restart
+   * and tells the players when the world is vanilla again; then the packs can be removed. `on` cancels it.
+   */
+  function setRestoring(value, announce = true) {
+    restoring = value;
+    world.setDynamicProperty('bct:restore', value || undefined);
+    sweep = undefined;
+    if (value) {
+      setEnabled(false);
+      far.setEnabled(true);
+      far.setTargets(changedChunks);
+      if (announce) world.sendMessage('§e[BCT] Restoring the world to vanilla blocks. You can leave and come back; it carries on. ' +
+        'Do not remove the packs until it says it is done.');
+      // Written to the content log whatever debug is set to, so a restore can be checked afterwards.
+      console.warn(`[BCT] restore started: ${changedChunks().length} chunks to put back (blocks ${replacements.ownedChunks().length}, ` +
+        `leaves ${leaves.ownedChunks().length}, overlays ${overlays.ownedChunks().length}, edges ${terrain.nativeChunks().length}; ` +
+        `leaf types ${leaves.customTypes().length}, converted leaves ${leaves.status.swaps})`);
+    } else far.setTargets(undefined);
+  }
+
   function status() {
     return { enabled, suspended, settings, connected: connected.status, carriers: carriers.total, terrain: terrain.status, chunks: scanner.chunks.size,
       replacements: replacements.status, leaves: leaves.status, overlays: overlays.status, far: far.status };
@@ -240,7 +282,8 @@ export function startEngine(api) {
     if (event.id === 'bct:control') {
       const command = (event.message ?? '').trim();
       if (command === 'off' || command === 'clear') setEnabled(false);
-      else if (command === 'on') setEnabled(true);
+      else if (command === 'on') { if (restoring) setRestoring(false); setEnabled(true); }
+      else if (command === 'restore') setRestoring(true);
       else if (command === 'status') reply('[BCT] ' + JSON.stringify(status()));
     } else if (event.id === 'bct:config') {
       try {
@@ -267,6 +310,58 @@ export function startEngine(api) {
     try { settings = resolveSettings(JSON.parse(world.getDynamicProperty('bct:settings') ?? '{}')); }
     catch (error) { log('saved settings ignored: ' + String(error)); }
     if (world.getDynamicProperty('bct:enabled') === false) setEnabled(false);
+    if (world.getDynamicProperty('bct:restore') === true) setRestoring(true, false);
+  }
+
+  /**
+   * While restoring, the loaded chunks within 3 chunks of every player (and of the far worker) are searched for
+   * any block the engine makes, whether or not a chunk list knows the chunk: replacement blocks and converted
+   * leaves go back to vanilla, overlay surfaces and edge blocks go. A round that finds nothing counts as clean.
+   */
+  function restoreSweep(until) {
+    if (!sweep || sweep.index >= sweep.chunks.length) {
+      if (sweep) sweep.clean = sweep.found === 0;
+      const chunks = new Map();
+      for (const player of currentPlayers()) {
+        const cx = Math.floor(player.location.x / 16), cz = Math.floor(player.location.z / 16);
+        for (let dx = -3; dx <= 3; dx++) for (let dz = -3; dz <= 3; dz++)
+          chunks.set(player.dimension.id + '|' + (cx + dx) + '|' + (cz + dz), { dimension: player.dimension, cx: cx + dx, cz: cz + dz });
+      }
+      const types = [...new Set([...replacements.customTypes(), ...leaves.customTypes(), ...overlays.surfaceTypes(), ...terrain.nativeTypes()])];
+      sweep = { chunks: [...chunks.values()], index: 0, found: 0, types, clean: sweep?.clean ?? false, rounds: (sweep?.rounds ?? 0) + 1 };
+    }
+    if (!sweep.types.length) { sweep.index = sweep.chunks.length; return; }
+    while (sweep.index < sweep.chunks.length && now() < until) {
+      const { dimension, cx, cz } = sweep.chunks[sweep.index++], range = dimension.heightRange;
+      try { if (!dimension.isChunkLoaded({ x: cx * 16, y: 0, z: cz * 16 })) continue; } catch { continue; }
+      for (let y = range.min; y < range.max; y += 64) {
+        const volume = new api.BlockVolume({ x: cx * 16, y, z: cz * 16 }, { x: cx * 16 + 15, y: Math.min(range.max - 1, y + 63), z: cz * 16 + 15 });
+        try {
+          if (!dimension.containsBlock(volume, { includeTypes: sweep.types }, true)) continue;
+          for (const location of dimension.getBlocks(volume, { includeTypes: sweep.types }, true).getBlockLocationIterator()) {
+            const block = dimension.getBlock(location);
+            if (!block) continue;
+            sweep.found++;
+            if (replacements.vanillaOf(block.typeId)) replacements.revert(block);
+            else if (!leaves.revertLeaf(block)) block.setType('minecraft:air');
+          }
+        } catch (error) { console.warn('[BCT] restore sweep ' + cx + ',' + cz + ': ' + String(error)); }
+      }
+    }
+  }
+
+  /** While restoring: edge blocks in chunks that have loaded go, and once nothing is left the players are told. */
+  function restoreStep() {
+    if (++restorePasses % 5 !== 0) return;
+    terrain.removeNative();
+    const left = changedChunks().length + (sweep?.clean ? 0 : 1);
+    if (restorePasses % 100 === 0) console.warn(`[BCT] restore: ${left} chunks to go (blocks ${replacements.ownedChunks().length}, leaves ` +
+      `${leaves.ownedChunks().length}, overlays ${overlays.ownedChunks().length}, edges ${terrain.nativeChunks().length})`);
+    if (left) return;
+    setRestoring(false);
+    world.setDynamicProperty('bct:restore', undefined);
+    world.sendMessage('§a[BCT] The world is back to vanilla blocks. You can remove the packs now.');
+    console.warn('[BCT] restore done');
   }
 
   function tick() { budget.measure(poll); }
@@ -274,11 +369,12 @@ export function startEngine(api) {
     if (!started) start();
     const all = currentPlayers(), drawn = refreshGraphics(all);
     // Replacement blocks and overlay surfaces also draw in ray tracing, so they follow every player.
-    if (enabled) { replaceScanner.poll(all); overlayScanner.poll(all); }
+    if (enabled) { replaceScanner.poll(blockPlayers()); overlayScanner.poll(blockPlayers()); }
     // Water, mobs and other packs change blocks without events; rescan now and then.
     if (++refreshPasses % Math.max(1, Math.round(settings.replace.refreshTicks / settings.intervalTicks)) === 0) replaceScanner.reset();
     if (++overlayPasses % Math.max(1, Math.round(settings.overlay.refreshTicks / settings.intervalTicks)) === 0) overlayScanner.reset();
-    if (enabled) far.tick(realPlayers);
+    if (enabled || restoring) far.tick(realPlayers);
+    if (restoring) restoreStep();
     terrain.maintain();
     if (!enabled || suspended || !drawn.length) return;
     connected.maintain();
@@ -293,7 +389,9 @@ export function startEngine(api) {
     { run: until => replaceScanner.run(until), cap: () => settings.scanSliceMs },
     { run: until => scanner.run(until), cap: () => settings.scanSliceMs },
     { run: until => overlayScanner.run(until), cap: () => settings.overlay.sliceMs },
-    { run: until => overlays.tick(currentPlayers(), until), cap: () => settings.overlay.sliceMs },
+    { run: until => overlays.tick(blockPlayers(), until), cap: () => settings.overlay.sliceMs },
+    { run: until => { if (restoring) leaves.restore(until); }, cap: () => settings.leaves.sliceMs },
+    { run: until => { if (restoring) restoreSweep(until); }, cap: () => settings.replace.sliceMs },
   ];
   let replaceTicks = 0;
   system.runInterval(() => {
@@ -301,12 +399,12 @@ export function startEngine(api) {
     budget.measure(() => {
       const players = currentPlayers(), maintenance = ++replaceTicks % 10 === 0;
       views.update(players);
-      replacements.tick(players, maintenance);
+      replacements.tick(blockPlayers(), maintenance);
       leaves.tick(players, replaceTicks % 4 === 0);
     });
     budget.share(parts);
   }, 1);
 
   return { settings: () => settings, connected, terrain, scanner, sources, carriers, replacements, leaves, replaceScanner,
-    overlays, overlayScanner, views, budget, tick, setEnabled, status };
+    overlays, overlayScanner, views, budget, tick, setEnabled, setRestoring, status };
 }

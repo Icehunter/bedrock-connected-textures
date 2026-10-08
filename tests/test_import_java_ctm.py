@@ -9,6 +9,7 @@ from PIL import Image
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'converter'))
 from import_java_ctm import import_rules
+from java_environment_bindings import _EnvironmentMapping
 from java_materials import MaterialPolicy
 from java_block_states import resolve_known_block_selection
 
@@ -226,9 +227,40 @@ class JavaImportTests(unittest.TestCase):
                 {'block': 'minecraft:spruce_log', 'states': {'pillar_axis': ['y']}},
                 {'block': 'minecraft:stone', 'states': {}}])
 
+    def test_a_state_bedrock_has_no_counterpart_for_leaves_the_rule_out_instead_of_stopping(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            folder = ctm_folder(root)
+            (folder / 'a.properties').write_text('matchBlocks=oak_log:axis=x\nmethod=fixed\ntiles=0\n')
+            (folder / 'b.properties').write_text('matchBlocks=stone\nmethod=fixed\ntiles=0\n')
+            document = import_rules(root, {})
+            self.assertEqual([rule['filename'].rsplit('/', 1)[-1] for rule in document['rules']], ['b.properties'])
+            self.assertEqual(document['importAccounting']['excludedRules'][0]['reason'],
+                             'minecraft:oak_log:axis has no Bedrock state',
+                             'dropping the state would widen the rule to every log, so the rule is left out')
+
+    def test_shape_states_of_slabs_stairs_fences_and_walls_translate_to_their_bedrock_states(self):
+        states = {'minecraft:oak_slab': {'minecraft:vertical_half'},
+                  'minecraft:oak_stairs': {'weirdo_direction', 'upside_down_bit', 'minecraft:corner'},
+                  'minecraft:oak_fence': {'minecraft:connection_north'},
+                  'minecraft:cobblestone_wall': {'wall_connection_type_east', 'wall_post_bit'}}
+        mapping = _EnvironmentMapping(states, set())
+        for token in ('oak_slab:type=top', 'oak_stairs:facing=north:half=top:shape=outer_left', 'oak_fence:north=true',
+                      'cobblestone_wall:east=low:up=false'):
+            mapping.add_block('a.properties', token)
+        report = mapping.report()
+        self.assertEqual(report['unresolvedPredicates'], [])
+        names = report['stateNames']
+        self.assertEqual(names['minecraft:oak_slab']['type'], {'name': 'minecraft:vertical_half', 'values': {'top': 'top'}})
+        self.assertEqual(names['minecraft:oak_stairs']['facing']['values'], {'north': 3})
+        self.assertEqual(names['minecraft:oak_stairs']['half']['values'], {'top': True})
+        self.assertEqual(names['minecraft:oak_stairs']['shape']['values'], {'outer_left': 'outer_left'})
+        self.assertEqual(names['minecraft:oak_fence']['north']['name'], 'minecraft:connection_north')
+        self.assertEqual(names['minecraft:cobblestone_wall']['east']['values'], {'low': 'short'})
+        self.assertEqual(names['minecraft:cobblestone_wall']['up'], {'name': 'wall_post_bit', 'values': {'false': False}})
+
     def test_unsupported_rules_fail_instead_of_approximating(self):
-        options = ('method=overlay', 'method=ctm_compact', 'method=fixed\nbiomes=plains',
-                   'method=fixed\nmatchBlocks=oak_log:axis=x')
+        options = ('method=overlay', 'method=ctm_compact', 'method=fixed\nbiomes=plains')
         for option in options:
             with self.subTest(option=option), tempfile.TemporaryDirectory() as temporary:
                 root = Path(temporary)

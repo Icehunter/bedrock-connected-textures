@@ -150,6 +150,8 @@ export function fakeBedrock({ blocks = new Map(), states = new Map(), height = {
           writes.push({ location: { ...location }, type: value.type, states: { ...value.states } });
           if (value.type === 'minecraft:air') blocks.delete(key); else blocks.set(key, value.type);
           states.set(key, { ...value.states });
+          // Like the game, setting a block drops a waterlogged block's water.
+          wet.delete(key);
           this.typeId = value.type;
           onSet({ ...location }, value);
         },
@@ -227,6 +229,7 @@ export function fakeBedrock({ blocks = new Map(), states = new Map(), height = {
     beforeEvents: { playerBreakBlock: channel(), playerInteractWithBlock: channel(), playerPlaceBlock: channel() },
     players: [],
     getAllPlayers() { return this.players; },
+    sendMessage(message) { for (const player of this.players) player.sendMessage(message); },
     getDimension: () => dimension,
     getDynamicProperty: name => { charge('property'); return properties.get(name); },
     setDynamicProperty: (name, value) => { charge('property'); if (value === undefined) properties.delete(name); else properties.set(name, value); },

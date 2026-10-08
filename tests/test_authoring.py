@@ -99,13 +99,51 @@ class PatternBlockTest(unittest.TestCase):
                 self.assertTrue(all(rule['condition'] == 'same_block'
                                     for rule in culling['minecraft:block_culling_rules']['rules']))
 
+    def test_a_slab_takes_the_pattern_on_half_a_block(self):
+        with tempfile.TemporaryDirectory() as folder:
+            bp, rp = Path(folder) / 'BP', Path(folder) / 'RP'
+            entry, missing = write_block(bp, rp, 'minecraft:oak_slab', 'mypack:oak_slab', {'repeat': [2, 2]},
+                                         samples=SAMPLES, grid=grid(Path(folder) / 'grid.png', 2, 2))
+            self.assertEqual(missing, [])
+            self.assertEqual(check_tree(bp, rp, SAMPLES), [])
+            self.assertEqual(entry['shape'], 'slab')
+            block = json.loads((bp / 'blocks/oak_slab.json').read_text())['minecraft:block']
+            self.assertEqual(block['description']['states']['bct:vertical_half'], ['bottom', 'top'])
+            geometry = block['components']['minecraft:geometry']
+            self.assertEqual(geometry['bone_visibility']['shape_bottom'], "q.block_state('bct:vertical_half') == 'bottom'")
+            boxes = [permutation['components']['minecraft:collision_box'] for permutation in block['permutations']
+                     if 'minecraft:collision_box' in permutation['components']]
+            self.assertEqual(boxes, [{'origin': [-8, 0, -8], 'size': [16, 8, 16]}, {'origin': [-8, 8, -8], 'size': [16, 8, 16]}])
+            self.assertTrue((rp / 'models/blocks/mypack_oak_slab.geo.json').exists())
+            double = build_block('minecraft:oak_double_slab', 'mypack:oak_double_slab', {'repeat': [2, 2]}, samples=SAMPLES)
+            self.assertEqual(double['definition']['minecraft:block']['components']['minecraft:geometry'],
+                             'minecraft:geometry.full_block')
+            self.assertEqual(double['loot']['pools'][0]['entries'][0]['name'], 'minecraft:oak_slab')
+            entry, _ = write_block(bp, rp, 'minecraft:oak_stairs', 'mypack:oak_stairs', {'repeat': [2, 2]},
+                                   samples=SAMPLES, grid=grid(Path(folder) / 'grid.png', 2, 2))
+            self.assertEqual(check_tree(bp, rp, SAMPLES), [])
+            self.assertEqual(entry['shape'], 'stairs')
+            stairs = json.loads((bp / 'blocks/oak_stairs.json').read_text())['minecraft:block']
+            self.assertEqual(len(stairs['components']['minecraft:geometry']['bone_visibility']), 40)
+            entry, _ = write_block(bp, rp, 'minecraft:oak_fence', 'mypack:oak_fence', {'repeat': [2, 2]},
+                                   samples=SAMPLES, grid=grid(Path(folder) / 'grid.png', 2, 2))
+            self.assertEqual(check_tree(bp, rp, SAMPLES), [])
+            self.assertEqual(entry['shape'], 'fence')
+            fence = json.loads((bp / 'blocks/oak_fence.json').read_text())['minecraft:block']
+            self.assertEqual(fence['components']['minecraft:connection_rule'], {'accepts_connections_from': 'only_fences'},
+                             'vanilla nether brick fences, panes and walls do not join a wooden fence')
+            entry, _ = write_block(bp, rp, 'minecraft:cobblestone_wall', 'mypack:cobblestone_wall', {'repeat': [2, 2]},
+                                   samples=SAMPLES, grid=grid(Path(folder) / 'grid.png', 2, 2))
+            self.assertEqual(check_tree(bp, rp, SAMPLES), [])
+            self.assertEqual(entry['shape'], 'wall')
+
     def test_blocks_that_cannot_be_swapped_are_refused_with_the_reason(self):
         def refused(vanilla, identifier, pattern, text):
             with self.assertRaises(AuthoringError) as caught:
                 build_block(vanilla, identifier, pattern, samples=SAMPLES)
             self.assertIn(text, str(caught.exception))
         refused('minecraft:grass_block', 'mypack:grass', {'repeat': [2, 2]}, 'stays vanilla')
-        refused('minecraft:torch', 'mypack:torch', {'repeat': [2, 2]}, 'not a full cube')
+        refused('minecraft:torch', 'mypack:torch', {'repeat': [2, 2]}, 'not a full cube or a slab')
         refused('minecraft:stone', 'minecraft:stone2', {'repeat': [2, 2]}, 'must be your pack id')
         refused('minecraft:stone', 'stone', {'repeat': [2, 2]}, 'must look like mypack:stone')
         refused('minecraft:stone', 'mypack:stone', {'repeat': [7, 5]}, 'more than 4096 block permutations')
@@ -379,6 +417,30 @@ class ConnectedBlockTest(unittest.TestCase):
         self.assertEqual(atlas['mypack_glass_along'], {'textures': 'textures/blocks/glass_ctm_24'})
         culling = json.loads((self.rp / 'block_culling/mypack_glass.json').read_text())
         self.assertTrue(all(rule['condition'] == 'same_block' for rule in culling['minecraft:block_culling_rules']['rules']))
+
+    def test_tiles_can_have_random_variants_and_faces_that_do_not_join_a_texture_of_their_own(self):
+        for tile in (0, 2, 24, 26):
+            ground_texture(self.rp / f'textures/blocks/glass_ctm_b_{tile}.png')
+        ground_texture(self.rp / 'textures/blocks/end_0.png')
+        ground_texture(self.rp / 'textures/blocks/end_1.png')
+        sides = ['north', 'south', 'west', 'east']
+        write_connected(self.bp, self.rp, 'minecraft:oak_planks', 'mypack:planks',
+                        connected_tiles(['textures/blocks/glass_ctm', 'textures/blocks/glass_ctm_b']), faces=sides,
+                        textures={'up': ['textures/blocks/end_0', 'textures/blocks/end_1'],
+                                  'down': 'textures/blocks/end_0'}, samples=SAMPLES)
+        self.assertEqual(check_tree(self.bp, self.rp, SAMPLES), [])
+        atlas = json.loads((self.rp / 'textures/terrain_texture.json').read_text())['texture_data']
+        self.assertEqual(atlas['mypack_planks_alone'], {'textures': {'variations': [
+            {'path': 'textures/blocks/glass_ctm_0'}, {'path': 'textures/blocks/glass_ctm_b_0'}]}})
+        self.assertEqual(len(atlas['mypack_planks_up']['textures']['variations']), 2)
+        self.assertEqual(atlas['mypack_planks_down'], {'textures': 'textures/blocks/end_0'})
+        definition = json.loads((self.bp / 'blocks/planks.json').read_text())
+        joined = quarter_textures(definition, {'up', 'down', 'east'})
+        self.assertEqual({joined[f'up_{q}'] for q in ('00', '10', '01', '11')}, {'up'})
+        self.assertEqual({joined[f'down_{q}'] for q in ('00', '10', '01', '11')}, {'down'})
+        with self.assertRaisesRegex(AuthoringError, 'does not join: leave it out of --faces'):
+            write_connected(self.bp, self.rp, 'minecraft:oak_planks', 'mypack:planks', connected_tiles('textures/blocks/glass_ctm'),
+                            textures={'up': 'textures/blocks/end_0'}, samples=SAMPLES)
 
     def test_planks_can_join_sideways_on_their_sides_only(self):
         entry = write_connected(self.bp, self.rp, 'minecraft:oak_planks', 'mypack:planks',

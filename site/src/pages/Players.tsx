@@ -15,7 +15,8 @@ export default function Players() {
         <Alert.Content>
           <Alert.Title>Try a pack in a copy of your world first</Alert.Title>
           <Alert.Description>
-            Converted blocks stay in the world. A world played with a converted pack keeps needing it.
+            Converted blocks stay in the world. To take a pack out, follow the steps in "Take a pack
+            out" below.
           </Alert.Description>
         </Alert.Content>
       </Alert>
@@ -56,15 +57,44 @@ export default function Players() {
       <Section id="converting" title="What you will see">
         <p>
           Blocks take the pack's look as soon as they load, nearest first. The blocks you place change
-          at once. The world beyond your simulation distance is converted in the background, one area
-          at a time. The action bar shows how far it has got:
+          at once. Far away, past your simulation distance, only the leaves change, one area at a
+          time, starting with what you look at. Other blocks change when you come near them. The
+          action bar shows how far it has got:
         </p>
-        <CodeBlock label="Action bar text">{"Converting the world around you: N / M chunks"}</CodeBlock>
+        <CodeBlock label="Action bar text">{"Loading the pack in the distance: N / M chunks"}</CodeBlock>
         <p>
           The engine swaps blocks for look-alike copies that can show the pack's patterns. They work
           like the normal blocks: mining, drops, tools, explosions and redstone behave the same. Grass,
           dirt, sand and other blocks whose gameplay needs the real block stay vanilla. Their random
           textures, edges and decals are drawn by the game itself.
+        </p>
+      </Section>
+
+      <Section id="remove" title="Take a pack out">
+        <p>Before you remove the packs, put the world back to vanilla blocks.</p>
+        <p>With commands on (cheats, or an operator on a server):</p>
+        <ol className="list-decimal space-y-3 pl-6">
+          <li>
+            Run <Code>/scriptevent bct:control restore</Code> in the chat.
+          </li>
+          <li>
+            Keep playing until the chat says the world is back to vanilla blocks. You can leave and
+            come back. It goes on where it stopped.
+          </li>
+          <li>Close the world and remove the packs.</li>
+        </ol>
+        <p>Without commands, or if you already removed the packs:</p>
+        <ol className="list-decimal space-y-3 pl-6">
+          <li>Close Minecraft.</li>
+          <li>
+            Get a copy of the repository and run{" "}
+            <Code>python bct.py restore &lt;world folder&gt;</Code>. It saves a zip of the world first.
+          </li>
+          <li>Open the world without the packs.</li>
+        </ol>
+        <p>
+          If you remove a pack and do neither, its blocks show as a dirt block with a "?". They are not
+          lost: add the pack back and they return.
         </p>
       </Section>
 
@@ -88,9 +118,7 @@ export default function Players() {
             </Accordion.Heading>
             <Accordion.Panel>
               <Accordion.Body>
-                Yes. Converted blocks stay in the world, so a world played with a converted pack keeps
-                needing it. Try a pack in a copy of your world first. To take the engine out of a world,
-                run <Code>/scriptevent bct:control off</Code> first.
+                Yes, until you take the pack out. The steps are in "Take a pack out" above.
               </Accordion.Body>
             </Accordion.Panel>
           </Accordion.Item>

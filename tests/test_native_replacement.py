@@ -16,7 +16,7 @@ from bedrock_schema import check_tree
 from carrier_budget import apply_budget, load_budget, rule_targets
 from common import samples_path
 from native_replacement import (build_replacements, fallback_patterns, load_policy, repeat_index, repeat_moduli,
-                                representative, vanilla_tags_of)
+                                representative, shaped_over_budget, vanilla_tags_of)
 
 FACES = ['north', 'east', 'south', 'west', 'up', 'down']
 TEXTURES = 'assets/minecraft/textures/block/'
@@ -161,6 +161,22 @@ def source_pack(root):
     material(root, CTM + 'log/1.png', (120, 80, 40, 255))
 
 
+class PermutationBudgetTests(unittest.TestCase):
+    def test_the_costliest_shaped_blocks_go_first_until_the_pack_fits(self):
+        report = {'permutations': 70000, 'block_permutations': {
+            'minecraft:stone': [9000, None], 'minecraft:oak_stairs': [2560, 'stairs'],
+            'minecraft:stone_stairs': [1280, 'stairs'], 'minecraft:oak_slab': [128, 'slab']}}
+        self.assertEqual(shaped_over_budget(report, 0, limit=67500), {'minecraft:oak_stairs'})
+        self.assertEqual(shaped_over_budget(report, 1000, limit=67500), {'minecraft:oak_stairs', 'minecraft:stone_stairs'})
+        self.assertEqual(shaped_over_budget(report, 0, limit=70000), set(), 'a pack within the limit keeps everything')
+        self.assertEqual(shaped_over_budget(report, 0, limit=1), {'minecraft:oak_stairs', 'minecraft:stone_stairs',
+                                                                    'minecraft:oak_slab'}, 'full cubes are never left out')
+        report['block_permutations']['minecraft:white_concrete_stairs'] = [640, 'stairs']
+        report['permutations'] += 640
+        self.assertEqual(shaped_over_budget(report, 0, limit=70000), {'minecraft:white_concrete_stairs'},
+                         'dyed stairs go before the costlier wood and stone stairs')
+
+
 class RepeatCoordinateTests(unittest.TestCase):
     def test_repeat_index_matches_the_engine_with_texture_orientations(self):
         source = Path(__file__).resolve().parents[1] / 'engine/tiles.mjs'
@@ -199,14 +215,14 @@ def drawing_policy():
 
 
 class NativeReplacementTests(unittest.TestCase):
-    def build(self, root, policy=None):
+    def build(self, root, policy=None, doc=None):
         source = root / 'compiled'
         source_pack(source)
         # The same order as convert_java_author_pack.convert: variations, replacement blocks, then carriers.
         policy = policy or load_policy()
         budget = load_budget()
         budget['carrier_fallback'] = fallback_patterns(policy)
-        doc = document()
+        doc = doc or document()
         _, _, first = apply_budget(doc, budget)
         variations = {item['rule'] for item in first['dropped_rules'] if item.get('native_variation')}
         targets = {rule['id']: sorted(rule_targets(rule, doc)) for rule in doc['rules']}
@@ -246,6 +262,90 @@ class NativeReplacementTests(unittest.TestCase):
             self.assertEqual(reasons[('wool', 'minecraft:red_carpet')], 'not a full cube')
             self.assertEqual(report['uncarried_targets']['chained'], [],
                              'a rule with no target is reported by the accounting')
+
+    def test_slabs_show_the_tile_of_a_full_block_in_their_place_on_half_a_block(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            material(root / 'compiled', TEXTURES + 'cobblestone.png', (90, 90, 90, 255))
+            for n in range(4):
+                material(root / 'compiled', CTM + f'cobble/{n}.png', (10 * n, 90, 90, 255))
+            doc = document()
+            doc['rules'].append({'id': 'cobble', 'method': 'repeat', 'blocks': [],
+                                 'matchTiles': [TEXTURES + 'cobblestone.png'], 'faces': FACES, 'width': 2, 'height': 2,
+                                 'tiles': [CTM + f'cobble/{n}.png' for n in range(4)]})
+            # Bedrock's stone_stairs are cobblestone stairs.
+            for block in ('cobblestone', 'cobblestone_slab', 'cobblestone_double_slab', 'stone_stairs', 'nether_brick_fence',
+                          'cobblestone_wall'):
+                doc['baseTextures']['minecraft:' + block] = cube('cobblestone')
+            doc['fullCubeBlocks'] += ['minecraft:cobblestone', 'minecraft:cobblestone_double_slab']
+            _, _, data, built = self.build(root, doc=doc)
+            self.assertEqual(sorted(built['rules']['cobble']), ['minecraft:cobblestone', 'minecraft:cobblestone_double_slab',
+                                                               'minecraft:cobblestone_slab', 'minecraft:cobblestone_wall',
+                                                               'minecraft:nether_brick_fence',
+                                                               'minecraft:stone_stairs'])
+            entries = {entry['vanilla']: entry for entry in data['blocks']}
+            slab_entry = entries['minecraft:cobblestone_slab']
+            self.assertEqual(slab_entry['shape'], 'slab')
+            self.assertEqual(slab_entry['mirror'], {'minecraft:vertical_half': 'bct:vertical_half'})
+            self.assertNotIn('shape', entries['minecraft:cobblestone_double_slab'], 'a double slab is a full cube')
+
+            def looks(definition):
+                return {permutation['condition']: permutation['components']['minecraft:material_instances']
+                        for permutation in definition['permutations']
+                        if 'minecraft:material_instances' in permutation['components']}
+
+            cobble, slab = self.block(root, 'r_cobblestone'), self.block(root, 'r_cobblestone_slab')
+            self.assertEqual(looks(slab), looks(cobble), 'every place shows the tile the full block shows there')
+            self.assertEqual(slab['description']['states']['bct:vertical_half'], ['bottom', 'top'])
+            boxes = {permutation['condition']: permutation['components']['minecraft:collision_box']
+                     for permutation in slab['permutations'] if 'minecraft:collision_box' in permutation['components']}
+            self.assertEqual(boxes, {"q.block_state('bct:vertical_half') == 'bottom'": {'origin': [-8, 0, -8],
+                                                                                        'size': [16, 8, 16]},
+                                     "q.block_state('bct:vertical_half') == 'top'": {'origin': [-8, 8, -8],
+                                                                                     'size': [16, 8, 16]}})
+            self.assertTrue(slab['components']['minecraft:liquid_detection']['detection_rules'][0]['can_contain_liquid'])
+            geometry = slab['components']['minecraft:geometry']
+            self.assertEqual(geometry['bone_visibility']['shape_top'], "q.block_state('bct:vertical_half') == 'top'")
+            model = read_json(root / REPLACE_RP / f"models/blocks/{geometry['identifier'].split('.')[1]}_r_cobblestone_slab.geo.json")
+            bones = {bone['name']: bone['cubes'][0] for bone in model['minecraft:geometry'][0]['bones']}
+            self.assertEqual(bones['shape_bottom']['uv']['north'], {'uv': [0, 8], 'uv_size': [16, 8],
+                                                                    'material_instance': 'north'},
+                             'a bottom slab side shows the lower half of the tile, as in Java')
+            self.assertEqual(bones['shape_top']['uv']['north']['uv'], [0, 0])
+            culling = read_json(root / REPLACE_RP / f"block_culling/{geometry['identifier'].split('.')[1]}_r_cobblestone_slab.json")
+            culled = {(rule['geometry_part']['bone'], rule['geometry_part']['face'])
+                      for rule in culling['minecraft:block_culling_rules']['rules']}
+            self.assertIn(('shape_bottom', 'down'), culled)
+            self.assertNotIn(('shape_bottom', 'up'), culled, 'the inside face of a slab never culls')
+            loot = read_json(root / REPLACE_BP / 'loot_tables/bct/bct_pack_test/r_cobblestone_double_slab.json')
+            entry = loot['pools'][0]['entries'][0]
+            self.assertEqual((entry['name'], entry['functions'][0]['count']), ('minecraft:cobblestone_slab', 2))
+            self.assertEqual(self.block(root, 'r_cobblestone_double_slab')['components']['minecraft:geometry'],
+                             'minecraft:geometry.full_block')
+            stairs_entry = entries['minecraft:stone_stairs']
+            self.assertEqual(stairs_entry['shape'], 'stairs')
+            self.assertEqual(stairs_entry['mirror']['minecraft:corner'], 'bct:corner')
+            stairs = self.block(root, 'r_stone_stairs')
+            self.assertEqual(looks(stairs), looks(cobble), 'stairs show the same tiles as the full block too')
+            self.assertEqual(len(stairs['components']['minecraft:geometry']['bone_visibility']), 40)
+            self.assertEqual(sum('minecraft:collision_box' in permutation['components']
+                                 for permutation in stairs['permutations']), 40)
+            loot = read_json(root / REPLACE_BP / 'loot_tables/bct/bct_pack_test/r_stone_stairs.json')
+            self.assertEqual(loot['pools'][0]['entries'][0]['name'], 'minecraft:stone_stairs', 'a stair drops itself')
+            self.assertEqual(entries['minecraft:nether_brick_fence']['shape'], 'fence')
+            fence = self.block(root, 'r_nether_brick_fence')
+            self.assertEqual(looks(fence), looks(cobble))
+            self.assertEqual(fence['components']['minecraft:connection_rule'], {'accepts_connections_from': 'none'},
+                             'vanilla wooden fences must not join a nether brick fence')
+            wall = self.block(root, 'r_cobblestone_wall')
+            self.assertEqual(entries['minecraft:cobblestone_wall']['shape'], 'wall')
+            self.assertEqual(looks(wall), looks(cobble))
+            self.assertEqual(len(wall['components']['minecraft:geometry']['bone_visibility']), 9,
+                             'a post and a short and a tall arm per side')
+            self.assertEqual(sum('minecraft:collision_box' in permutation['components']
+                                 for permutation in wall['permutations']), 162)
+            self.assertEqual(sum('minecraft:collision_box' in permutation['components']
+                                 for permutation in fence['permutations']), 16)
 
     def test_repeat_blocks_mirror_vanilla_and_cover_every_position(self):
         with tempfile.TemporaryDirectory() as folder:

@@ -12,7 +12,8 @@ from PIL import Image
 # A full mipmap chain adds a third to the memory of the base image.
 MIPMAPS = 4 / 3
 WARN_MIB = 2048
-WARN_PERMUTATIONS = 30000
+# Every combination of a custom block's states counts; Bedrock warns above this many in a world.
+WARN_PERMUTATIONS = 65536
 IMAGE_SUFFIXES = ('.png', '.tga', '.jpg', '.jpeg')
 
 
@@ -47,6 +48,7 @@ def load_report(base_packs, replacement=None, permutations=0):
                             'packs this large have failed to load. '
                             'Convert a lower-resolution edition of the pack.')
     if permutations > WARN_PERMUTATIONS:
-        warnings.append(f'{permutations} custom block permutations; worlds may load slowly or fail to load.')
+        warnings.append(f'{permutations} custom block permutations, over the {WARN_PERMUTATIONS} the game warns about; '
+                        'worlds may load slowly or fail to load.')
     report['warnings'] = warnings
     return report

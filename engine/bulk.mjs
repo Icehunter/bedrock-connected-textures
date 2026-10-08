@@ -13,6 +13,14 @@
  * (and set the water again) instead of adding them here.
  */
 
+/** Sets one block and gives a waterlogged block its water back, which setPermutation drops. */
+export function setKeepingWater(block, permutation) {
+  let wet = false;
+  try { wet = block.isWaterlogged === true; } catch { /* unknown */ }
+  block.setPermutation(permutation);
+  if (wet) try { block.setWaterlogged?.(true); } catch { /* the block cannot hold water */ }
+}
+
 /** api: @minecraft/server (BlockPermutation, ListBlockVolume). log(message) reports a refused write. */
 export function createBulkWriter({ api, log = () => {} }) {
   const groups = new Map();   // dimension id + permutation key -> { dimension, permutation, locations }

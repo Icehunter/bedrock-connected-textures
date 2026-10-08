@@ -24,6 +24,7 @@ from authoring import (AuthoringError, add_edge_to_data, add_to_data, build_carr
                        check_pack, init_pack,
                        parse_models, write_block, write_connected, write_edge, write_leaves, write_overlay_tiles)
 from common import samples_path  # noqa: E402
+from world_restore import WorldRestoreError, restore_world  # noqa: E402
 
 
 def samples_of(options):
@@ -103,8 +104,15 @@ def overlays_command(options):
 def connected_command(options):
     tiles = connected_tiles(options.ctm, options.alone, options.across, options.along, options.joined)
     connect = options.connect if options.connect else 'same'
+    textures = {}
+    for item in options.face_texture or []:
+        face, _, paths = item.partition('=')
+        if not paths:
+            raise AuthoringError('--face-texture is FACE=PATH, such as up=textures/blocks/sandstone_top')
+        variants = paths.split(',')
+        textures[face] = variants[0] if len(variants) == 1 else variants
     entry = write_connected(options.bp, options.rp, options.vanilla, options.block, tiles, faces=options.faces,
-                            joins=options.joins, connect=connect, samples=samples_of(options))
+                            joins=options.joins, connect=connect, textures=textures, samples=samples_of(options))
     report_entry(options, entry, 'connected')
 
 
@@ -121,6 +129,23 @@ def check_command(options):
         print(f'{len(problems)} problem(s): fix them and run python bct.py check again.')
         return 1
     print('The pack is ready for BCT.')
+    return 0
+
+
+def restore_command(options):
+    try:
+        report = restore_world(options.world, samples_of(options), backup=not options.no_backup)
+    except WorldRestoreError as error:
+        raise AuthoringError(str(error)) from None
+    if report['backup']:
+        print('Backup: ' + report['backup'])
+    for name in sorted(report['rewritten']):
+        print('  ' + name)
+    print(f"Changed these blocks in {report['subchunks']} chunk section(s).")
+    if report['left']:
+        print('These BCT blocks are still in the world: ' + ', '.join(sorted(report['left'])))
+        return 1
+    print('The world has no BCT blocks. You can open it without the BCT packs.')
     return 0
 
 
@@ -196,11 +221,14 @@ def main(argv=None):
     connected = commands.add_parser('connected', help='Make a connected copy of a vanilla block, such as glass')
     connected.add_argument('vanilla', help='The vanilla block, such as minecraft:glass')
     connected.add_argument('block', help='Your block id, such as mypack:glass')
-    connected.add_argument('--ctm', help='A standard 47-tile set, such as textures/blocks/glass_ctm (glass_ctm_0 to _46)')
-    connected.add_argument('--alone', help='Or the four tiles: a block on its own')
-    connected.add_argument('--across', help='Joined left and right')
-    connected.add_argument('--along', help='Joined up and down')
-    connected.add_argument('--joined', help='Joined all round')
+    connected.add_argument('--ctm', nargs='+', help='A standard 47-tile set, such as textures/blocks/glass_ctm '
+                           '(glass_ctm_0 to _46); several sets are random variants')
+    connected.add_argument('--alone', nargs='+', help='Or the four tiles: a block on its own (several: random variants)')
+    connected.add_argument('--across', nargs='+', help='Joined left and right')
+    connected.add_argument('--along', nargs='+', help='Joined up and down')
+    connected.add_argument('--joined', nargs='+', help='Joined all round')
+    connected.add_argument('--face-texture', action='append', metavar='FACE=PATH',
+                           help='A face that does not join shows this texture (PATH,PATH,... for random variants)')
     connected.add_argument('--faces', nargs='+', help='The faces that join (default all six)')
     connected.add_argument('--joins', default='all', help='all, horizontal or vertical (bookshelves: horizontal)')
     connected.add_argument('--connect', nargs='+', metavar='BLOCK', help='The blocks it joins (default: the same block)')
@@ -218,6 +246,12 @@ def main(argv=None):
     check.add_argument('--rp', required=True, help='Your resource pack folder')
     check.add_argument('--samples', type=Path, help="Mojang's bedrock-samples folder")
     check.set_defaults(run=check_command)
+    restore = commands.add_parser('restore', help='Put every BCT block in a world back to its vanilla block, '
+                                  'with the game closed; works after the packs are removed')
+    restore.add_argument('world', help='The world folder (the one holding level.dat and db)')
+    restore.add_argument('--no-backup', action='store_true', help='Do not zip the world first')
+    restore.add_argument('--samples', type=Path, help="Mojang's bedrock-samples folder")
+    restore.set_defaults(run=restore_command)
     options = parser.parse_args(argv)
     try:
         return options.run(options) or 0

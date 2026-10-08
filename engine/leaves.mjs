@@ -45,7 +45,7 @@
  * waiting for players to look away) have update_bit cleared again when a
  * conversion set it.
  */
-import { createBulkWriter } from './bulk.mjs';
+import { createBulkWriter, setKeepingWater } from './bulk.mjs';
 import { javaModelIndex } from './tiles.mjs';
 import { NO_VIEWS, showsAt } from './views.mjs';
 
@@ -208,13 +208,6 @@ export function createLeaves({ api, limits, log = () => {}, logAliases = () => [
     const current = block.permutation.getAllStates?.() ?? {}, states = {};
     for (const [name, mirrored] of Object.entries(entry.mirror)) if (mirrored in current) states[name] = current[mirrored] === 1 || current[mirrored] === true;
     return resolve(entry.vanilla, states);
-  }
-
-  function setKeepingWater(block, permutation) {
-    let wet = false;
-    try { wet = block.isWaterlogged === true; } catch { /* unknown */ }
-    block.setPermutation(permutation);
-    if (wet) try { block.setWaterlogged?.(true); } catch { /* the block cannot hold water */ }
   }
 
   function own(dimensionId, cx, cz) {
@@ -976,6 +969,43 @@ export function createLeaves({ api, limits, log = () => {}, logAliases = () => [
     customsOf: typeId => { const entry = byVanilla.get(typeId); return entry ? [entry.block] : []; },
     customTypes: () => [...byCustom.keys()],
     isLeaf: typeId => byCustom.has(typeId),
+    /** Turns one converted leaf back into its vanilla leaf, keeping its water. */
+    revertLeaf(block) {
+      const entry = byCustom.get(block?.typeId);
+      if (!entry) return false;
+      setKeepingWater(block, vanillaOf(entry, block)); stats.reverts++;
+      return true;
+    },
+    /** The chunks holding converted leaves: [{ dimension (id), cx, cz }]. */
+    ownedChunks: () => { recover(); return [...owned.values()]; },
+    /**
+     * Restoring the world: every converted leaf in the loaded chunks that hold some goes back to its vanilla leaf
+     * (keeping its water), and the chunk is forgotten. Chunks not loaded wait. Nothing happens before the pack's
+     * leaf data arrives, since without it a converted leaf cannot be mapped back.
+     */
+    restore(until) {
+      recover();
+      if (!byCustom.size) return;
+      const types = [...byCustom.keys()];
+      for (const chunk of [...owned.values()]) {
+        if (now() >= until) break;
+        let dimension;
+        try { dimension = world.getDimension(chunk.dimension); } catch { continue; }
+        try { if (!dimension.isChunkLoaded({ x: chunk.cx * 16, y: 0, z: chunk.cz * 16 })) continue; } catch { continue; }
+        const range = dimension.heightRange;
+        const volume = new api.BlockVolume({ x: chunk.cx * 16, y: range.min, z: chunk.cz * 16 },
+          { x: chunk.cx * 16 + 15, y: range.max - 1, z: chunk.cz * 16 + 15 });
+        try {
+          if (dimension.containsBlock(volume, { includeTypes: types }, true))
+            for (const location of dimension.getBlocks(volume, { includeTypes: types }, true).getBlockLocationIterator()) {
+              const block = dimension.getBlock(location), entry = block && byCustom.get(block.typeId);
+              if (entry) { setKeepingWater(block, vanillaOf(entry, block)); stats.reverts++; }
+            }
+        } catch (error) { console.warn('[BCT] leaf restore ' + chunk.dimension + ' ' + chunk.cx + ',' + chunk.cz + ': ' + String(error)); continue; }
+        disown(chunk.dimension, chunk.cx, chunk.cz);
+      }
+      flush();
+    },
     /** Blocks moved (a piston): leaves around it check again as if a log went away. */
     moved(dimension, location) {
       if (!byCustom.size || !enabled) return;

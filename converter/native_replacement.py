@@ -42,6 +42,7 @@ import hashlib
 import itertools
 import json
 import math
+import re
 from pathlib import Path
 import shutil
 import tempfile
@@ -51,6 +52,7 @@ from PIL import Image
 
 from bedrock_schema import Schemas, block_errors, culling_errors, geometry_errors, require_valid
 from block_gameplay import block_tags, components as gameplay_components, loot_table, mining, needed_tool
+from block_shapes import shape_components, shape_of, shaped_block, single_slab
 from common import BLOCKS_FORMAT, read_json, write_json
 from java_block_geometry import cube
 from model_blocks import build as build_model_block
@@ -69,6 +71,10 @@ MAX_BONES = 64
 MAX_MATERIALS = 64
 # A random rule's pick is a block state, and a block state holds at most 16 values.
 MAX_RANDOM_TILES = 16
+# Bedrock warns that a world whose custom blocks have more permutations than this may load and run slowly.
+WORLD_PERMUTATIONS = 65536
+# Shaped blocks in sixteen dye colours, left out first when a pack passes the limit.
+DYED = re.compile(r'_(concrete|wool|terracotta)_|stained_glass')
 # Block permutations a replacement may have unless the policy sets max_permutations.
 DEFAULT_MAX_PERMUTATIONS = 4096
 SKIP = ('<skip>', '<default>')
@@ -153,7 +159,7 @@ def profile_of(block, policy):
     """
     profile = next((item for item in policy.get('profiles', []) if _matches(block, item['blocks'])), None)
     if profile is None:
-        return None
+        return _shaped_profile(block, policy)
     result = dict(profile)
     color = result['map_color']
     if color is not None and color in policy.get('colors', {}):
@@ -168,6 +174,33 @@ def profile_of(block, policy):
     return result
 
 
+def _shaped_profile(block, policy):
+    """A shaped block's profile, borrowed from its full block (policy shaped); None when the full block has none.
+
+    oak_slab and oak_stairs borrow oak_planks, cobblestone_slab cobblestone;
+    `base` names the full block where the name does not lead to it (Bedrock's
+    stone_stairs are cobblestone stairs). A slab or stair drops itself and a
+    double slab two slabs, whatever the full block drops.
+    """
+    shaped = policy.get('shaped', {})
+    if not _matches(block, shaped.get('blocks', [])):
+        return None
+    slab = single_slab(block) or block
+    stem = slab.removesuffix('_slab').removesuffix('_stairs').removesuffix('_fence').removesuffix('_wall')
+    names = [shaped.get('base', {}).get(slab)] + [stem + suffix for suffix in ('_planks', 's', '_block', '')]
+    base = next((name for name in names if name and profile_of(name, policy)), None)
+    if base is None:
+        return None
+    result = {key: value for key, value in profile_of(base, policy).items() if key not in ('xp', 'fortune', 'loot')}
+    result['blocks'] = [block]
+    if slab != block:
+        result['loot'] = [{'item': slab, 'min': 2}]
+    for override in shaped.get('overrides', []):
+        if _matches(block, override['blocks']):
+            result.update({key: value for key, value in override.items() if key not in ('blocks', 'reason')})
+    return result
+
+
 def vanilla_tags_of(block, policy):
     """The vanilla Bedrock block tags of a vanilla block (policy vanilla_tags), which its replacement carries too."""
     return sorted(tag for tag, patterns in policy.get('vanilla_tags', {}).get('tags', {}).items()
@@ -179,7 +212,37 @@ def fallback_patterns(policy):
     return [pattern for entry in policy.get('carrier_fallback', []) for pattern in entry['blocks']]
 
 
-def build_replacements(document, candidates, policy, *, source, samples, key, output, passengers=None, model_blocks=()):
+def registered_permutations(definition):
+    """The permutations the game registers for a block: every combination of its states' values."""
+    states = definition['minecraft:block']['description'].get('states', {})
+    counts = [len(spec) if isinstance(spec, list) else spec['values']['max'] - spec['values']['min'] + 1
+              for spec in states.values()]
+    return math.prod(counts)
+
+
+def shaped_over_budget(report, other_permutations, limit=WORLD_PERMUTATIONS):
+    """The shaped blocks (slabs, stairs, fences, walls) to leave out so the pack stays within the game's permutation limit.
+
+    report: build_replacements' report; other_permutations: the pack's other
+    custom blocks (overlay surfaces). Dyed blocks go first (concrete, wool and
+    terracotta stairs and slabs, sixteen colours of rarely built blocks), then
+    the costliest (stairs with large patterns before slabs); they stay vanilla
+    blocks showing the author's base texture. Returns the vanilla block ids, or
+    an empty set.
+    """
+    total = report['permutations'] + other_permutations
+    dropped = set()
+    shaped = [(cost, block) for block, (cost, shape) in report['block_permutations'].items() if shape]
+    for cost, block in sorted(shaped, key=lambda item: (not DYED.search(item[1]), -item[0], item[1])):
+        if total <= limit:
+            break
+        dropped.add(block)
+        total -= cost
+    return dropped
+
+
+def build_replacements(document, candidates, policy, *, source, samples, key, output, passengers=None, model_blocks=(),
+                       skip=()):
     """Write Replace_BP and Replace_RP for every representable block.
 
     candidates: {rule id: [target blocks]} for rules that should draw natively.
@@ -193,6 +256,7 @@ def build_replacements(document, candidates, policy, *, source, samples, key, ou
     model_blocks: model_blocks.plan_all plans (blocks drawn with the author's Java
     models, leaves first); they go in the same packs, with their engine data
     under 'leaves'.
+    skip: blocks left out to keep the pack within the permutation limit (shaped_over_budget).
     Returns (engine data or None, report).
     """
     samples, output = Path(samples), Path(output)
@@ -221,6 +285,9 @@ def build_replacements(document, candidates, policy, *, source, samples, key, ou
         for block in sorted(rules_by_block):
             rule_ids = sorted(rules_by_block[block], key=order.get)
             reason = _not_replaceable(block, known, full, pane_patterns, policy, kept_vanilla)
+            if block in skip:
+                reason = (f"left out: the pack's custom blocks would pass the game's {WORLD_PERMUTATIONS} permutations; "
+                          'it shows the base texture')
             if reason:
                 unsupported += _unsupported(rule_ids, block, reason)
                 continue
@@ -268,6 +335,7 @@ def build_replacements(document, candidates, policy, *, source, samples, key, ou
         require_valid(bp, rp, samples)
     replaced = sorted(writer.replaced.items(), key=lambda item: order[item[0]])
     report = {'replacement_blocks': len(blocks), 'permutations': writer.permutations,
+              'block_permutations': dict(sorted(writer.block_permutations.items())),
               'materials': len(materials.atlas),
               'rules': {rule_id: sorted(targets) for rule_id, targets in replaced},
               'unsupported': unsupported, 'notes': writer.notes, 'kept_vanilla': dict(sorted(kept_vanilla.items())),
@@ -457,6 +525,8 @@ class _ReplacementWriter:
         self.notes = []
         self.tagged = {}
         self.permutations = 0
+        # {vanilla block: (permutations the game registers for its replacement, its shape or None)}
+        self.block_permutations = {}
 
     def add(self, block, rule_ids, profile, pane):
         """Writes the replacement of one block; ValueError or OSError says why it cannot be replaced."""
@@ -466,7 +536,7 @@ class _ReplacementWriter:
         stem = 'r_' + block.removeprefix('minecraft:')
         identifier = self.namespace + ':' + stem
         block_rules = [self.rules[rule_id] for rule_id in rule_ids]
-        build_look = self._pane_look if pane else self._cube_look
+        build_look = self._pane_look if pane else self._shaped_look if shape_of(block) else self._cube_look
         states, components, permutations, files, entry_extra, plan = build_look(
             block, block_rules, vanilla_states, mirror, transparent, stem)
         loot_path = f'loot_tables/bct/{self.namespace}/{stem}.json'
@@ -502,7 +572,9 @@ class _ReplacementWriter:
         vanilla_sound = self.sounds.get(block.removeprefix('minecraft:'), {}).get('sound')
         if vanilla_sound:
             self.terrain_sounds[identifier] = {'sound': vanilla_sound}
-        self.permutations += len(permutations)
+        cost = registered_permutations(definition)
+        self.permutations += cost
+        self.block_permutations[block] = (cost, shape_of(block) if not pane else None)
         entry = self._engine_entry(block, identifier, mirror, vanilla_states, plan, entry_extra, transparent, profile)
         self.entries.append(entry)
         for rule_id in rule_ids:
@@ -529,7 +601,7 @@ class _ReplacementWriter:
                 write_json(path, written)
             if sound:
                 self.terrain_sounds[entry['block']] = {'sound': sound}
-            self.permutations += len(definition['minecraft:block']['permutations'])
+            self.permutations += registered_permutations(definition)
             entries.append(entry)
             reports.append(report)
         return entries, reports, skipped
@@ -615,6 +687,42 @@ class _ReplacementWriter:
                       'minecraft:collision_box': True, 'minecraft:selection_box': True}
         models = _model_states(plan)
         return states, components, permutations, files, ({'models': models} if models else {}), plan
+
+    def _shaped_look(self, block, block_rules, vanilla_states, mirror, transparent, stem):
+        """(states, components, permutations, files, engine entry fields, plan) of a shaped replacement (a slab, stair, fence or wall).
+
+        Each face shows what a full block in its place would show; the geometry
+        keeps the parts the shape state shows, and collision and selection follow it.
+        """
+        shape = shape_of(block)
+        plan = self._plan_within_limit(block, block_rules, vanilla_states)
+        if self._oriented_faces(plan, mirror):
+            raise ValueError('turned textures on a shaped block')
+        if plan['groups']:
+            raise ValueError('model parts on a shaped block')
+        permutations, overlay_faces = self._permutations(plan, block, mirror, transparent, [])
+        if overlay_faces:
+            raise ValueError('overlay layers on a shaped block')
+        largest = max(len(permutation['components']['minecraft:material_instances']) for permutation in permutations)
+        if largest > MAX_MATERIALS:
+            raise ValueError(f"{largest} material instances exceed Bedrock's limit of {MAX_MATERIALS}")
+        geometry_id = 'geometry.' + self.namespace + '.' + stem
+        culling = self.namespace + ':' + stem + '_culling'
+        built = shaped_block(geometry_id, shape, mirror)
+        files = {self.rp / f'models/blocks/{self.namespace}_{stem}.geo.json': built['geometry'],
+                 self.rp / f'block_culling/{self.namespace}_{stem}.json':
+                     _culling_rules(culling, built['parts'], transparent)}
+        instances = permutations[0]['components']['minecraft:material_instances']
+        # Boxes depend only on the shape states; these permutations add them to whichever look permutation matches.
+        permutations += built['permutations']
+        components = {'minecraft:geometry': {'identifier': geometry_id, 'culling': culling,
+                                             'bone_visibility': built['visibility']},
+                      'minecraft:material_instances': instances, **built['boxes'],
+                      **shape_components(shape, block)}
+        states = self._cube_states(plan, vanilla_states, mirror)
+        models = _model_states(plan)
+        entry = {'shape': shape, **({'models': models} if models else {})}
+        return states, components, permutations, files, entry, plan
 
     def _plan_within_limit(self, block, block_rules, vanilla_states):
         """The block's plan; the weighted Java model turns are dropped when they exceed the permutation limit."""
@@ -807,7 +915,7 @@ def _not_replaceable(block, known, full, pane_patterns, policy, kept_vanilla):
     if reason:
         kept_vanilla[block] = reason
         return 'stays vanilla: ' + reason
-    if block not in full and not _matches(block, pane_patterns):
+    if block not in full and not _matches(block, pane_patterns) and not shape_of(block):
         return 'not a full cube'
     return _fallback_reason(block, policy)
 

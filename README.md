@@ -19,9 +19,10 @@ It has three parts:
 2. Add a pack made for it, and turn on both its behavior pack and its
    resource pack.
 3. Play. Blocks take the pack's look as soon as they load, nearest first,
-   and the blocks you place change at once. The world beyond your simulation
-   distance is converted in the background, one area at a time; the action
-   bar shows how many of the chunks around you are done.
+   and the blocks you place change at once. Beyond your simulation distance,
+   the leaves change in the background, one area at a time; the action bar
+   shows how many of the chunks around you are done. Other blocks change when
+   you come near them.
 
 The same pack works in Classic, Vibrant Visuals and ray tracing; there is no
 setting to pick.
@@ -32,8 +33,18 @@ drops, tools, explosions and redstone behave the same. Grass, dirt, sand and
 other blocks whose gameplay needs the real block stay vanilla; their random
 textures, edges and decals are drawn by the game itself.
 
-- Converted blocks stay in the world: a world played with a converted pack
-  keeps needing it. Try a pack in a copy of your world first.
+- Converted blocks stay in the world. To take a pack out of a world, first
+  run `/scriptevent bct:control restore` and play until it says the world is
+  back to vanilla blocks. You can leave and come back; it carries on. Then
+  remove the packs. This needs commands (cheats on, or an operator on a
+  server).
+- Without commands, or after the packs are removed: close the game and run
+  `python bct.py restore <world folder>` from a copy of this repository. It
+  zips the world first, then puts every block of a converted pack back to
+  vanilla. Then open the world without the packs.
+- If you remove a pack and do neither, its blocks show as unknown blocks (a
+  dirt block with a "?"). Add the pack back and they return.
+  Try a pack in a copy of your world first.
 - `/scriptevent bct:control status` shows what the engine is doing.
 
 ## For pack makers
