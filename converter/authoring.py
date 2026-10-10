@@ -1100,6 +1100,9 @@ CARRIERS_SCRIPT = 'scripts/bct-carriers.js'
 # The files `bct.py carriers` wrote last time, so a rebuild removes them first (in the behavior pack's root).
 CARRIER_FILES = 'bct-carriers-files.json'
 CARRIER_TILES = 47
+# The Java connected methods a carrier can draw, with how many tiles each takes (given as a list of paths).
+CARRIER_METHOD_TILES = {'ctm': 47, 'horizontal': 4, 'vertical': 4, 'horizontal+vertical': 7, 'vertical+horizontal': 7,
+                        'top': 1}
 # Files of the carrier add-on that stay out of the author's packs: its own manifests, icons and scripts.
 CARRIER_SKIPPED = ('manifest.json', 'pack_icon.png', 'carrier-atlas.json')
 # Files the author's pack may have too, merged by key.
@@ -1115,15 +1118,28 @@ def carrier_rules(carriers, rp, known):
         where = f'carriers[{index}]'
         if not isinstance(entry, dict):
             raise AuthoringError(where + ': must be an object with tiles and blocks')
-        unknown = set(entry) - {'tiles', 'blocks', 'faces'}
+        unknown = set(entry) - {'tiles', 'blocks', 'faces', 'method'}
         if unknown:
-            raise AuthoringError(f'{where}.{sorted(unknown)[0]}: is not tiles, blocks or faces')
+            raise AuthoringError(f'{where}.{sorted(unknown)[0]}: is not tiles, blocks, faces or method')
+        method = entry.get('method', 'ctm')
+        if method not in CARRIER_METHOD_TILES:
+            raise AuthoringError(f'{where}.method: must be one of {", ".join(sorted(CARRIER_METHOD_TILES))}')
         tiles = entry.get('tiles')
-        if not isinstance(tiles, str) or not tiles.startswith('textures/'):
-            raise AuthoringError(where + '.tiles: must be the tile path without its number, such as '
-                                 'textures/blocks/glass_ctm (tiles glass_ctm_0 to _46)')
-        for tile in range(CARRIER_TILES):
-            _texture_file(rp, f'{tiles}_{tile}')
+        count = CARRIER_METHOD_TILES[method]
+        if isinstance(tiles, list):
+            if len(tiles) != count or any(not isinstance(tile, str) or not tile.startswith('textures/') for tile in tiles):
+                raise AuthoringError(f'{where}.tiles: {method} takes a list of {count} texture paths '
+                                     'beginning with textures/')
+            tile_paths = list(tiles)
+        else:
+            if method != 'ctm':
+                raise AuthoringError(f'{where}.tiles: {method} takes a list of {count} texture paths')
+            if not isinstance(tiles, str) or not tiles.startswith('textures/'):
+                raise AuthoringError(where + '.tiles: must be the tile path without its number, such as '
+                                     'textures/blocks/glass_ctm (tiles glass_ctm_0 to _46)')
+            tile_paths = [f'{tiles}_{tile}' for tile in range(CARRIER_TILES)]
+        for tile in tile_paths:
+            _texture_file(rp, tile)
         blocks = entry.get('blocks')
         blocks = [blocks] if isinstance(blocks, str) else blocks
         if not isinstance(blocks, list) or not blocks or any(block not in known for block in blocks):
@@ -1131,8 +1147,8 @@ def carrier_rules(carriers, rp, known):
         faces = entry.get('faces', list(OVERLAY_FACES))
         if not isinstance(faces, list) or not faces or any(face not in OVERLAY_FACES for face in faces):
             raise AuthoringError(where + '.faces: must name faces from up, north, south, west, east and down')
-        rules.append({'id': f'c{index}', 'method': 'ctm', 'blocks': blocks, 'faces': faces, 'connect': 'block',
-                      'tiles': [f'{tiles}_{tile}' for tile in range(CARRIER_TILES)]})
+        rules.append({'id': f'c{index}', 'method': method, 'blocks': blocks, 'faces': faces, 'connect': 'block',
+                      'tiles': tile_paths})
     return rules
 
 

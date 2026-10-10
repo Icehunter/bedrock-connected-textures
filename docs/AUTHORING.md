@@ -66,9 +66,9 @@ Swapped blocks stay swapped. To take your pack out of a world, players run
 `/scriptevent bct:control restore`. They wait until it says the world is back
 to vanilla blocks, then remove the packs. If they remove the pack first, its
 blocks show as unknown blocks until the pack is added back.
-`python bct.py restore` works with the game closed, but it only knows the
-blocks of converted packs, not yours. So players of your pack need the
-command. Tell them this where you share the pack.
+`python bct.py restore` works with the game closed. It puts back the blocks
+of converted packs and the blocks of your pack that BCT swapped in (they
+carry `bct:` states). Other custom blocks in your pack stay as they are.
 
 Your blocks keep the vanilla block's gameplay: mining time and tool, drops
 (Fortune, Silk Touch), explosion resistance, map colour, sounds,
@@ -398,6 +398,25 @@ carriers: [
 ```
 python bct.py carriers --bp ... --rp ...
 ```
+
+A carrier draws any Java method. `method` is `ctm` by default. For the other
+methods, give `tiles` as a list of texture paths: 4 for `horizontal` and
+`vertical`, 7 for `horizontal+vertical` and `vertical+horizontal`, 1 for
+`top`.
+
+```js
+carriers: [
+  { method: "horizontal", tiles: ["textures/blocks/planks_0", "textures/blocks/planks_1",
+    "textures/blocks/planks_2", "textures/blocks/planks_3"], blocks: ["minecraft:oak_planks"],
+    faces: ["north", "south", "west", "east"] }
+]
+```
+
+Use carriers, not connected blocks (section 6), when the pack runs in Vibrant
+Visuals. A connected block splits each face into four parts. Vibrant Visuals
+lights a part of a face from inside the block, so these faces draw black in
+dark places. A carrier leaves the vanilla block as it is, so it has vanilla
+light.
 
 `bct.py carriers` builds the carrier entities, models, render controllers and
 texture atlas into your packs (merging `materials/entity.material` with

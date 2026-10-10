@@ -181,7 +181,7 @@ With commands on:
 
 If a pack is removed first, its blocks show as unknown blocks, but they keep their names. Add the pack back and they come back; restore can run then.
 
-`python bct.py restore <world folder>` does the same for converted packs with the game closed, and with no packs needed. It zips the world first. Then it reads the save and writes each `bct_*` block back as its vanilla block, with the states the block kept. Overlay surfaces and edges become air. At the end it checks that no BCT block is left.
+`python bct.py restore <world folder>` does the same for converted packs with the game closed, and with no packs needed. It zips the world first. Then it reads the save and writes each `bct_*` block back as its vanilla block, with the states the block kept. A block of an authored pack that carries `bct:` states goes back to the vanilla block of the same name; the pack's other custom blocks stay. Overlay surfaces and edges become air. At the end it checks that no BCT block is left.
 
 `bct:config` merges the given values over the defaults, rejects unknown names and out-of-range values, and saves them in the world. `bct:settings` opens the terrain edge height form. Converted blocks and leaves stay in the world until it is restored. With `debug` on, the engine logs scan errors and `/scriptevent bct:probe` logs the selection for the face under the crosshair; with it off, the engine logs only restore progress.
 

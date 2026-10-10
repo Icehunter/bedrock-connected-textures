@@ -8,7 +8,10 @@ game writes. Only palette entries change, so every block keeps its place:
 
 - `<pack>:r_<block>` (a replacement block) becomes `minecraft:<block>`;
 - `<pack>:m_<leaf>` (a converted leaf) becomes `minecraft:<leaf>`;
-- any other block of a `bct_` namespace (overlay surfaces, edge blocks) becomes air.
+- any other block of a `bct_` namespace (overlay surfaces, edge blocks) becomes air;
+- a block of an authored pack (`<pack>:<block>`, such as `ashen_vow:sandstone`) that carries `bct:` states becomes
+  `minecraft:<block>`. Only BCT puts `bct:` states on a block, so a pack's other custom blocks stay as they are, and so
+  does a BCT block with no vanilla block of that name.
 
 The vanilla states come back from the `bct:` states by name (`bct:vertical_half`
 gives `minecraft:vertical_half`), checked against Mojang's block list, with 0
@@ -28,6 +31,7 @@ import zlib
 SUBCHUNK_TAG = 47
 BLOCK_SIZE = 32768
 BCT = re.compile(r'^bct_[a-z0-9_]+:')
+BCT_MARKS = (b'bct_', b'bct:')       # in a sub-chunk that may hold a BCT block: a namespace, or a state name
 
 
 class WorldRestoreError(Exception):
@@ -327,17 +331,39 @@ def vanilla_states(samples):
             for item in data['data_items']}
 
 
+def may_hold_bct(value):
+    """Whether a sub-chunk's bytes could name a BCT block (a cheap check before reading its palette)."""
+    return any(mark in value for mark in BCT_MARKS)
+
+
+def authored_vanilla(entry, known):
+    """The vanilla block an authored pack's swapped block stands in for, or None when this is not one.
+
+    A custom block (any namespace but minecraft and bct_) with `bct:` states is one the BCT engine swapped in for
+    the vanilla block of the same name; a block with no such vanilla block cannot be put back."""
+    name = entry.get('name', (8, ''))[1]
+    namespace, _, stem = name.partition(':')
+    if not stem or namespace == 'minecraft' or BCT.match(name):
+        return None
+    if not any(state.startswith('bct:') for state in entry.get('states', (10, {}))[1]):
+        return None
+    return 'minecraft:' + stem if 'minecraft:' + stem in known else None
+
+
 def bct_mapping(known):
     """mapping(entry) for rewrite_subchunk: a BCT block's palette entry as its vanilla block (or air)."""
     def mapping(entry):
         name = entry.get('name', (8, ''))[1]
-        if not BCT.match(name):
-            return None
-        stem = name.split(':', 1)[1]
         vanilla = None
-        for prefix in ('r_', 'm_'):
-            if stem.startswith(prefix) and 'minecraft:' + stem[len(prefix):] in known:
-                vanilla = 'minecraft:' + stem[len(prefix):]
+        if BCT.match(name):
+            stem = name.split(':', 1)[1]
+            for prefix in ('r_', 'm_'):
+                if stem.startswith(prefix) and 'minecraft:' + stem[len(prefix):] in known:
+                    vanilla = 'minecraft:' + stem[len(prefix):]
+        else:
+            vanilla = authored_vanilla(entry, known)
+            if vanilla is None:
+                return None
         version = entry.get('version', (3, 0))
         if vanilla is None:
             return {'name': (8, 'minecraft:air'), 'states': (10, {}), 'version': version}
@@ -356,11 +382,13 @@ def bct_mapping(known):
     return mapping
 
 
-def count_bct_blocks(latest):
-    """{block name: count} of BCT blocks actually placed (palette entries some block uses)."""
+def count_bct_blocks(latest, known=None):
+    """{block name: count} of BCT blocks actually placed (palette entries some block uses).
+
+    known: Mojang's block list, to count authored packs' swapped blocks too."""
     found = Counter()
     for key, value in latest.items():
-        if not is_subchunk_key(key) or b'bct_' not in value:
+        if not is_subchunk_key(key) or not may_hold_bct(value):
             continue
         version = value[0]
         if version not in (8, 9):
@@ -383,7 +411,7 @@ def count_bct_blocks(latest):
             for index in range(size):
                 entry, i = read_palette_entry(value, i)
                 name = entry['name'][1]
-                if BCT.match(name) and indices.get(index):
+                if (BCT.match(name) or (known and authored_vanilla(entry, known))) and indices.get(index):
                     found[name] += indices[index]
     return found
 
@@ -405,15 +433,16 @@ def restore_world(world, samples, backup=True):
     if backup:
         archive = shutil.make_archive(str(world) + '.bct-backup', 'zip', world)
     latest, last = read_database(folder)
-    mapping = bct_mapping(vanilla_states(samples))
+    known = vanilla_states(samples)
+    mapping = bct_mapping(known)
     puts, rewritten = {}, Counter()
     for key, value in latest.items():
-        if is_subchunk_key(key) and b'bct_' in value:
+        if is_subchunk_key(key) and may_hold_bct(value):
             new, changed = rewrite_subchunk(value, mapping)
             if new is not None:
                 puts[key] = new
                 rewritten.update(changed)
     if puts:
         append_batch(folder, puts, last + 1)
-    left = count_bct_blocks(read_database(folder)[0])
+    left = count_bct_blocks(read_database(folder)[0], known)
     return {'backup': archive, 'subchunks': len(puts), 'rewritten': dict(rewritten), 'left': dict(left)}

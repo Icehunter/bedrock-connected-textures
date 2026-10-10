@@ -39,6 +39,26 @@ def palette_of(value):
     return names
 
 
+def subchunk_n(palette, indices):
+    """A version 9 sub-chunk with one storage of 3 bits per block."""
+    words, per = [0] * 410, 10
+    for position, index in enumerate(indices):
+        words[position // per] |= index << (position % per * 3)
+    out = bytearray([9, 1, 4, 3 << 1]) + struct.pack('<410I', *words) + struct.pack('<i', len(palette))
+    for item in palette:
+        out += write_palette_entry(item)
+    return bytes(out)
+
+
+def palette_of_n(value):
+    i, names = 4 + 4 * 410, []
+    size = struct.unpack('<i', value[i:i + 4])[0]; i += 4
+    for _ in range(size):
+        item, i = read_palette_entry(value, i)
+        names.append(item)
+    return names
+
+
 class LogTest(unittest.TestCase):
     def test_crc32c(self):
         self.assertEqual(world_restore._crc32c(b'123456789'), 0xe3069283)
@@ -83,6 +103,25 @@ class RestoreTest(unittest.TestCase):
         self.assertEqual(other[0]['name'][1], 'minecraft:oak_leaves')
         self.assertEqual(other[0]['states'][1]['persistent_bit'], (1, 1))
         self.assertEqual(other[1]['name'][1], 'minecraft:air')
+
+    def test_an_authored_packs_swapped_blocks_go_back_but_its_other_blocks_stay(self):
+        palette = [entry('minecraft:stone', {}),
+                   entry('ashen_vow:sandstone', {'bct:n': (3, 1), 'bct:u': (3, 0)}),
+                   entry('ashen_vow:oak_planks', {'bct:e': (3, 1)}),
+                   entry('ashen_vow:iron_brazier', {'lit': (1, 1)}),
+                   entry('ashen_vow:made_up_block', {'bct:n': (3, 1)})]
+        indices = [position % 5 for position in range(4096)]
+        with tempfile.TemporaryDirectory() as world:
+            db = Path(world) / 'db'
+            db.mkdir()
+            (db / '000003.log').write_bytes(b'')
+            append_batch(db, {KEY: subchunk_n(palette, indices)}, 1)
+            report = restore_world(world, SAMPLES, backup=False)
+            latest, _ = read_database(db)
+        names = [item['name'][1] for item in palette_of_n(latest[KEY])]
+        self.assertEqual(names, ['minecraft:stone', 'minecraft:sandstone', 'minecraft:oak_planks',
+                                 'ashen_vow:iron_brazier', 'ashen_vow:made_up_block'])
+        self.assertEqual(report['left'], {})
 
     def test_count_sees_only_blocks_in_use(self):
         palette = [entry('minecraft:stone', {}), entry('bct_pack:r_stone', {})]

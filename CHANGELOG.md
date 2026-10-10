@@ -1,5 +1,19 @@
 # Changelog
 
+## Unreleased
+
+Bedrock pack authors:
+- Carriers draw any Java method: `horizontal`, `vertical`,
+  `horizontal+vertical`, `vertical+horizontal` and `top`, as well as `ctm`.
+  Give `method` and a list of `tiles`.
+- Connected blocks draw black in dark places in Vibrant Visuals. The
+  carriers section of the authoring guide says to use carriers there.
+
+World restore:
+- `bct.py restore` also puts back the blocks of authored packs that BCT
+  swapped in. It finds them by their `bct:` states, and leaves the pack's
+  other custom blocks alone.
+
 ## 1.2.1
 
 Converted packs:
