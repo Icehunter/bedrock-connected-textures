@@ -541,6 +541,12 @@ class CheckTest(unittest.TestCase):
         self.write('// my pack' + chr(10) + self.script.read_text(encoding='utf-8').replace('"format": 1,', '"format": 1, // first'))
         self.assertEqual(check_pack(self.bp, self.rp, samples=SAMPLES), [])
 
+    def test_notes_say_what_is_not_wrong_but_worth_knowing(self):
+        notes = []
+        self.assertEqual(check_pack(self.bp, self.rp, samples=SAMPLES, notes=notes), [])
+        self.assertEqual(len(notes), 1)
+        self.assertIn('no texture sets', notes[0])
+
     def test_the_engine_message_and_the_schema_problems_are_reported(self):
         self.write('export default ' + json.dumps({'format': 1, 'pack': 'mypack',
                                                    'blocks': {'minecraft:stone': {'block': 'mypack:nope'}}}) + ';')

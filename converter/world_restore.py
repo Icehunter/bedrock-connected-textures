@@ -296,7 +296,10 @@ def rewrite_subchunk(value, mapping):
         bits = header >> 1
         words = 0 if bits == 0 else -(-4096 // (32 // bits))
         out += bytes([header]) + value[i:i + 4 * words]; i += 4 * words
-        size = struct.unpack('<i', value[i:i + 4])[0]; out += value[i:i + 4]; i += 4
+        if bits == 0:
+            size = 1
+        else:
+            size = struct.unpack('<i', value[i:i + 4])[0]; out += value[i:i + 4]; i += 4
         for _ in range(size):
             start = i
             entry, i = read_palette_entry(value, i)
@@ -373,7 +376,10 @@ def count_bct_blocks(latest):
                 raw = struct.unpack('<%dI' % words, value[i:i + 4 * words]); i += 4 * words
                 mask = (1 << bits) - 1
                 indices = Counter([(word >> (k * bits)) & mask for word in raw for k in range(per)][:4096])
-            size = struct.unpack('<i', value[i:i + 4])[0]; i += 4
+            if bits == 0:
+                size = 1
+            else:
+                size = struct.unpack('<i', value[i:i + 4])[0]; i += 4
             for index in range(size):
                 entry, i = read_palette_entry(value, i)
                 name = entry['name'][1]

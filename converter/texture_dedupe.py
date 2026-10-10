@@ -50,12 +50,15 @@ def _channel_file(set_path, value):
 
 def dedupe_addon(addon, resource_folder='Source_RP/'):
     """Merge identical block textures in the add-on's resource pack; returns {'files_removed', 'bytes_removed'}."""
+    prefix = resource_folder
+    # Images are only hashed, one at a time: a large add-on is gigabytes, too much to hold in memory.
+    # The text files are kept, to read and rewrite the names in them.
     with zipfile.ZipFile(addon) as source:
         infos = {info.filename: info for info in source.infolist()}
-        files = {name: source.read(name) for name in infos}
-    prefix = resource_folder
-    images = [name for name in files if name.startswith(prefix + BLOCKS) and name.endswith('.png')]
-    digest = {name: hashlib.sha256(files[name]).hexdigest() for name in images}
+        images = [name for name in infos if name.startswith(prefix + BLOCKS) and name.endswith('.png')]
+        digest = {name: hashlib.sha256(source.read(name)).hexdigest() for name in images}
+        files = {name: source.read(name) for name in infos
+                 if name.startswith(prefix) and name.endswith(('.json', '.material'))}
     sets = _texture_sets(files, prefix)
     # Which images texture sets name as maps, and which as colours.
     map_users, color_images = defaultdict(list), set()
@@ -127,26 +130,27 @@ def dedupe_addon(addon, resource_folder='Source_RP/'):
                 if _set_of(image) in sets:
                     removed.add(_set_of(image))
     # Rewrite every quoted path of a merged colour image.
+    rewritten = {}
     if renamed_paths:
         pattern = re.compile('"(' + '|'.join(re.escape(path) for path in sorted(renamed_paths, key=len, reverse=True)) + ')"')
         for name, text in texts.items():
             updated = pattern.sub(lambda match: '"' + renamed_paths[match.group(1)] + '"', text)
             if updated != text:
-                files[name] = updated.encode('utf-8')
+                rewritten[name] = updated.encode('utf-8')
     for set_path, document in sets.items():
         if set_path not in removed:
-            files[set_path] = (json.dumps(document, indent=2) + '\n').encode('utf-8')
+            rewritten[set_path] = (json.dumps(document, indent=2) + '\n').encode('utf-8')
     # A map left without any texture set naming it (its sets were merged away) goes too.
     still_named = {_channel_file(set_path, value) for set_path, document in sets.items() if set_path not in removed
                    for value in document.get('minecraft:texture_set', {}).values() if isinstance(value, str)}
     for image in list(map_users):
         if image not in still_named and image not in color_images and not named_elsewhere(image):
             removed.add(image)
-    saved = sum(len(files[name]) for name in removed if name in files)
+    saved = sum(infos[name].file_size for name in removed if name in infos)
     temporary = addon.with_suffix('.dedupe')
-    with zipfile.ZipFile(temporary, 'w', zipfile.ZIP_DEFLATED) as output:
+    with zipfile.ZipFile(addon) as source, zipfile.ZipFile(temporary, 'w', zipfile.ZIP_DEFLATED) as output:
         for name, info in infos.items():
             if name not in removed:
-                output.writestr(info, files[name])
+                output.writestr(info, rewritten[name] if name in rewritten else source.read(name))
     temporary.replace(addon)
     return {'files_removed': len(removed), 'bytes_removed': saved}

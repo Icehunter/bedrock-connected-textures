@@ -47,22 +47,24 @@ def cap_block_textures(pack):
     return scaled
 
 
-def cap_addon_block_textures(addon, width, resource_folder='Source_RP/'):
+def cap_addon_block_textures(addon, width, resource_folder='Source_RP/', also=()):
     """Scale the block textures of a finished add-on wider than width down to it; returns how many.
 
     BCT's own generated textures (the ground edge surfaces) are drawn at 256 pixels whatever the
     pack's resolution; in a 64-pixel pack they alone would outgrow the atlas. Block geometry maps
-    textures on a 16-unit grid, so a smaller image draws the same.
+    textures on a 16-unit grid, so a smaller image draws the same. also names more images by their
+    path in the resource pack without the extension, such as atlas textures outside textures/blocks.
     """
     addon = Path(addon)
     prefix = resource_folder + 'textures/blocks/'
-    with zipfile.ZipFile(addon) as source:
-        members = [(info, source.read(info.filename)) for info in source.infolist()]
+    extra = {resource_folder + path + '.png' for path in also}
     scaled = 0
     temporary = addon.with_suffix('.sizing')
-    with zipfile.ZipFile(temporary, 'w', zipfile.ZIP_DEFLATED) as output:
-        for info, data in members:
-            if info.filename.startswith(prefix) and info.filename.endswith('.png'):
+    # One member at a time: a large add-on is gigabytes, too much to hold in memory at once.
+    with zipfile.ZipFile(addon) as source, zipfile.ZipFile(temporary, 'w', zipfile.ZIP_DEFLATED) as output:
+        for info in source.infolist():
+            data = source.read(info.filename)
+            if (info.filename.startswith(prefix) and info.filename.endswith('.png')) or info.filename in extra:
                 with Image.open(io.BytesIO(data)) as image:
                     if image.width > width:
                         height = max(1, round(image.height * width / image.width))

@@ -94,13 +94,14 @@ def grade_addon(addon, bedrock_pack, resource_folder='Source_RP/'):
     """Fit the grade and rewrite the add-on's block colour textures with it; returns the report."""
     with zipfile.ZipFile(addon) as converted, zipfile.ZipFile(bedrock_pack) as bedrock:
         fit = fit_grade(converted, resource_folder, bedrock)
-        if fit is None:
-            return {'applied': False, 'reason': f'fewer than {MIN_SHARED} block textures shared with the Bedrock pack'}
-        members = [(info, converted.read(info.filename)) for info in converted.infolist()]
+    if fit is None:
+        return {'applied': False, 'reason': f'fewer than {MIN_SHARED} block textures shared with the Bedrock pack'}
     count = 0
     temporary = addon.with_suffix('.grading')
-    with zipfile.ZipFile(temporary, 'w', zipfile.ZIP_DEFLATED) as output:
-        for info, data in members:
+    # One member at a time: a large add-on is gigabytes, too much to hold in memory at once.
+    with zipfile.ZipFile(addon) as converted, zipfile.ZipFile(temporary, 'w', zipfile.ZIP_DEFLATED) as output:
+        for info in converted.infolist():
+            data = converted.read(info.filename)
             if info.filename.startswith(resource_folder + BLOCKS) and _is_color(info.filename):
                 data = graded(data, fit['matrix'])
                 count += 1

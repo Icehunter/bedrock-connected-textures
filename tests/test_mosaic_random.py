@@ -30,6 +30,17 @@ class MosaicRandomTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as folder:
             self.assertTrue(random_looks_authored(write_mosaic(folder, noise, 2, 2), 2, 2))
 
+    def test_the_same_mosaic_at_four_times_the_resolution_gets_the_same_answer(self):
+        # Grain that wraps round, drawn at 256 pixels a tile and again at 1024. The larger one is smoother
+        # between neighbouring pixels, so at full size the author's joins look far better than random ones.
+        noise = np.random.default_rng(2).integers(90, 150, (512, 512, 3)).astype(np.uint8)
+        wrapped = Image.fromarray(np.tile(noise, (3, 3, 1))).resize((6144, 6144), Image.BILINEAR)
+        large = np.asarray(wrapped, dtype=float)[2048:4096, 2048:4096]
+        with tempfile.TemporaryDirectory() as folder:
+            self.assertTrue(random_looks_authored(write_mosaic(folder, noise.astype(float), 2, 2), 2, 2))
+        with tempfile.TemporaryDirectory() as folder:
+            self.assertTrue(random_looks_authored(write_mosaic(folder, large, 2, 2), 2, 2))
+
     def test_a_picture_with_large_shapes_keeps_one_tile(self):
         # A smooth gradient across the mosaic: tiles only join where the author put them side by side.
         ramp = np.linspace(0, 255, 64)

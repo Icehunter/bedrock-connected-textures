@@ -22,9 +22,13 @@ from PIL import Image
 # sand 1.35, grass top 1.65; at random the grass shows a few soft patches and no
 # hard seams, much closer to the author's look than one tile everywhere. A
 # mosaic of large distinct shapes measures well above 2. Edges are compared at
-# full resolution: scaling down hides fine grain and leaves only the broad
-# shapes, which reverses those results.
-RANDOM_SEAM_LIMIT = 1.7
+# the resolution the limit was measured at: much smaller hides fine grain and
+# leaves only the broad shapes, which reverses those results; larger makes the
+# author's own joins smoother still, and the same grass measured 2.5 at 512
+# pixels. Larger tiles are scaled down to MEASURE_WIDTH first; there the 512
+# pixel grass measures 1.71.
+RANDOM_SEAM_LIMIT = 1.8
+MEASURE_WIDTH = 256
 
 
 def kept_vanilla_patterns(policy):
@@ -38,9 +42,12 @@ def only_vanilla_blocks(targets, patterns):
 
 
 def _edges(path):
-    """The four edges of a tile as float arrays: left, right, top, bottom."""
+    """The four edges of a tile as float arrays (left, right, top, bottom), at most MEASURE_WIDTH wide."""
     with Image.open(path) as image:
-        pixels = np.asarray(image.convert('RGB'), dtype=float)
+        image = image.convert('RGB')
+        if image.width > MEASURE_WIDTH:
+            image = image.resize((MEASURE_WIDTH, round(image.height * MEASURE_WIDTH / image.width)), Image.LANCZOS)
+        pixels = np.asarray(image, dtype=float)
     return pixels[:, 0], pixels[:, -1], pixels[0], pixels[-1]
 
 

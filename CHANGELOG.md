@@ -1,5 +1,28 @@
 # Changelog
 
+## Unreleased
+
+Converted packs:
+- Grass, sand and other blocks that stay vanilla show the pack's random tiles
+  at 512 pixels too. Before, a 512 pixel pack could show its base texture
+  there, which in some packs only says to enable connected textures.
+- The converter warns when a pack is too large for the game's terrain atlas.
+  The game then scales the block textures down and blurs them.
+  `--scale-to-atlas` scales them down first, so they stay sharp. It never
+  scales up.
+
+Bedrock pack authors:
+- `bct.py check` says when the terrain atlas is full or near full. Then the
+  game scales the block textures down, so they look less sharp. Check counts
+  the vanilla textures and the pack's, at the size of the widest one.
+- `bct.py check` reads the texture sets. Broken ones are problems. Notes say
+  when the manifest needs `raytraced` or `pbr`, and which textures have no
+  texture set.
+- Texture sets with `.tga` layers count as complete.
+
+World restore:
+- `bct.py restore` works on chunk sections that hold a single block type.
+
 ## 1.2.0
 
 Converted packs:

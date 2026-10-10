@@ -480,7 +480,18 @@ checks, before the world loads:
 - the textures your BCT atlas entries name;
 - that the behavior pack depends on the engine, its `main.js` and
   `publisher.js` are current, and the overlays and carriers are built from the
-  current `bct.js`.
+  current `bct.js`;
+- the terrain atlas: the game gives every block texture a slot as wide as the
+  widest one, and each animation frame and random variant takes a slot. Past
+  16384 pixels square, the game scales the block textures down, so they look
+  blurred. Check counts the vanilla textures
+  and yours, and says when the atlas is over that size, or near it;
+- texture sets (`textures/blocks/*.texture_set.json`): broken ones are
+  problems. Notes say when the resource pack's `manifest.json` needs
+  `"raytraced"` (ray tracing) or `"pbr"` (Vibrant Visuals) in `capabilities`,
+  and which of your textures have no texture set and look flat.
+
+Lines starting with `Note:` are not mistakes; the pack still loads.
 
 In game:
 

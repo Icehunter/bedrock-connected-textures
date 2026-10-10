@@ -122,9 +122,12 @@ def carriers_command(options):
 
 
 def check_command(options):
-    problems = check_pack(options.bp, options.rp, samples=samples_of(options))
+    notes = []
+    problems = check_pack(options.bp, options.rp, samples=samples_of(options), notes=notes)
     for problem in problems:
         print('  ' + problem)
+    for note in notes:
+        print('Note: ' + note)
     if problems:
         print(f'{len(problems)} problem(s): fix them and run python bct.py check again.')
         return 1

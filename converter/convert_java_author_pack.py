@@ -84,6 +84,7 @@ from pack_identity import identity as pack_identity, pack_title, reference_versi
 from sand_edges import write_sand_edge_layer
 from texture_dedupe import dedupe_addon
 from texture_load import WARN_MIB, load_report, measure
+from pack_scan import ATLAS_SIDE, addon_atlas_sizes, atlas_fit_width, estimate_atlas
 from texture_size import cap_addon_block_textures, cap_block_textures, most_common_width
 from top_decals import bake_top_decals, find_top_decals
 from vv_scene_profile import WATER_TEXTURES, apply_scene_profile, read_scene_profile, read_water_textures
@@ -140,14 +141,15 @@ CONVERSION_LIMITATIONS = (
 
 def convert(archives, destination, *, vanilla=None, samples=None, key='author-pack', title=None, workers=4,
             vv_scene=None, carrier_filter='bilinear', carrier_budget=None, version=None, authors=None, bedrock_grade=False,
-            max_permutations=WORLD_PERMUTATIONS):
+            max_permutations=WORLD_PERMUTATIONS, scale_to_atlas=False):
     """Convert a Java pack stack into one add-on for the Bedrock Connected Textures engine.
 
     archives: the Java pack ZIPs, lowest priority first. vanilla: the Java client jar; without one,
     the release the pack was made for is downloaded and checked against Mojang's hash. samples:
     Mojang's bedrock-samples folder. vv_scene: a Bedrock pack whose Vibrant Visuals scene settings
     and water textures are used, and none of its other artwork. key seeds the pack's UUIDs and
-    namespaces, so it stays the same between updates of one pack. Returns the conversion report,
+    namespaces, so it stays the same between updates of one pack. scale_to_atlas scales the block
+    textures down, never up, until the game's terrain atlas holds them. Returns the conversion report,
     which is also written to conversion.json.
     """
     # 1. Read the pack. What can fail early fails before any work: Node runs the engine's tile
@@ -268,6 +270,7 @@ def convert(archives, destination, *, vanilla=None, samples=None, key='author-pa
     pack_width = most_common_width(Path(next(item for item in base if item['renderer'] == 'rtx')['resource_pack']) / 'textures/blocks')
     if pack_width:
         report['scaled_to_pack_resolution'] = cap_addon_block_textures(published['installable_packs'][0]['archive'], pack_width)
+    report['terrain_atlas'] = fit_terrain_atlas(published['installable_packs'][0]['archive'], samples, scale_to_atlas)
     # Identical images are kept once (texture_dedupe.py): the game loads every copy into texture memory.
     report['deduplicated_textures'] = dedupe_addon(Path(published['installable_packs'][0]['archive']))
     if bedrock_grade:
@@ -276,6 +279,37 @@ def convert(archives, destination, *, vanilla=None, samples=None, key='author-pa
     report['schema_check'] = check_schemas(published['installable_packs'][0]['archive'], samples, destination)
     write_json(destination / 'conversion.json', report)
     return report
+
+
+def fit_terrain_atlas(archive, samples, scale):
+    """The terrain atlas the add-on asks for (pack_scan.py); with scale, its block textures scaled down to fit.
+
+    Past the largest atlas the game scales every block texture down itself, blurred, with a low
+    resources warning. Scaling them here first keeps them sharp and loads faster. scale is False,
+    True (the widest width that fits) or a width in pixels.
+    """
+    sizes = addon_atlas_sizes(archive, samples)
+    estimate = estimate_atlas(sizes)
+    result = {key: estimate[key] for key in ('side', 'share', 'slots', 'width')}
+    if scale:
+        width = atlas_fit_width(sizes) if scale is True else min(scale, estimate['width'])
+        if width < estimate['width']:
+            # The atlas also holds a few textures outside textures/blocks, such as the cracks of a breaking block.
+            others = [texture for texture, (size, own) in sizes.items()
+                      if own and size[0] > width and not texture.startswith('textures/blocks/')]
+            result['scaled_to'] = width
+            result['scaled_textures'] = cap_addon_block_textures(archive, width, also=others)
+            fitted = estimate_atlas(addon_atlas_sizes(archive, samples))
+            result.update(fitted_side=fitted['side'], fitted_share=fitted['share'])
+            fits = 'the terrain atlas fits' if fitted['share'] <= 1 else \
+                f"the terrain atlas still needs {fitted['side']} pixels square, over the {ATLAS_SIDE} the game builds"
+            print(f"Scaled {result['scaled_textures']} block textures from {estimate['width']} to {width} pixels; "
+                  f'{fits}.')
+    elif estimate['share'] > 1:
+        print(f"Warning: the terrain atlas needs {estimate['side']} pixels square, over the {ATLAS_SIDE} the game "
+              'builds; the game will scale the block textures down and blur them. '
+              'Convert with --scale-to-atlas to scale them sharply here.')
+    return result
 
 
 # --- Reading the pack ---
@@ -1687,6 +1721,10 @@ def parse_arguments():
     parser.add_argument('--max-permutations', type=int, default=WORLD_PERMUTATIONS,
                         help='Custom block permutations the pack may have before the costliest slabs and stairs are '
                              f'left out (default {WORLD_PERMUTATIONS}, the number the game warns about)')
+    parser.add_argument('--scale-to-atlas', nargs='?', type=int, const=True, default=False, metavar='WIDTH',
+                        help="Scale the block textures down (never up) until the game's terrain atlas holds them, "
+                             'or to WIDTH pixels; without it, a pack too large for the atlas is scaled down by the '
+                             'game, blurred')
     parser.add_argument('--version',
                         help="The pack's own version, such as 4.1.0 "
                              '(default: a tag like R4.1.0 in the file name, else 1.0.0)')
@@ -1709,7 +1747,8 @@ def main():
                          key=options.key, title=options.title, workers=options.workers,
                          vv_scene=options.vv_scene, carrier_filter=options.carrier_filter,
                          carrier_budget=options.carrier_budget, version=options.version, authors=options.author,
-                         bedrock_grade=options.bedrock_grade, max_permutations=options.max_permutations)
+                         bedrock_grade=options.bedrock_grade, max_permutations=options.max_permutations,
+                         scale_to_atlas=options.scale_to_atlas)
         print(f"Imported {report['rule_count']} connected-texture rules.")
         for item in report['installable_packs']:
             print('Converted pack: ' + item['archive'])

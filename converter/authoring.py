@@ -36,6 +36,7 @@ from terrain_native import _copy_other_maps, _geometry_model, _material_block, _
 from native_replacement import (AXIS_ROTATION, BLOCK_FORMAT, FACES, _behavior_of, _culling_rules,
                                 _fallback_reason, _keep_vanilla_reason, _replacement_geometry, _state_values,
                                 load_policy, profile_of, repeat_index, vanilla_tags_of)
+from pack_scan import atlas_messages, atlas_paths, ray_tracing_messages
 
 ROOT = Path(__file__).resolve().parents[1]
 PACK_ID = re.compile(r'^[a-z0-9_-]{1,80}$')
@@ -1217,18 +1218,6 @@ SCHEMA = ROOT / 'docs/bct.schema.json'
 CHECKER = ROOT / 'converter/check_pack.mjs'
 
 
-def _atlas_paths(entry):
-    """The texture paths a terrain atlas entry names: one path, a list, or weighted variations."""
-    textures = entry.get('textures') if isinstance(entry, dict) else None
-    if isinstance(textures, str):
-        return [textures]
-    if isinstance(textures, dict):
-        textures = textures.get('variations', [])
-    if not isinstance(textures, list):
-        return []
-    return [item.get('path') if isinstance(item, dict) else item for item in textures]
-
-
 def _atlas_problems(rp, pack):
     """Textures the pack's own atlas entries (named after the pack) name that are not in the resource pack."""
     path = Path(rp) / 'textures/terrain_texture.json'
@@ -1239,15 +1228,18 @@ def _atlas_problems(rp, pack):
     for alias, entry in read_json(path).get('texture_data', {}).items():
         if not alias.startswith((key + '_', f'bct_ov_{key}_')):
             continue
-        for texture in _atlas_paths(entry):
+        for texture in atlas_paths(entry):
             if isinstance(texture, str) and not any((Path(rp) / (texture + extension)).exists()
                                                     for extension in ('.png', '.tga')):
                 problems.append(f'textures/terrain_texture.json: {alias} names {texture}, which is not in the resource pack')
     return problems
 
 
-def check_pack(bp, rp, *, samples, node='node'):
-    """Everything wrong with a BCT pack, as messages; [] when it is ready."""
+def check_pack(bp, rp, *, samples, node='node', notes=None):
+    """Everything wrong with a BCT pack, as messages; [] when it is ready.
+
+    notes, a list, gets what is not wrong but worth knowing: an atlas near its limit, ray tracing set-up.
+    """
     import shutil
     import subprocess
     bp, rp = Path(bp), Path(rp)
@@ -1300,4 +1292,8 @@ def check_pack(bp, rp, *, samples, node='node'):
         if isinstance(data.get('pack'), str):
             problems += _atlas_problems(rp, data['pack'])
     problems += check_tree(bp, rp, samples)
+    for scan in (atlas_messages(rp, samples), ray_tracing_messages(rp)):
+        problems += scan[0]
+        if notes is not None:
+            notes += scan[1]
     return list(dict.fromkeys(problems))

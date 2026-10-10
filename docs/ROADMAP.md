@@ -71,14 +71,10 @@ Rounder, more natural tree trunks, as 3D leaves did for leaves.
 
 - Suspicious sand edges are not drawn in converted packs.
 - Poplar leaves stay vanilla when a pack has no poplar leaf art.
-- `python bct.py restore` only knows the blocks of converted packs. Blocks
-  from an author's own Bedrock pack need `/scriptevent bct:control restore`,
-  run before the pack is removed.
 - Connected blocks draw no inner corners: a block's states cannot hold its
   diagonal neighbours. Carriers draw them, except in ray tracing.
-- Each random variant takes a place in the terrain atlas, and Bedrock does not
-  say when the atlas is full. `bct.py check` could count a pack's textures at
-  its size and warn before that point.
-- Ray tracing: `bct.py` does not yet say whether a pack's resource pack and
-  texture sets are ready for ray tracing (the `raytraced` capability, MER
-  texture sets). `bct.py check` could.
+- Some Java packs give a block a base texture that only says to enable
+  connected textures, because a rule always covers it in Java. The converter
+  keeps the base texture when the rule gives the block's faces different
+  tiles, as a mosaic does. The text then shows on item icons and on blocks
+  the engine has not swapped yet, such as stone far away.
