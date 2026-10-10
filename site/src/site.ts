@@ -2,7 +2,7 @@ export const REPO = "https://github.com/Icehunter/bedrock-connected-textures";
 export const RELEASES = `${REPO}/releases`;
 export const LATEST = `${REPO}/releases/latest`;
 export const ISSUES = `${REPO}/issues`;
-export const VERSION = "1.2.0";
+export const VERSION = "1.2.1";
 
 export const NAV = [
   { to: "/", label: "Home", end: true },

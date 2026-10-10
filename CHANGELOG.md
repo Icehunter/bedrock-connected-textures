@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 1.2.1
 
 Converted packs:
 - Grass, sand and other blocks that stay vanilla show the pack's random tiles

@@ -1,6 +1,6 @@
 # Roadmap
 
-What comes after 1.2.0. Nothing here is promised for a date; items move into
+What comes after 1.2.1. Nothing here is promised for a date; items move into
 `CHANGELOG.md` when they ship.
 
 ## Shaped blocks after 1.2
@@ -67,7 +67,7 @@ Rounder, more natural tree trunks, as 3D leaves did for leaves.
 - First as textures only: bark that reads as round, in the pack's own art.
 - Then as shaped logs, on the shaped-block geometry 1.2 added.
 
-## Known gaps in 1.2.0
+## Known gaps in 1.2.1
 
 - Suspicious sand edges are not drawn in converted packs.
 - Poplar leaves stay vanilla when a pack has no poplar leaf art.

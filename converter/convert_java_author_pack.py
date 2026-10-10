@@ -943,10 +943,10 @@ def manifest(key, title, renderer):
             'header': {'name': title + ' - ' + renderer.upper(),
                        'description': 'Author textures with native Bedrock material bindings.',
                        'uuid': str(uuid.uuid5(uuid.NAMESPACE_URL, 'bct/base/' + key + '/' + renderer)),
-                       'version': [1, 2, 0], 'min_engine_version': [1, 26, 20]},
+                       'version': [1, 2, 1], 'min_engine_version': [1, 26, 20]},
             'modules': [{'type': 'resources',
                          'uuid': str(uuid.uuid5(uuid.NAMESPACE_URL, 'bct/base/module/' + key + '/' + renderer)),
-                         'version': [1, 2, 0]}]}
+                         'version': [1, 2, 1]}]}
     if renderer != 'classic':
         data['capabilities'] = ['pbr', 'raytraced'] if renderer == 'rtx' else ['pbr']
     return data
