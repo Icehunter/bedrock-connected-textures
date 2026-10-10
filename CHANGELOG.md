@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 1.2.2
 
 Bedrock pack authors:
 - Carriers draw any Java method: `horizontal`, `vertical`,
