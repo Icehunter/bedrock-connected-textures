@@ -61,7 +61,7 @@ export function definitionsFor(data, registry) {
  * by kind.
  */
 export function fakeBedrock({ blocks = new Map(), states = new Map(), height = { min: -64, max: 320 }, onSet = () => {}, registry, costs,
-  recordVolumes = true } = {}) {
+  recordVolumes = true, tags = new Map() } = {}) {
   const clock = { ms: 0 }, calls = new Map(), stepTimes = [];
   /** Moves the clock by the cost of a game call (only with costs). */
   const charge = (name, ms = costs?.[name] ?? 0) => {
@@ -71,6 +71,9 @@ export function fakeBedrock({ blocks = new Map(), states = new Map(), height = {
     tally.count++; tally.ms += ms;
     calls.set(name, tally);
   };
+  // The game reads a filter's type and tag lists on every call: each entry costs (costs.type).
+  const typeCost = filter => ((filter.includeTypes?.length ?? 0) + (filter.excludeTypes?.length ?? 0) +
+    (filter.includeTags?.length ?? 0) + (filter.excludeTags?.length ?? 0)) * (costs?.type ?? 0);
   const known = type => { if (registry && !registry.has(type)) throw new Error('Unknown block type: ' + type); };
   const checkStates = (type, values) => {
     if (!registry) return;
@@ -123,9 +126,13 @@ export function fakeBedrock({ blocks = new Map(), states = new Map(), height = {
     for (const type of [...(filter.includeTypes ?? []), ...(filter.excludeTypes ?? [])]) known(type);
     const include = filter.includeTypes && new Set(filter.includeTypes), exclude = new Set(filter.excludeTypes ?? []);
     const includePermutations = filter.includePermutations ?? [], excludePermutations = filter.excludePermutations ?? [];
-    const anyInclude = Boolean(include) || includePermutations.length > 0;
-    return (type, key) => (!anyInclude || include?.has(type) || includePermutations.some(permutation => matchesPermutation(permutation, type, key))) &&
-      !exclude.has(type) && !excludePermutations.some(permutation => matchesPermutation(permutation, type, key));
+    // Block tags (tags: type -> Set of tags); a type matches a tag list when it has any of them.
+    const tagged = (type, list) => list.some(tag => tags.get(type)?.has(tag));
+    const includeTags = filter.includeTags ?? [], excludeTags = filter.excludeTags ?? [];
+    const anyInclude = Boolean(include) || includePermutations.length > 0 || includeTags.length > 0;
+    return (type, key) => (!anyInclude || include?.has(type) || tagged(type, includeTags) ||
+      includePermutations.some(permutation => matchesPermutation(permutation, type, key))) &&
+      !exclude.has(type) && !tagged(type, excludeTags) && !excludePermutations.some(permutation => matchesPermutation(permutation, type, key));
   };
   /** Every location of a box volume or a list volume. */
   const locationsOf = volume => {
@@ -167,7 +174,7 @@ export function fakeBedrock({ blocks = new Map(), states = new Map(), height = {
       const keep = filterOf(filter);
       if (recordVolumes) volumes.push({ from: volume.from, to: volume.to, types: [...(filter.includeTypes ?? [])], exclude: [...(filter.excludeTypes ?? [])] });
       const found = matching(volume, keep);
-      charge('getBlocks', (costs?.getBlocks ?? 0) + cellsOf(volume) * (costs?.cell ?? 0) + found.length * (costs?.result ?? 0));
+      charge('getBlocks', (costs?.getBlocks ?? 0) + cellsOf(volume) * (costs?.cell ?? 0) + found.length * (costs?.result ?? 0) + typeCost(filter));
       const inside = new Set(found.map(at => at.x + ',' + at.y + ',' + at.z));
       return {
         getBlockLocationIterator: function* () { for (const at of found) { charge('next'); yield at; } },
@@ -196,7 +203,7 @@ export function fakeBedrock({ blocks = new Map(), states = new Map(), height = {
     containsBlock(volume, filter) {
       if (recordVolumes) volumes.push({ from: volume.from, to: volume.to, types: [...(filter.includeTypes ?? [])], exclude: [...(filter.excludeTypes ?? [])], contains: true });
       const found = matching(volume, filterOf(filter), true);
-      charge('containsBlock', (costs?.containsBlock ?? 0) + cellsOf(volume) * (costs?.cell ?? 0));
+      charge('containsBlock', (costs?.containsBlock ?? 0) + cellsOf(volume) * (costs?.cell ?? 0) + typeCost(filter));
       return found.length > 0;
     },
     getEntities({ type, tags = [], location, maxDistance, excludeTypes = [] } = {}) {
@@ -318,6 +325,11 @@ export function fakeBedrock({ blocks = new Map(), states = new Map(), height = {
  * figures for Bedrock's script bindings (a call crossing into the game, a
  * block read or write, a volume query by its cells and results).
  */
+/** Costs measured in game (1.26.50, Windows) with `/scriptevent bct:control speed`: a filter costs about 1.5 µs per listed type. */
+export const MEASURED_COSTS = Object.freeze({
+  getBlock: 0.006, getState: 0.002, setPermutation: 0.03, getTopmostBlock: 0.008, isChunkLoaded: 0.003,
+  getBlocks: 0.005, containsBlock: 0.002, cell: 0, result: 0.0005, next: 0.0005, isInside: 0.0005, type: 0.0015,
+  getEntities: 0.05, spawnEntity: 0.1, entity: 0.003, property: 0.01, fillBlocks: 0.05, filled: 0.001 });
 export const GAME_COSTS = Object.freeze({
   getBlock: 0.004, getState: 0.002, setPermutation: 0.03, getTopmostBlock: 0.01, isChunkLoaded: 0.002,
   getBlocks: 0.02, containsBlock: 0.01, cell: 0.00002, result: 0.0005, next: 0.0005, isInside: 0.0005,

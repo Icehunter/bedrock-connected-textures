@@ -136,6 +136,66 @@ def default_uv(face, low, high):
             'west': [z0, 16 - y1, z1, 16 - y0], 'east': [16 - z1, 16 - y1, 16 - z0, 16 - y0]}[face]
 
 
+# Where the side faces under a raised top face sample its edge, in texture units inside the edge
+# (a texture is 16 wide): less than one texel of a 1024 pixel texture, so they take the edge texels.
+_EDGE_SAMPLE = .01
+# Thickness of the turned cubes that close a raised top face's west and east sides, in pixels.
+_SIDE_THICKNESS = .001
+
+
+def close_top_face(plane, bottom):
+    """Cubes that close the gap under a raised top face, down to the face it covers at `bottom`.
+
+    plane is a Bedrock cube with an "up" face and no rotation. The plane becomes a block from
+    `bottom` to its top, whose north and south faces repeat the top's texels along those edges.
+    A face UV cannot turn a row of texels upright without uv_rotation, which samples outside the
+    texture in Bedrock, so the west and east sides are thin cubes turned a quarter turn about the
+    north-south axis: their top and bottom faces, standing upright, take the texels of the top's
+    column there. Seen from the side, the raised plane then meets the lower face next to it.
+    """
+    (x, y, z), (width, height, depth) = plane['origin'], plane['size']
+    top = plane['uv']['up']
+    if 'uv_rotation' in top or 'rotation' in plane:
+        raise ValueError('Only an unturned top face can be closed')
+    (u, v), (du, dv) = top['uv'], top['uv_size']
+    named = {'material_instance': top['material_instance']} if 'material_instance' in top else {}
+
+    def strip(edge, inward):
+        """Where a strip along an edge samples, right inside the edge, and its width there.
+
+        The width is 0: every texel row of the strip reads the same edge row. A strip seen edge on
+        would otherwise squeeze its rows into a fraction of a screen pixel, so the GPU would pick a
+        small mip level, where neighbouring atlas textures blend in as coloured dashes.
+        """
+        return edge + (_EDGE_SAMPLE if inward > 0 else -_EDGE_SAMPLE), 0
+
+    top_y = y + height
+    # The top's u grows from the low x side, its v from the high z side (Bedrock flips top faces).
+    # A north face reads u from low x, a south face from high x.
+    north_v, north_size = strip(v + dv, -dv)
+    south_v, south_size = strip(v, dv)
+    block = {'origin': [x, bottom, z], 'size': [width, top_y - bottom, depth], 'uv': {
+        'up': top,
+        'north': {'uv': [u, north_v], 'uv_size': [du, north_size], **named},
+        'south': {'uv': [u + du, south_v], 'uv_size': [-du, south_size], **named}}}
+    cubes = [block]
+    rise = top_y - bottom
+    centre_y = (top_y + bottom) / 2
+    for side_x, edge_u, inward in ((x + width - _SIDE_THICKNESS / 2, u + du, -du), (x + _SIDE_THICKNESS / 2, u, du)):
+        side_u, side_size = strip(edge_u, inward)
+        # Turning about z keeps z, so the faces read v along z exactly as the top does; a bottom
+        # face reads v the other way, so it runs back from the far end. Whichever of the two
+        # faces turns outward shows.
+        cubes.append({
+            'origin': [side_x - rise / 2, centre_y - _SIDE_THICKNESS / 2, z],
+            'size': [rise, _SIDE_THICKNESS, depth],
+            'pivot': [side_x, centre_y, z + depth / 2],
+            'rotation': [0, 0, 90],
+            'uv': {'up': {'uv': [side_u, v], 'uv_size': [side_size, dv], **named},
+                   'down': {'uv': [side_u, v + dv], 'uv_size': [side_size, -dv], **named}}})
+    return cubes
+
+
 def _has_area(face, size):
     """Whether a face of an element of this size covers any area; Java draws nothing for a flat one."""
     return all(abs(size[axis]) > 1e-6 for axis in FACE_SPAN_AXES[face])

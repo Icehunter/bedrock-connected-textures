@@ -25,3 +25,13 @@ const send=(index,payload,digest=checksum('[1,2,3]'))=>system.sendScriptEvent('b
 send(1,'3]');send(1,'3]');send(0,'[1,2,');assert.deepEqual(assembled,[[1,2,3]],'out-of-order and duplicate chunks assemble exactly once');
 send(0,'[5,','00000000');send(1,'6]','00000000');assert.equal(assembled.length,1,'checksum rejects mixed/corrupt data');
 shuffled.dispose();
+{
+  // With no engine to acknowledge, a source sent in full waits instead of taking every tick's budget from the next one.
+  const sent=new Map();
+  const counting={...system,sendScriptEvent(id,message){const {provider}=JSON.parse(message);sent.set(provider,(sent.get(provider)??0)+1);}};
+  const big={...packet,provider:'big'},small={engine:'replace',provider:'small',digest:checksum('[1]'),parts:['[1]']};
+  const quiet=publishSources({system:counting,world,sources:[big,small]});
+  for(let i=0;i<Math.ceil(big.parts.length/32)+2;i++)tick();
+  assert.ok((sent.get('small')??0)>=1,'the second source is sent once the first has gone out in full');
+  quiet.dispose();
+}

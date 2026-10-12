@@ -25,6 +25,7 @@ from PIL import Image
 
 from common import BLOCKS_FORMAT, read_json, samples_path, terrain_pack, write_json
 from edge_shapes import edge_alpha
+from java_block_geometry import close_top_face
 from terrain_layers import native_surface_height, surface_height
 
 # The vanilla block a terrain material inherits ambient occlusion from, where the names differ.
@@ -62,7 +63,9 @@ def emit_native_surfaces(root, bp, rp, effects, targets, entity_emitter=None, sa
     native_effects = [effect for effect in effects if not effect.get('entity_surface')]
     bones = _finish_shared_block(block, effects, native_effects, planes)
     geometry = _geometry_model('geometry.' + stem, bones)
-    geometries = [geometry, *_height_profile_geometries(block, native_effects, geometry)]
+    # Height profiles lift the open planes; every geometry is closed down to the host face after.
+    geometries = [dict(model, bones=_close_plane_edges(model['bones'], _host_face(effects[0])))
+                  for model in (geometry, *_height_profile_geometries(block, native_effects, geometry))]
     write_json(bp / f'blocks/{stem}.json', {'format_version': '1.26.50', 'minecraft:block': block})
     geometry_document = {'format_version': '1.21.0', 'minecraft:geometry': geometries}
     write_json(rp / f'models/blocks/{stem}.geo.json', geometry_document)
@@ -344,6 +347,9 @@ def _emit_material_block(root, bp, rp, effect, targets, samples=None, quadrants=
     aliases, image_count = _write_cut_textures(root, rp, stem, effect, sources, shapes)
     _add_atlas_aliases(rp, stem, aliases)
     bones, visibility = _material_planes(effect, shapes, quadrants)
+    if not quadrants:
+        # Quarter planes are closed once the shared block has moved them into place.
+        bones = _close_plane_edges(bones, _host_face(effect))
     geometry_id = 'geometry.' + stem
     geometry = {'format_version': '1.21.0', 'minecraft:geometry': [_geometry_model(geometry_id, bones)]}
     write_json(rp / f'models/blocks/{stem}.geo.json', geometry)
@@ -467,6 +473,11 @@ def _plane_top(effect, quadrants):
     return top
 
 
+def _host_face(effect):
+    """Pixel height of the host's top face in the block's model: a block two cells up draws one block lower."""
+    return -(effect.get('native_offset', 1) - 1) * 16
+
+
 def _plane_bone(name, shape, side, top, size):
     """A flat plane just under `top`, turned a quarter turn per side."""
     # Negative top-face UV sizes put texture row zero at north. Native blocks have no entity yaw
@@ -482,6 +493,21 @@ def _plane_bone(name, shape, side, top, size):
             'uv': {'up': {'uv': [16, size], 'uv_size': [-size, -size], 'material_instance': shape}},
         }],
     }
+
+
+def _close_plane_edges(bones, bottom):
+    """Copies of the bones whose planes reach down to the host face at `bottom` (pixels).
+
+    A plane sits a little above its host's top face, and the host next door draws its own top face
+    lower; closing the plane fills that step, so no gap shows between them at a low angle.
+    """
+    closed = []
+    for bone in bones:
+        bone = deepcopy(bone)
+        bone['cubes'] = [part for plane in bone.get('cubes', [])
+                         for part in (close_top_face(plane, bottom) if 'up' in plane['uv'] else [plane])]
+        closed.append(bone)
+    return closed
 
 
 def _geometry_model(identifier, bones):

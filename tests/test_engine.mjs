@@ -55,23 +55,25 @@ test('connected rules limited to biomes draw in those biomes only', () => {
   }
 });
 
-test('chunk scans ask for the union of both block sets, one 16-block section of the band at a time', () => {
+test('chunk scans ask for short type lists, one 16-block section of the band at a time', () => {
   const env = setup({ sources: [['connected', 'pack', stoneRules], ['terrain', 'pack', grassProvider]] });
   const radius = DEFAULT_SETTINGS.connected.chunkRadius, terrainRadius = DEFAULT_SETTINGS.terrain.chunkRadius;
+  // Chunk queries start on a chunk corner; terrain also reads the ring of blocks around a section.
+  const inChunk = env => env.volumes.filter(volume => volume.from.x % 16 === 0 && volume.from.z % 16 === 0);
+  const scanned = () => new Set(inChunk(env).map(volume => volume.from.x + ',' + volume.from.z)).size;
   // Scans share a few milliseconds of each tick, so how many ticks they take depends on the machine.
-  const scanned = () => new Set(env.volumes.map(volume => volume.from.x + ',' + volume.from.z)).size;
   for (let tick = 0; tick < 5000 && scanned() < (2 * terrainRadius + 1) ** 2; tick++) env.step(1);
-  const playerChunk = env.volumes.filter(volume => volume.from.x === 0 && volume.from.z === 0);
-  assert.deepEqual(new Set(playerChunk[0].types), new Set(['minecraft:stone', 'minecraft:grass_block']));
+  const playerChunk = inChunk(env).filter(volume => volume.from.x === 0 && volume.from.z === 0);
   assert.deepEqual([Math.min(...playerChunk.map(volume => volume.from.y)), Math.max(...playerChunk.map(volume => volume.to.y))], [70 - 24, 70 + 24]);
   assert.ok(playerChunk.every(volume => Math.floor(volume.from.y / 16) === Math.floor(volume.to.y / 16)), 'no query spans two sections');
-  for (const volume of env.volumes) {
+  for (const volume of inChunk(env)) {
     const distance = Math.max(Math.abs(volume.from.x / 16), Math.abs(volume.from.z / 16));
     assert.ok(distance <= terrainRadius);
-    assert.equal(volume.types.includes('minecraft:stone'), distance <= radius, 'connected types only inside their radius');
+    if (volume.types.includes('minecraft:stone')) assert.ok(distance <= radius, 'connected types only inside their radius');
+    // Terrain asks for one rule group's targets or sources at a time, never mixed with other parts' types.
+    if (!volume.types.includes('minecraft:stone')) assert.ok(volume.types.length === 1, JSON.stringify(volume.types));
   }
-  const chunks = new Set(env.volumes.map(volume => volume.from.x + ',' + volume.from.z));
-  assert.equal(chunks.size, (2 * terrainRadius + 1) ** 2, 'every chunk in the terrain radius is scanned');
+  assert.equal(scanned(), (2 * terrainRadius + 1) ** 2, 'every chunk in the terrain radius is scanned');
 });
 
 test('the top-surface pass finds terrain sources outside the vertical band', () => {
@@ -197,4 +199,16 @@ test('the scanner starts with the player chunk and works outward', () => {
   const distances = env.volumes.map(volume => Math.max(Math.abs(volume.from.x / 16 - 2), Math.abs(volume.from.z / 16 + 2)));
   assert.ok(distances.every((distance, index) => index === 0 || distance >= distances[index - 1] - 1), 'nearer chunks first');
   assert.ok(Math.max(...distances) <= DEFAULT_SETTINGS.connected.chunkRadius);
+});
+
+test('terrain rules naming a block the game does not know still draw their other targets', async () => {
+  const { vanillaBlocks } = await import('./fake_bedrock.mjs');
+  const provider = [{ ...grassProvider[0], rules: [{ ...grassProvider[0].rules[0], targets: ['minecraft:dirt', 'minecraft:bricks'] }] }];
+  const fake = fakeBedrock({ blocks: new Map([['3,70,3', 'minecraft:grass_block'], ['3,70,4', 'minecraft:dirt']]), registry: vanillaBlocks() });
+  const engine = startEngine(fake.api);
+  publishSources({ system: fake.system, world: fake.world, sources: [packet('terrain', 'pack', provider)] });
+  fake.player({ x: 8, y: 70, z: 8 });
+  fake.step(40);
+  assert.ok(fake.entities.some(entity => entity.typeId === 'bct:grass_edge' && entity.isValid), 'the dirt next to grass gets its edge');
+  assert.ok(engine.scanner.chunks.size > 0);
 });

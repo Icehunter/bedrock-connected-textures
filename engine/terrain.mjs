@@ -9,6 +9,10 @@ import { vanillaView } from './core.mjs';
 const FACES = ['north', 'east', 'south', 'west', 'up', 'down'];
 const TAG = 'bct_terrain';
 const REVISION = 1;
+// A host a scan reached from one source block is not updated again from the next for this many ticks.
+const SURFACE_TICKS = 40;
+// Hosts remembered before the old ones are dropped.
+const SURFACED_LIMIT = 20000;
 
 function validateProviders(supplied) {
   if (!Array.isArray(supplied)) throw new Error('Terrain sources must be an array');
@@ -42,13 +46,19 @@ export function createTerrain({ api, limits, inReach = () => true, log = () => {
   const { world, system } = api;
   const view = vanillaView(vanillaType, vanillaStates);
   const providers = validateProviders(supplied);
-  const owned = new Map(), hosts = new Map(), failures = new Map(), pending = new Map();
+  const owned = new Map(), hosts = new Map(), failures = new Map(), pending = new Map(), surfaced = new Map();
   const hostKey = (dimension, location) => dimension + ':' + location.x + ':' + location.y + ':' + location.z;
+  const knownTypes = new Map();
+  /** Whether the game knows a block type (remembered: the answer never changes in a session). */
+  const known = type => {
+    if (!knownTypes.has(type)) knownTypes.set(type, !api.BlockTypes?.get || Boolean(api.BlockTypes.get(type)));
+    return knownTypes.get(type);
+  };
   const settings = createHeightSettings({ ModalFormData: api.ModalFormData, applyHeights, report: log });
   const native = new NativeSurfaces(world, (type, states) => api.BlockPermutation.resolve(type, states), () => providers,
     () => limits().maxNativeCarriers, () => system.currentTick, log, undefined, true);
   let enabled = true, recovered = false, suspended = false, recoveryPending = false, flushing = false;
-  let passes = 0, capacitySkips = 0, validationCursor = 0;
+  let passes = 0, capacitySkips = 0, validationCursor = 0, prunedAt = -1;
 
   function remember(key, record) {
     owned.set(key, record);
@@ -57,7 +67,21 @@ export function createTerrain({ api, limits, inReach = () => true, log = () => {
     hosts.get(id).add(key);
   }
 
-  const effectOf = output => Object.values(providers.find(provider => provider.id === output.provider).effects).find(effect => effect.entity === output.entity);
+  // Providers and their effects by id and carrier entity, built once per provider change: update() runs for every host.
+  let lookups = null;
+  const lookup = () => lookups ??= {
+    provider: new Map(providers.map(provider => [provider.id, provider])),
+    effect: new Map(providers.map(provider => {
+      const byEntity = new Map();
+      for (const effect of Object.values(provider.effects)) if (!byEntity.has(effect.entity)) byEntity.set(effect.entity, effect);
+      return [provider.id, byEntity];
+    })),
+    // Entities a provider draws with native blocks rather than carriers.
+    nativeEntities: new Map(providers.map(provider => [provider.id, new Set(Object.values(provider.effects)
+      .filter(effect => effect.native_block && !effect.entity_surface).map(effect => effect.entity))])),
+    exclusive: providers.filter(provider => provider.exclusive_quarters),
+  };
+  const effectOf = output => lookup().effect.get(output.provider)?.get(output.entity);
 
   function actorPosition(record, heights) {
     const effect = providers.flatMap(provider => Object.values(provider.effects)).find(effect => effect.entity === record.entity.typeId);
@@ -201,20 +225,21 @@ export function createTerrain({ api, limits, inReach = () => true, log = () => {
       wanted.push(...outputs);
     }
     native.sync(dimension, location, wanted, limits().maxNativeCarriers);
-    for (const provider of providers.filter(provider => provider.exclusive_quarters)) {
+    for (const provider of lookup().exclusive) {
+      const effects = lookup().effect.get(provider.id);
       const stack = wanted.filter(output => output.provider === provider.id);
       const contacts = Array(8).fill(0);
       for (const output of stack) {
-        const effect = Object.values(provider.effects).find(effect => effect.entity === output.entity);
+        const effect = effects.get(output.entity);
         for (let bit = 0; bit < 8; bit++) if (output.tile & (1 << bit)) contacts[bit] = Math.max(contacts[bit], effect.priority);
       }
       for (const output of stack) {
-        const effect = Object.values(provider.effects).find(effect => effect.entity === output.entity);
+        const effect = effects.get(output.entity);
         if (effect.entity_surface) output.quarters = Array.from({ length: 4 }, (_, q) => effect.mask_lookup[contacts[q] + 6 * contacts[(q + 1) % 4] + 36 * contacts[q + 4]]);
       }
     }
     const actors = wanted.filter(output => (!output.quarters || output.quarters.some(value => value > 0)) &&
-      !Object.values(providers.find(provider => provider.id === output.provider).effects).some(effect => effect.entity === output.entity && effect.native_block && !effect.entity_surface));
+      !lookup().nativeEntities.get(output.provider).has(output.entity));
     const keys = new Set(actors.map(output => descriptorKey(dimension.id, location, output)));
     for (const key of hosts.get(hostKey(dimension.id, location)) ?? []) {
       const record = owned.get(key);
@@ -259,7 +284,7 @@ export function createTerrain({ api, limits, inReach = () => true, log = () => {
         if (effect?.height_tuning && !effect.mask_lookup)
           values['bct:variation'] = effect.biome_tint === 'grass' ? ((Math.imul(location.x, 73428767) ^ Math.imul(location.z, 912931)) >>> 0) % 3 : 0;
         if (output.tint) {
-          const palette = providers.find(provider => provider.id === output.provider)?.biome_palette;
+          const palette = lookup().provider.get(output.provider)?.biome_palette;
           if (palette?.length) {
             let best = 0, distance = Infinity;
             palette.forEach((color, index) => {
@@ -312,10 +337,118 @@ export function createTerrain({ api, limits, inReach = () => true, log = () => {
     if (enabled) validateAnchors();
   }
 
-  /** Updates the eight hosts around an exposed source block. */
-  function surface(dimension, location) {
+  /**
+   * Updates the eight hosts around an exposed source block a scan found. A host next to several
+   * sources is updated once per SURFACE_TICKS, and a neighbour of the source's own type is skipped:
+   * a block's edges never reach a block of its own type. Block events still update hosts at once.
+   */
+  function surface(dimension, location, typeId) {
+    const tick = system.currentTick;
+    // Old hosts are dropped at most once a tick; a Map keeps insertion order, so the oldest come first.
+    if (surfaced.size > SURFACED_LIMIT && prunedAt !== tick) {
+      prunedAt = tick;
+      for (const [key, at] of surfaced) { if (tick - at < SURFACE_TICKS) break; surfaced.delete(key); }
+    }
     for (let dx = -1; dx <= 1; dx++) for (let dz = -1; dz <= 1; dz++) {
-      if (dx || dz) update(dimension, { x: location.x + dx, y: location.y, z: location.z + dz });
+      if (!dx && !dz) continue;
+      const host = { x: location.x + dx, y: location.y, z: location.z + dz }, key = hostKey(dimension.id, host);
+      if (tick - (surfaced.get(key) ?? -Infinity) < SURFACE_TICKS) continue;
+      if (typeId) {
+        let neighbor;
+        try { neighbor = dimension.getBlock(host); } catch { continue; }
+        if (neighbor?.typeId === typeId) continue;
+      }
+      // Re-inserted, so the Map stays ordered oldest first.
+      surfaced.delete(key); surfaced.set(key, tick);
+      update(dimension, host);
+    }
+  }
+
+  /**
+   * Scanner consumer: the hosts of one chunk between low and high that have a source next to them.
+   * Visiting every source would visit every block of a grass field, so instead each group of rules
+   * with the same targets and sources reads both as position lists (short type lists, one call each),
+   * walks the shorter list and looks for the other in the 26 blocks around it. Hosts under existing
+   * native surfaces are updated too, so an edge whose source has gone is removed.
+   */
+  function* scanChunk(dimension, record, low, high) {
+    if (!enabled || suspended || !providers.length) return;
+    // A type the game does not know (a Java name such as minecraft:bricks) makes a block filter throw.
+    const withAliases = types => [...new Set(types.flatMap(type => [type, ...aliasesOf(type)]))].filter(known);
+    const groups = new Map();
+    for (const provider of providers) for (const rule of provider.rules) {
+      const key = [...rule.targets].sort().join() + '|' + [...rule.neighbors].sort().join();
+      if (!groups.has(key)) {
+        const targets = withAliases(rule.targets), sources = withAliases(rule.neighbors);
+        // An empty list would match every block.
+        if (targets.length && sources.length) groups.set(key, { targets, sources, targetSet: new Set(targets), sourceSet: new Set(sources) });
+      }
+    }
+    const natives = [...native.ids()].filter(known), x0 = record.x * 16, z0 = record.z * 16;
+    // Sections follow the game's 16-block sections; the band's ends cut the first and last.
+    for (let bottom = low, top; bottom <= high; bottom = top + 1) {
+      top = Math.min(high, Math.floor(bottom / 16) * 16 + 15);
+      const section = new api.BlockVolume({ x: x0, y: bottom, z: z0 }, { x: x0 + 15, y: top, z: z0 + 15 });
+      const around = new api.BlockVolume({ x: x0 - 1, y: bottom - 1, z: z0 - 1 }, { x: x0 + 16, y: top + 1, z: z0 + 16 });
+      const pending = new Map();   // hosts to update, by key
+      if (natives.length && dimension.containsBlock(section, { includeTypes: natives }, true))
+        for (const at of dimension.getBlocks(section, { includeTypes: natives }, true).getBlockLocationIterator()) {
+          const typeId = dimension.getBlock(at)?.typeId;
+          if (native.ids().has(typeId)) { const host = { x: at.x, y: at.y - native.offset(typeId), z: at.z }; pending.set(hostKey(dimension.id, host), host); }
+        }
+      yield;
+      for (const group of groups.values()) {
+        if (!dimension.containsBlock(section, { includeTypes: group.targets }, true) ||
+          !dimension.containsBlock(around, { includeTypes: group.sources }, true)) continue;
+        const targets = dimension.getBlocks(section, { includeTypes: group.targets }, true);
+        const sources = dimension.getBlocks(around, { includeTypes: group.sources }, true);
+        yield;
+        // The shorter list is walked; the longer one is only asked about the blocks around each entry.
+        const walkSources = sources.getCapacity() <= targets.getCapacity();
+        const [walked, other] = walkSources ? [sources, targets] : [targets, sources];
+        let reads = 0;
+        for (const at of walked.getBlockLocationIterator()) {
+          around: for (let dx = -1; dx <= 1; dx++) for (let dy = -1; dy <= 1; dy++) for (let dz = -1; dz <= 1; dz++) {
+            if (!dx && !dy && !dz) continue;
+            const near = { x: at.x + dx, y: at.y + dy, z: at.z + dz };
+            if (!other.isInside(near)) continue;
+            const host = walkSources ? near : { x: at.x, y: at.y, z: at.z };
+            pending.set(hostKey(dimension.id, host), host);
+            // A walked host needs only one source next to it.
+            if (!walkSources) break around;
+          }
+          if (++reads % 16 === 0) yield;
+        }
+      }
+      let updates = 0;
+      for (const host of pending.values()) { update(dimension, host); if (++updates % 4 === 0) yield; }
+      yield;
+    }
+    yield* topsOutsideBand(dimension, x0, z0, low, high, [...groups.values()]);
+  }
+
+  /**
+   * Terrain above or below the band (a mountain seen from a valley): the topmost block of each column of
+   * the chunk and the ring around it, paired by type like the band's sections. One native call a column.
+   */
+  function* topsOutsideBand(dimension, x0, z0, low, high, groups) {
+    const wanted = new Set(groups.flatMap(group => [...group.targets, ...group.sources]));
+    const tops = new Map();   // 'x,z' -> { x, y, z, typeId }
+    let reads = 0;
+    for (let x = x0 - 1; x <= x0 + 16; x++) for (let z = z0 - 1; z <= z0 + 16; z++) {
+      let top;
+      try { top = dimension.getTopmostBlock({ x, z }); } catch { continue; }
+      if (top && (top.location.y < low || top.location.y > high) && wanted.has(top.typeId))
+        tops.set(x + ',' + z, { x, y: top.location.y, z, typeId: top.typeId });
+      if (++reads % 16 === 0) yield;
+    }
+    for (const host of tops.values()) {
+      if (host.x < x0 || host.x > x0 + 15 || host.z < z0 || host.z > z0 + 15) continue;
+      const paired = groups.some(group => group.targetSet.has(host.typeId) && [-1, 0, 1].some(dx => [-1, 0, 1].some(dz => {
+        const near = (dx || dz) && tops.get((host.x + dx) + ',' + (host.z + dz));
+        return near && Math.abs(near.y - host.y) <= 1 && group.sourceSet.has(near.typeId);
+      })));
+      if (paired) { update(dimension, { x: host.x, y: host.y, z: host.z }); yield; }
     }
   }
 
@@ -345,6 +478,7 @@ export function createTerrain({ api, limits, inReach = () => true, log = () => {
     providers.splice(0, providers.length, ...incoming);
     native.idCache = null;
     native.staleGroups = null;
+    lookups = null;
     for (const provider of incoming) for (const effect of Object.values(provider.effects)) failures.delete(effect.entity);
     native.flush();
     return providers;
@@ -358,7 +492,7 @@ export function createTerrain({ api, limits, inReach = () => true, log = () => {
   }
 
   return {
-    addProviders, setProviders, update, changed, found, surface, recover, maintain, despawn, clear,
+    addProviders, setProviders, update, changed, found, surface, scan: scanChunk, recover, maintain, despawn, clear,
     owned, providers, native, settings, applyHeights, validateAnchors,
     /** Block types the scanner looks for: transition sources, the replacements standing for them, and native carriers. */
     blockTypes: () => [...new Set([...providers.flatMap(provider => provider.scan_sources ?? provider.rules.flatMap(rule => rule.neighbors))

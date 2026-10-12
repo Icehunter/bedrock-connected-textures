@@ -16,6 +16,7 @@ import json
 import numpy as np
 from PIL import Image
 
+from carrier_materials import carrier_material, write_carrier_filter_materials
 from common import write_json
 from terrain_masks import QUARTERS
 
@@ -236,7 +237,11 @@ def _emit_masked_entity(bp, rp, effect, bones, materials, atlas, server_entity, 
                                         'client_sync': True}
         for quadrant in range(4)})
     geometry_id = 'geometry.' + stem
-    client = _client_description(effect['entity'], 'entity_alphatest', textures, geometry_id, controllers)
+    # A wrapping sampler reads the opposite edge of the mask at a quarter's edge and draws a line of
+    # it along the block; a clamped one keeps each edge to its own texels.
+    write_carrier_filter_materials(rp, 'point')
+    material = carrier_material('entity_alphatest', texture_filter='point')
+    client = _client_description(effect['entity'], material, textures, geometry_id, controllers)
     _write_carrier(bp, rp, stem, server, _carrier_model(geometry_id, 8, mesh), client, controllers)
 
 

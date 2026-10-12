@@ -3,7 +3,7 @@ import sys
 import unittest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'converter'))
-from java_block_geometry import cube, fit_scale, fits, geometry, shaded, vertices
+from java_block_geometry import close_top_face, cube, fit_scale, fits, geometry, shaded, vertices
 
 
 class JavaBlockGeometryTests(unittest.TestCase):
@@ -71,6 +71,44 @@ class JavaBlockGeometryTests(unittest.TestCase):
         self.assertFalse(shaded({'shade': False}))
         self.assertFalse(shaded({'shade_direction_override': 'up'}), '26.3 writes this where 26.2 wrote shade: false')
         self.assertTrue(shaded({'shade_direction_override': 'north'}))
+
+    def test_closed_top_face_repeats_the_top_texels_along_each_edge(self):
+        # Bedrock face UVs as cube() writes them: a top face reads u from low x and v from high z,
+        # a bottom face v from low z, a north face u from low x and a south face u from high x.
+        for java_uv in ([0, 0, 16, 16], [16, 8, 8, 16], [8, 0, 16, 8]):
+            plane = cube({'from': [0, 0.1, 0], 'to': [16, 0.124, 16], 'faces': {'up': {'uv': java_uv}}},
+                         lambda face, data: 'tile')
+            (x, _, z), (width, _, depth) = plane['origin'], plane['size']
+            top = plane['uv']['up']
+            u = lambda at_x: top['uv'][0] + top['uv_size'][0] * (at_x - x) / width
+            v = lambda at_z: top['uv'][1] + top['uv_size'][1] * (z + depth - at_z) / depth
+            block, west, east = close_top_face(plane, -1)
+            self.assertEqual(block['origin'][1], -1)
+            self.assertAlmostEqual(block['origin'][1] + block['size'][1], 0.124)
+            north, south = block['uv']['north'], block['uv']['south']
+            for at_x in (x, x + width):
+                self.assertAlmostEqual(north['uv'][0] + north['uv_size'][0] * (at_x - x) / width, u(at_x))
+                self.assertAlmostEqual(south['uv'][0] + south['uv_size'][0] * (x + width - at_x) / width, u(at_x))
+            self.assertAlmostEqual(north['uv'][1], v(z), delta=.02)
+            self.assertAlmostEqual(south['uv'][1], v(z + depth), delta=.02)
+            for side, edge_x in ((west, x + width), (east, x)):
+                self.assertEqual(side['rotation'], [0, 0, 90])
+                self.assertEqual(side['uv']['up']['material_instance'], 'tile')
+                # A quarter turn about z either way swaps the x and y sizes about the pivot.
+                pivot, size, origin = side['pivot'], side['size'], side['origin']
+                self.assertAlmostEqual(pivot[1] - size[0] / 2, -1)
+                self.assertAlmostEqual(pivot[1] + size[0] / 2, 0.124)
+                self.assertLess(abs(pivot[0] - edge_x), .001)
+                self.assertEqual((origin[2], size[2]), (z, depth))
+                up, down = side['uv']['up'], side['uv']['down']
+                for at_z in (z, z + depth):
+                    self.assertAlmostEqual(up['uv'][1] + up['uv_size'][1] * (z + depth - at_z) / depth, v(at_z))
+                    self.assertAlmostEqual(down['uv'][1] + down['uv_size'][1] * (at_z - z) / depth, v(at_z))
+                for face in (up, down):
+                    self.assertAlmostEqual(face['uv'][0], u(edge_x), delta=.02)
+                    # One texel column only, so a strip seen edge on keeps the top's mip level.
+                    self.assertEqual(face['uv_size'][0], 0)
+            self.assertEqual((north['uv_size'][1], south['uv_size'][1]), (0, 0))
 
 
 if __name__ == '__main__':

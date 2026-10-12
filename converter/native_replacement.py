@@ -54,6 +54,7 @@ from bedrock_schema import Schemas, block_errors, culling_errors, geometry_error
 from block_gameplay import block_tags, components as gameplay_components, loot_table, mining, needed_tool
 from block_shapes import shape_components, shape_of, shaped_block, single_slab
 from common import BLOCKS_FORMAT, read_json, write_json
+import connected_cases
 from java_block_geometry import cube
 from model_blocks import build as build_model_block
 from native_connected import export_material, FACES
@@ -66,11 +67,16 @@ OVERLAY_METHODS = {'overlay_random', 'overlay_fixed'}
 RANDOM_METHODS = ('random', 'overlay_random')
 # Methods whose tile depends on the neighbors: geometry can only read block states.
 CONNECTED_METHODS = {'ctm', 'horizontal', 'vertical', 'horizontal+vertical', 'vertical+horizontal', 'top'}
+# Connected methods a full-cube replacement draws: the engine writes the block's neighbour case
+# (connected_cases) into states, and each case is a permutation with its own face tiles.
+NATIVE_CONNECTED_METHODS = {'ctm'}
 # Bedrock limits (server/block/1.26.20 schema): bones in bone_visibility and material instances per block.
 MAX_BONES = 64
 MAX_MATERIALS = 64
 # A random rule's pick is a block state, and a block state holds at most 16 values.
 MAX_RANDOM_TILES = 16
+# Every replacement block carries this tag, so the engine finds them with one tag rather than a list of every type.
+REPLACEMENT_TAG = 'bct:replacement'
 # Bedrock warns that a world whose custom blocks have more permutations than this may load and run slowly.
 WORLD_PERMUTATIONS = 65536
 # Shaped blocks in sixteen dye colours, left out first when a pack passes the limit.
@@ -291,14 +297,15 @@ def build_replacements(document, candidates, policy, *, source, samples, key, ou
             if reason:
                 unsupported += _unsupported(rule_ids, block, reason)
                 continue
-            problems = {rule_id: _rule_problem(rules[rule_id]) for rule_id in rule_ids}
+            shape = 'pane' if _matches(block, pane_patterns) else 'shaped' if shape_of(block) else 'cube'
+            problems = {rule_id: _rule_problem(rules[rule_id], shape) for rule_id in rule_ids}
             for rule_id, problem in problems.items():
                 if problem:
                     unsupported.append({'rule': rule_id, 'block': block, 'reason': problem})
             rule_ids = [rule_id for rule_id in rule_ids if not problems[rule_id]]
             if not rule_ids:
                 continue
-            rule_ids = _with_joining_rules(rule_ids, block, document, rules, passengers_by_block, order)
+            rule_ids = _with_joining_rules(rule_ids, block, document, rules, passengers_by_block, order, shape)
             profile = profile_of(block, policy)
             if profile is None:
                 unsupported += _unsupported(rule_ids, block, 'no replacement profile (destroy time, explosion '
@@ -322,7 +329,7 @@ def build_replacements(document, candidates, policy, *, source, samples, key, ou
     needs, needs_report = _needs_data(policy, known, {entry['vanilla'] for entry in blocks})
     data = None
     if blocks or leaf_entries:
-        data = {'format_version': 1, 'blocks': blocks, 'open': open_blocks, 'solid': solid}
+        data = {'format_version': 1, 'blocks': blocks, 'open': open_blocks, 'solid': solid, 'tag': REPLACEMENT_TAG}
         if needs:
             data['needs'] = needs
         if leaf_entries:
@@ -550,7 +557,7 @@ class _ReplacementWriter:
             components['minecraft:map_color'] = profile['map_color']
         # The tool tag from the profile and the vanilla tags of the block it stands for.
         vanilla_tags = vanilla_tags_of(block, self.policy)
-        tags = sorted(set(block_tags(profile)) | set(vanilla_tags))
+        tags = sorted(set(block_tags(profile)) | set(vanilla_tags) | {REPLACEMENT_TAG})
         if tags:
             components['minecraft:tags'] = tags
         if vanilla_tags:
@@ -646,7 +653,12 @@ class _ReplacementWriter:
         built = _build_pane(self.document, block, block_rules, vanilla_states, mirror, self.materials,
                             pane_instance, self.namespace, stem, self.rp, transparent)
         states = {mirror[name]: _state_values(self.state_values[name]) for name in vanilla_states}
-        return states, built['components'], built['permutations'], dict(built['files']), {'pane': built['pane']}, None
+        entry = {'pane': built['pane']}
+        if built['connected']:
+            for name, size in built['connected']['states']:
+                states[name] = _state_values(range(size))
+            entry['ctm'] = self._connected_entry(block, built['connected'])
+        return states, built['components'], built['permutations'], dict(built['files']), entry, None
 
     def _cube_look(self, block, block_rules, vanilla_states, mirror, transparent, stem):
         """(states, components, permutations, files, engine entry fields, plan) of a full-cube replacement."""
@@ -686,7 +698,27 @@ class _ReplacementWriter:
                       'minecraft:material_instances': permutations[0]['components']['minecraft:material_instances'],
                       'minecraft:collision_box': True, 'minecraft:selection_box': True}
         models = _model_states(plan)
-        return states, components, permutations, files, ({'models': models} if models else {}), plan
+        entry = {'models': models} if models else {}
+        if plan['connected']:
+            entry['ctm'] = self._connected_entry(block, plan['connected'])
+        return states, components, permutations, files, entry, plan
+
+    def _connected_entry(self, block, connected):
+        """How the engine writes a connected block's look states: the blocks it joins, the look states,
+        the sides and diagonals of a case key (connected_cases) and the look index of each case.
+
+        A rule that connects by tile joins every block whose faces show one of its matched textures.
+        """
+        rule = connected['rule']
+        joins = {block}
+        if rule.get('connect', 'tile' if rule.get('matchTiles') else 'block') == 'tile':
+            matched = set(rule['matchTiles'])
+            joins |= {block for block, faces in self.document.get('baseTextures', {}).items()
+                      if matched & set(faces.values())}
+        return {'with': sorted(joins), 'states': [name for name, _ in connected['states']],
+                'sides': [list(offset) for offset in connected_cases.SIDES.values()],
+                'diagonals': [list(pair) for pair in connected.get('diagonals', connected_cases.DIAGONALS)],
+                'cases': {str(case): index for case, index in connected['cases'].items()}}
 
     def _shaped_look(self, block, block_rules, vanilla_states, mirror, transparent, stem):
         """(states, components, permutations, files, engine entry fields, plan) of a shaped replacement (a slab, stair, fence or wall).
@@ -756,7 +788,7 @@ class _ReplacementWriter:
         for local in FACES:
             turns = {}
             for look_key in plan['looks']:
-                look = _face_look(plan, self.document, look_key, local, first[2], first[3])
+                look = _face_look(plan, self.document, look_key, local, first[2], first[3], first[4])
                 condition = ' && '.join(_look_condition(plan, mirror, look_key)) or '1.0'
                 turns.setdefault(look['orientation'], []).append(condition)
             if set(turns) != {0}:
@@ -769,10 +801,10 @@ class _ReplacementWriter:
         Returns (permutations, faces with an overlay layer).
         """
         permutations, overlay_faces = [], set()
-        for look_key, coordinate_values, location, picks in plan['combos']:
+        for look_key, coordinate_values, location, picks, case in plan['combos']:
             instances = {}
             for local in FACES:
-                look = _face_look(plan, self.document, look_key, local, location, picks)
+                look = _face_look(plan, self.document, look_key, local, location, picks, case)
                 if len(look['overlays']) > 1:
                     raise ValueError('more than one overlay layer on a face')
                 instances[local] = self._instance(self._face_material(look), transparent, tint=look['tint'])
@@ -793,7 +825,7 @@ class _ReplacementWriter:
             components = {'minecraft:material_instances': instances}
             if plan['turns']:
                 components['minecraft:transformation'] = {'rotation': AXIS_ROTATION[look_key[0]]}
-            permutations.append({'condition': _condition(plan, mirror, look_key, coordinate_values, picks),
+            permutations.append({'condition': _condition(plan, mirror, look_key, coordinate_values, picks, case),
                                  'components': components})
         return permutations, overlay_faces
 
@@ -812,10 +844,10 @@ class _ReplacementWriter:
                           if self.rules[plan['random_states'][index]['rule']]['method'] in OVERLAY_METHODS]
         for face in overlay_faces:
             cases = {}
-            for look_key, _, location, picks in plan['combos']:
+            for look_key, _, location, picks, case in plan['combos']:
                 terms = _look_condition(plan, mirror, look_key) + [
                     _state_term(plan['random_states'][index]['state'], picks[index]) for index in overlay_states]
-                shown_here = bool(_face_look(plan, self.document, look_key, face, location, picks)['overlays'])
+                shown_here = bool(_face_look(plan, self.document, look_key, face, location, picks, case)['overlays'])
                 cases.setdefault(' && '.join(terms) or '1.0', shown_here)
             shown = [case for case, visible in cases.items() if visible]
             if len(shown) == len(cases):
@@ -837,6 +869,9 @@ class _ReplacementWriter:
             states['bct:m'] = _state_values(range(len(plan['choices']['weights'])))
         for index, group in enumerate(plan['groups']):
             states[f'bct:g{index}'] = _state_values(range(len(group.get('modelChoices', []))))
+        if plan['connected']:
+            for name, size in plan['connected']['states']:
+                states[name] = _state_values(range(size))
         return states
 
     def _check_schema(self, definition, files):
@@ -920,7 +955,7 @@ def _not_replaceable(block, known, full, pane_patterns, policy, kept_vanilla):
     return _fallback_reason(block, policy)
 
 
-def _with_joining_rules(rule_ids, block, document, rules, passengers_by_block, order):
+def _with_joining_rules(rule_ids, block, document, rules, passengers_by_block, order, shape='cube'):
     """The block's rules plus the drawable rules that join it, in document order.
 
     Passengers join, and so do rules whose matchTiles name a layer or model
@@ -932,7 +967,8 @@ def _with_joining_rules(rule_ids, block, document, rules, passengers_by_block, o
         layer_textures, part_textures = _look_textures(info)
         extra += [rule['id'] for rule in document['rules']
                   if set(rule.get('matchTiles', [])) & (layer_textures | part_textures)]
-    return sorted(set(rule_ids + [rule_id for rule_id in extra if not _rule_problem(rules[rule_id])]), key=order.get)
+    return sorted(set(rule_ids + [rule_id for rule_id in extra if not _rule_problem(rules[rule_id], shape)]),
+                  key=order.get)
 
 
 def _needs_data(policy, known, replaced):
@@ -1001,10 +1037,18 @@ def _leaf_data(entries, plans, document, known):
                       'logRadius': decay['log_update_radius'], 'leafRadius': decay['leaf_update_radius']}}
 
 
-def _rule_problem(rule):
-    """Why a rule cannot draw on a replacement block, or None."""
+def _rule_problem(rule, shape='cube'):
+    """Why a rule cannot draw on a replacement block, or None; shape is 'cube', 'pane' or 'shaped'."""
     if any(rule.get(field) for field in CONDITIONS):
         return 'biome, height, state or neighbor-connection filters need the runtime renderer'
+    if rule['method'] in NATIVE_CONNECTED_METHODS and shape != 'shaped':
+        if rule.get('innerSeams'):
+            return 'innerSeams reads the blocks in front of the neighbours, which a block state cannot hold'
+        if rule.get('connect') == 'state':
+            return 'connect=state needs the states of the neighbours, which a block state cannot hold'
+        if len(rule['tiles']) < 47:
+            return 'ctm needs 47 tiles'
+        return None
     if rule['method'] in CONNECTED_METHODS:
         return (f'method={rule["method"]} picks its tile from the neighbors; Bedrock block geometry reads only '
                 'block states (query.block_state) and shows at most 64 bones, so it stays on entity carriers')
@@ -1147,22 +1191,41 @@ def _plan_block(document, block, rules, vanilla_states=(), single_choice=False):
                          else 'look depends on ' + state + ' which the block does not have')
     layer_textures, part_textures = _look_textures(info)
     face_textures = {texture for look in looks.values() for texture in look['faces'].values()}
-    randoms, decal_rules = [], []
+    randoms, decal_rules, connected = [], [], []
     for rule in rules:
         matched = set(rule.get('matchTiles', []))
         if matched & part_textures and not matched & (face_textures | layer_textures):
             decal_rules.append(rule)
         elif rule['method'] in RANDOM_METHODS:
             randoms.append(rule)
-    plan = {'block': block, 'logical': logical, 'rules': rules, 'looks': looks, 'state': state, 'turns': turns}
+        elif rule['method'] in NATIVE_CONNECTED_METHODS:
+            connected.append(rule)
+    plan = {'block': block, 'logical': logical, 'rules': rules, 'looks': looks, 'state': state, 'turns': turns,
+            'connected': _connected_plan(connected, turns)}
     coordinates = _axis_states(_repeat_axes(plan))
     random_states = [{'state': f'bct:r{index}', 'rule': rule['id'], 'count': len(rule['tiles'])}
                      for index, rule in enumerate(randoms)]
     drawn = list(range(len(random_states)))
     plan.update({'coordinates': coordinates, 'random_states': random_states, 'randoms': randoms,
-                 'combos': _combos(looks, coordinates, random_states, drawn), 'choices': choices,
+                 'combos': _combos(looks, coordinates, random_states, drawn, plan['connected']), 'choices': choices,
                  'groups': info['groups'], 'drawn_randoms': drawn, 'decal_rules': decal_rules})
     return plan
+
+
+def _connected_plan(rules, turns):
+    """The connected rule of a block with its looks and look states (connected_cases), or None.
+
+    Raises ValueError for what a replacement cannot draw: two connected rules, or a block turned by
+    its axis (the cases are in world space).
+    """
+    if not rules:
+        return None
+    if len(rules) > 1:
+        raise ValueError('more than one connected rule on a block')
+    if turns:
+        raise ValueError('connected textures on a block turned by its axis')
+    looks, cases = connected_cases.table()
+    return {'rule': rules[0], 'looks': looks, 'cases': cases, 'states': connected_cases.digit_states(len(looks))}
 
 
 def _unturned_looks(looks):
@@ -1229,8 +1292,9 @@ def _axis_states(pairs):
     return states
 
 
-def _combos(looks, coordinates, random_states, drawn):
-    """[(look key, coordinate state values, a location with those residues, random picks)] for every permutation.
+def _combos(looks, coordinates, random_states, drawn, connected=None):
+    """[(look key, coordinate state values, a location with those residues, random picks, connected look)] for
+    every permutation; the connected look is None without a connected rule.
 
     State values whose residues no location has (they disagree on an axis) are left out.
     """
@@ -1247,7 +1311,8 @@ def _combos(looks, coordinates, random_states, drawn):
                 picks = [0] * len(random_states)
                 for index, pick in zip(drawn, chosen):
                     picks[index] = pick
-                combos.append((key, values, tuple(location), tuple(picks)))
+                for case in range(len(connected['looks'])) if connected else [None]:
+                    combos.append((key, values, tuple(location), tuple(picks), case))
     return combos
 
 
@@ -1284,9 +1349,15 @@ def _layer_rule(plan, texture, world, look):
     return None
 
 
-def _rule_tile(plan, rule, world, location, picks, orientation, fallback):
-    """The tile a base rule shows on a world face at a location with these random picks; fallback for a skip."""
-    if rule['method'] == 'repeat':
+def _rule_tile(plan, rule, world, location, picks, orientation, fallback, case=None):
+    """The tile a base rule shows on a world face at a location with these random picks and connected look;
+    fallback for a skip."""
+    if rule['method'] in NATIVE_CONNECTED_METHODS:
+        if orientation:
+            raise ValueError('connected textures on a turned face')
+        # A hidden face (its neighbour joins) is never seen; it keeps the tile of a face alone.
+        tile = rule['tiles'][plan['connected']['looks'][case][world] or 0]
+    elif rule['method'] == 'repeat':
         orientation = 0 if rule.get('orient') == 'none' else orientation
         tile = rule['tiles'][repeat_index(location, world, rule['width'], rule['height'],
                                           rule.get('symmetry', 'none'), orientation)]
@@ -1297,8 +1368,10 @@ def _rule_tile(plan, rule, world, location, picks, orientation, fallback):
     return fallback if tile in SKIP else tile
 
 
-def _face_look(plan, document, key, local, location, picks):
+def _face_look(plan, document, key, local, location, picks, case=None):
     """What one local face shows: {base, layers, overlays, tint, overlay_tint, orientation}.
+
+    case is the connected look (connected_cases) the block's neighbours give, or None.
 
     tint is an RGB multiplier baked into the material or a Bedrock tint_method
     name. A biome-tinted layer over an untinted face (grass sides) is drawn as
@@ -1325,7 +1398,7 @@ def _face_look(plan, document, key, local, location, picks):
         if chosen:
             continue
         chosen = True
-        base = _rule_tile(plan, rule, world, location, picks, look['orientations'][world], texture)
+        base = _rule_tile(plan, rule, world, location, picks, look['orientations'][world], texture, case)
     layers, layer_tints = [], []
     for layer in look['layers'].get(world, []):
         rule = _layer_rule(plan, layer['texture'], world, look)
@@ -1407,13 +1480,16 @@ def _look_condition(plan, mirror, key):
     return terms
 
 
-def _condition(plan, mirror, key, values, picks):
-    """The permutation condition of a combo: its look, coordinate states and random picks."""
+def _condition(plan, mirror, key, values, picks, case=None):
+    """The permutation condition of a combo: its look, coordinate states, random picks and connected look."""
     terms = _look_condition(plan, mirror, key)
     for item, value in zip(plan['coordinates'], values):
         terms.append(_state_term(item['state'], value))
     for index in plan['drawn_randoms']:
         terms.append(_state_term(plan['random_states'][index]['state'], picks[index]))
+    if case is not None:
+        states = plan['connected']['states']
+        terms += [_state_term(name, value) for name, value in connected_cases.digits(case, states).items()]
     return ' && '.join(terms) or '1.0'
 
 
@@ -1543,11 +1619,12 @@ def _build_pane(document, block, rules, vanilla_states, mirror, materials, insta
     if not isinstance(tint, list):
         raise ValueError('biome-tinted panes')
     owner = next((rule for rule in rules if _rule_applies(rule, block, logical, 'north', broad_texture, {})), None)
-    if owner and owner['method'] != 'fixed':
+    connected = owner if owner and owner['method'] in NATIVE_CONNECTED_METHODS else None
+    if owner and owner['method'] != 'fixed' and not connected:
         raise ValueError(f'method={owner["method"]} on a pane has no native form')
     broad, instances = {}, {'edge': instance(materials.alias(edge_texture, (), tint))}
     for face in PANE_SIDES:
-        tile = owner['tiles'][0] if owner and owner['tiles'][0] not in SKIP else broad_texture
+        tile = owner['tiles'][0] if owner and not connected and owner['tiles'][0] not in SKIP else broad_texture
         instances[face + '_p'] = instance(materials.alias(tile, (), tint))
         broad[face] = [('p', '1.0')]
     instances['*'] = instances['edge']
@@ -1557,7 +1634,20 @@ def _build_pane(document, block, rules, vanilla_states, mirror, materials, insta
     culling_document = _culling_rules(culling, parts, transparent, same={'up', 'down'})
     files = {rp / f'models/blocks/{namespace}_{stem}.geo.json': model,
              rp / f'block_culling/{namespace}_{stem}.json': culling_document}
-    permutations = []
+    permutations, plan = [], None
+    if connected:
+        # One permutation per look sets the broad faces' tiles; the arm permutations below add the boxes.
+        looks, cases = connected_cases.pane_table()
+        plan = {'rule': connected, 'looks': looks, 'cases': cases, 'states': connected_cases.digit_states(len(looks)),
+                'diagonals': []}
+        for index, tiles in enumerate(looks):
+            look = dict(instances)
+            for face in PANE_SIDES:
+                tile = connected['tiles'][tiles[face]]
+                look[face + '_p'] = instance(materials.alias(broad_texture if tile in SKIP else tile, (), tint))
+            condition = ' && '.join(_state_term(name, value)
+                                    for name, value in connected_cases.digits(index, plan['states']).items())
+            permutations.append({'condition': condition, 'components': {'minecraft:material_instances': look}})
     for combination in itertools.product((False, True), repeat=4):
         connections = dict(zip(PANE_SIDES, combination))
         box = _pane_box(connections)
@@ -1568,19 +1658,21 @@ def _build_pane(document, block, rules, vanilla_states, mirror, materials, insta
     components = {'minecraft:geometry': {'identifier': geometry_id, 'culling': culling, 'bone_visibility': visibility},
                   'minecraft:material_instances': instances}
     pane = {side: mirror['minecraft:connection_' + side] for side in PANE_SIDES}
-    return {'components': components, 'permutations': permutations, 'pane': pane, 'files': files}
+    return {'components': components, 'permutations': permutations, 'pane': pane, 'files': files, 'connected': plan}
 
 
 def _pane_segment(face, low, high, material):
-    """One broad pane face strip; low-high runs along x for north/south faces and along z for west/east."""
+    """One broad pane face strip; low-high runs along Java x for north/south faces and along z for west/east.
+
+    Built as a Java element, so it lands where Java draws it (Bedrock geometry mirrors x) with Java's UVs.
+    """
+    at = {'north': 7, 'south': 9, 'west': 7, 'east': 9}[face]
     if face in ('north', 'south'):
-        strip = {'origin': [low - 8, 0, -1 if face == 'north' else 1], 'size': [high - low, 16, 0]}
-        u = 16 - high if face == 'north' else low
+        element = {'from': [low, 0, at], 'to': [high, 16, at]}
     else:
-        strip = {'origin': [-1 if face == 'west' else 1, 0, low - 8], 'size': [0, 16, high - low]}
-        u = low if face == 'west' else 16 - high
-    strip['uv'] = {face: {'uv': [u, 0], 'uv_size': [high - low, 16], 'material_instance': material}}
-    return strip
+        element = {'from': [at, 0, low], 'to': [at, 16, high]}
+    element['faces'] = {face: {}}
+    return cube(element, lambda _face, _data: material)
 
 
 def _pane_geometry(identifier, broad, mirror):
@@ -1599,19 +1691,16 @@ def _pane_geometry(identifier, broad, mirror):
                 parts.append((name, face, None))
                 state = arm(side) if shown else '!' + arm(side)
                 visibility[name] = state if expression == '1.0' else f'{state} && ({expression})'
-    post = {'origin': [-1, 0, -1], 'size': [2, 16, 2],
-            'uv': {'up': {'uv': [7, 7], 'uv_size': [2, 2], 'material_instance': 'edge'},
-                   'down': {'uv': [7, 7], 'uv_size': [2, 2], 'material_instance': 'edge'}}}
+    def edge(element):
+        return cube(element, lambda _face, _data: 'edge')
+
+    post = edge({'from': [7, 0, 7], 'to': [9, 16, 9], 'faces': {'up': {'uv': [7, 7, 9, 9]}, 'down': {'uv': [7, 7, 9, 9]}}})
     bones.append({'name': 'post', 'pivot': [0, 0, 0], 'cubes': [post]})
     parts += [('post', 'up', 'up'), ('post', 'down', 'down')]
     for side, (low, high) in PANE_ARMS.items():
-        size = [high[axis] - low[axis] for axis in range(3)]
-        uv = {'up': {'uv': [7, 0], 'uv_size': [2, 7]}, 'down': {'uv': [7, 0], 'uv_size': [2, 7]},
-              side: {'uv': [7, 0], 'uv_size': [2, 16]}}
-        for item in uv.values():
-            item['material_instance'] = 'edge'
-        bones.append({'name': 'arm_' + side, 'pivot': [0, 0, 0],
-                      'cubes': [{'origin': [low[0] - 8, low[1], low[2] - 8], 'size': size, 'uv': uv}]})
+        top = [7, 0, 9, 7]
+        arm_cube = edge({'from': low, 'to': high, 'faces': {'up': {'uv': top}, 'down': {'uv': top}, side: {'uv': [7, 0, 9, 16]}}})
+        bones.append({'name': 'arm_' + side, 'pivot': [0, 0, 0], 'cubes': [arm_cube]})
         parts += [('arm_' + side, 'up', 'up'), ('arm_' + side, 'down', 'down'), ('arm_' + side, side, side)]
         visibility['arm_' + side] = arm(side)
     description = {'identifier': identifier, 'texture_width': 16, 'texture_height': 16,
@@ -1624,7 +1713,8 @@ def _pane_box(connections):
     """Collision and selection box around the post and the connected arms (one box per block is all Bedrock allows)."""
     x0, x1 = (0 if connections['west'] else 7), (16 if connections['east'] else 9)
     z0, z1 = (0 if connections['north'] else 7), (16 if connections['south'] else 9)
-    return {'origin': [x0 - 8, 0, z0 - 8], 'size': [x1 - x0, 16, z1 - z0]}
+    # In the geometry's coordinates, which mirror Java's x, so the box lines up with the drawn arms.
+    return {'origin': [8 - x1, 0, z0 - 8], 'size': [x1 - x0, 16, z1 - z0]}
 
 
 def _pack_uuid(name):

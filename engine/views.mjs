@@ -35,6 +35,8 @@ const TRAVEL_SPEED = 0.15;
 const HEADING_PULL = 0.2;
 // Half a chunk column's horizontal diagonal (blocks): a chunk is in view while any part of it is.
 const CHUNK_RADIUS = 11.4;
+// Blocks added to a chunk's rank around the virtual player (far.mjs): more than any near chunk's distance.
+const VIRTUAL_PENALTY = 256;
 
 /** limits(): { viewAngle, farDistance, nearDistance, joinTicks }. */
 export function createViews({ system, limits }) {
@@ -44,8 +46,10 @@ export function createViews({ system, limits }) {
 
   /** Reads every player's head, view direction and heading, once per tick however many parts ask. */
   function update(players) {
-    if (readTick === system.currentTick && readPlayers === players) return;
-    readTick = system.currentTick; readPlayers = players;
+    // Parts pass different lists (with or without the virtual player); the same players read once a tick.
+    const who = players.map(player => player.id).join('|');
+    if (readTick === system.currentTick && readPlayers === who) return;
+    readTick = system.currentTick; readPlayers = who;
     const { viewAngle, farDistance, nearDistance, joinTicks } = limits();
     const tick = system.currentTick, ids = new Set();
     halfAngle = viewAngle * Math.PI / 360;
@@ -71,7 +75,7 @@ export function createViews({ system, limits }) {
       try { direction = player.getViewDirection(); } catch { /* not spawned yet */ }
       head ??= { x: feet.x, y: feet.y + EYE_HEIGHT, z: feet.z };
       const length = direction ? Math.hypot(direction.x, direction.y, direction.z) : 0;
-      const view = { dimension, x: head.x, y: head.y, z: head.z,
+      const view = { dimension, x: head.x, y: head.y, z: head.z, virtual: !!player.virtual,
         limit: tick - arrival.tick < joinTicks ? Math.min(nearDistance, farDistance) : farDistance,
         // Without a view direction the player could be looking anywhere.
         direction: length > 0 ? { x: direction.x / length, y: direction.y / length, z: direction.z / length } : undefined };
@@ -158,7 +162,8 @@ export function createViews({ system, limits }) {
     for (const view of views) {
       if (view.dimension !== dimensionId) continue;
       const dx = cx * 16 + 8 - view.x, dz = cz * 16 + 8 - view.z, distance = Math.hypot(dx, dz);
-      let score = distance;
+      // Chunks around real players come before the area the virtual player loads far away.
+      let score = view.virtual ? distance + VIRTUAL_PENALTY : distance;
       if (view.heading && distance > CHUNK_RADIUS) score = distance * (1 - HEADING_PULL * (dx * view.heading.x + dz * view.heading.z) / distance);
       if (waits && distance < view.limit + CHUNK_RADIUS) {
         const flat = view.direction ? Math.hypot(view.direction.x, view.direction.z) : 0;

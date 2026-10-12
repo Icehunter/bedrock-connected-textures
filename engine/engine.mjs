@@ -23,6 +23,10 @@ import { createLeaves } from './leaves.mjs';
 import { createOverlaySurfaces } from './terrain-native.mjs';
 import { createFar } from './far.mjs';
 import { AuthoredError, compileAuthored } from './authored.mjs';
+// Chunks this close to a player scan before other work shares the tick.
+const NEAR_CHUNKS = 1;
+// Milliseconds a tick leaves get while near work waits.
+const BACKGROUND_MS = 1;
 
 /**
  * The players blocks and overlay surfaces convert around. Beyond the simulation distance the far worker's
@@ -69,7 +73,7 @@ export function startEngine(api) {
   overlays = createOverlaySurfaces({ api, limits: () => settings.overlay, log, vanillaType, vanillaStates, aliasesOf,
     foreign: () => terrain.native.ids() });
   const now = () => (api.now ?? Date.now)();
-  const budget = createBudget({ system, now, limit: () => settings.budgetMs });
+  const budget = createBudget({ system, now, limit: () => (nearBusy() ? Math.max(settings.budgetMs, settings.nearBudgetMs) : settings.budgetMs) });
   // An area beyond the simulation distance is released once nothing is left to convert.
   far = createFar({ api, limits: () => settings.far, log, idle: () => {
     const leaf = leaves.status, swap = replacements.status, overlay = overlays.status;
@@ -79,12 +83,11 @@ export function startEngine(api) {
   // replace view settings), and chunks are scanned and converted where players head first.
   const views = createViews({ system, limits: () => settings.replace });
   const ahead = waits => record => views.rank(record.dimension.id, record.x, record.z, waits);
-  const scanner = new Scanner({ system, BlockVolume: api.BlockVolume, jobs: () => settings.scanJobs, now, log, rank: ahead(false), consumers: [
+  const scanner = new Scanner({ system, BlockVolume: api.BlockVolume, jobs: () => settings.scanJobs, now, log, rank: ahead(false), profile: () => settings.debug, consumers: [
     { radius: () => settings.connected.chunkRadius, band: () => settings.connected.yBand,
       types: () => connected.blockTypes(), found: (dimension, location) => connected.update(dimension, location) },
     { radius: () => settings.terrain.chunkRadius, band: () => settings.terrain.yBand, types: () => terrain.blockTypes(),
-      found: (dimension, location, typeId) => terrain.found(dimension, location, typeId),
-      surface: (dimension, location) => terrain.surface(dimension, location) },
+      scan: (dimension, record, low, high) => terrain.scan(dimension, record, low, high) },
   ] });
 
   let replaceScanner;
@@ -96,10 +99,10 @@ export function startEngine(api) {
     openExtras: () => [...leaves.customTypes(), ...overlays.surfaceTypes()],
     // Replacements never get carriers: the ones a block had while vanilla go right away.
     swapped: (dimension, location) => { if (connected.status.actors) connected.update(dimension, location); overlays.swapped(dimension, location); } });
-  replaceScanner = new Scanner({ system, BlockVolume: api.BlockVolume, jobs: () => 1, now, log, rank: ahead(true), consumers: [
+  replaceScanner = new Scanner({ system, BlockVolume: api.BlockVolume, jobs: () => 2, now, log, rank: ahead(true), profile: () => settings.debug, consumers: [
     { radius: () => settings.replace.chunkRadius, band: () => settings.replace.yBand, types: () => replacements.blockTypes(), scan: replacements.scan },
   ] });
-  const overlayScanner = new Scanner({ system, BlockVolume: api.BlockVolume, jobs: () => 1, now, log, rank: ahead(false), consumers: [
+  const overlayScanner = new Scanner({ system, BlockVolume: api.BlockVolume, jobs: () => 1, now, log, rank: ahead(false), profile: () => settings.debug, consumers: [
     { radius: () => settings.overlay.chunkRadius, band: () => settings.overlay.yBand, types: () => overlays.blockTypes(),
       prepare: overlays.prepare, found: overlays.found, surface: overlays.surface },
   ] });
@@ -273,8 +276,10 @@ export function startEngine(api) {
   }
 
   function status() {
-    return { enabled, suspended, settings, connected: connected.status, carriers: carriers.total, terrain: terrain.status, chunks: scanner.chunks.size,
-      replacements: replacements.status, leaves: leaves.status, overlays: overlays.status, far: far.status };
+    return { enabled, suspended, tick: system.currentTick, budget: budget.stats(), scans: {
+      replace: replaceScanner.backlog(), connectedAndTerrain: scanner.backlog(), overlay: overlayScanner.backlog() },
+      connected: connected.status, carriers: carriers.total, terrain: terrain.status, chunks: scanner.chunks.size,
+      replacements: replacements.status, leaves: leaves.status, overlays: overlays.status, far: far.status, settings };
   }
 
   system.afterEvents.scriptEventReceive.subscribe(event => {
@@ -284,7 +289,17 @@ export function startEngine(api) {
       if (command === 'off' || command === 'clear') setEnabled(false);
       else if (command === 'on') { if (restoring) setRestoring(false); setEnabled(true); }
       else if (command === 'restore') setRestoring(true);
-      else if (command === 'status') reply('[BCT] ' + JSON.stringify(status()));
+      else if (command === 'speed' && event.sourceEntity?.typeId === 'minecraft:player') {
+        const player = event.sourceEntity;
+        const text = '[BCT] speed ' + JSON.stringify(replacements.speedTest(player.dimension, player.location));
+        console.warn(text);
+        reply(text);
+      } else if (command === 'status') {
+        const text = '[BCT] status ' + JSON.stringify(status());
+        // Also in the content log, where it can be read in full.
+        console.warn(text);
+        reply(text);
+      }
     } else if (event.id === 'bct:config') {
       try {
         const overrides = JSON.parse(event.message || '{}');
@@ -364,7 +379,7 @@ export function startEngine(api) {
     console.warn('[BCT] restore done');
   }
 
-  function tick() { budget.measure(poll); }
+  function tick() { budget.measure(poll, 'poll'); }
   function poll() {
     if (!started) start();
     const all = currentPlayers(), drawn = refreshGraphics(all);
@@ -384,24 +399,32 @@ export function startEngine(api) {
   system.runInterval(tick, settings.intervalTicks);
   // The parts that share each tick's budget, each up to its own cap.
   const parts = [
-    { run: until => replacements.run(until), cap: () => settings.replace.sliceMs },
-    { run: until => leaves.run(until), cap: () => settings.leaves.sliceMs },
-    { run: until => replaceScanner.run(until), cap: () => settings.scanSliceMs },
-    { run: until => scanner.run(until), cap: () => settings.scanSliceMs },
-    { run: until => overlayScanner.run(until), cap: () => settings.overlay.sliceMs },
-    { run: until => overlays.tick(blockPlayers(), until), cap: () => settings.overlay.sliceMs },
-    { run: until => { if (restoring) leaves.restore(until); }, cap: () => settings.leaves.sliceMs },
-    { run: until => { if (restoring) restoreSweep(until); }, cap: () => settings.replace.sliceMs },
+    // Swaps and the scans of chunks next to players go first: they are what players see change.
+    { name: 'swaps', run: until => replacements.run(until), cap: () => settings.replace.sliceMs, first: () => replacements.hasNearQueued() },
+    { name: 'leaves', run: until => leaves.run(until), cap: () => (nearBusy() ? BACKGROUND_MS : settings.leaves.sliceMs) },
+    { name: 'replaceScan', run: until => replaceScanner.run(until), cap: () => settings.scanSliceMs, first: () => replaceScanner.nearWork(NEAR_CHUNKS) },
+    { name: 'scan', run: until => scanner.run(until), cap: () => settings.scanSliceMs },
+    { name: 'overlayScan', run: until => overlayScanner.run(until), cap: () => settings.overlay.sliceMs },
+    { name: 'overlays', run: until => overlays.tick(blockPlayers(), until), cap: () => settings.overlay.sliceMs },
+    { name: 'restoreLeaves', run: until => { if (restoring) leaves.restore(until); }, cap: () => settings.leaves.sliceMs },
+    { name: 'restoreSweep', run: until => { if (restoring) restoreSweep(until); }, cap: () => settings.replace.sliceMs },
   ];
-  let replaceTicks = 0;
+  let replaceTicks = 0, busyTick = -1, busy = false;
+  // Whether chunks next to players still wait for their scans or swaps; leaves are background work meanwhile.
+  function nearBusy() {
+    if (busyTick !== system.currentTick) {
+      busyTick = system.currentTick;
+      busy = replacements.hasNearQueued() || replaceScanner.nearWork(NEAR_CHUNKS + 1) || scanner.nearWork(NEAR_CHUNKS + 1) ||
+        overlayScanner.nearWork(NEAR_CHUNKS + 1);
+    }
+    return busy;
+  }
   system.runInterval(() => {
     if (!started) return;
-    budget.measure(() => {
-      const players = currentPlayers(), maintenance = ++replaceTicks % 10 === 0;
-      views.update(players);
-      replacements.tick(blockPlayers(), maintenance);
-      leaves.tick(players, replaceTicks % 4 === 0);
-    });
+    const players = currentPlayers(), maintenance = ++replaceTicks % 10 === 0;
+    budget.measure(() => views.update(players), 'views');
+    budget.measure(() => replacements.tick(blockPlayers(), maintenance), 'swapBookkeeping');
+    budget.measure(() => leaves.tick(players, replaceTicks % (nearBusy() ? 16 : 4) === 0), 'leafSchedule');
     budget.share(parts);
   }, 1);
 

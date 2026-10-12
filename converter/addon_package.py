@@ -155,11 +155,11 @@ def compose_source_addon(base_rp, connected_addon, output, *, key, title, versio
         if configuration is None:
             raise ValueError('Source addon has no connected-texture data')
         _share_repeat_update_component(selected['bp'])
-        packets = [packet('connected', key, configuration)]
+        # Replacement blocks change what players stand next to, so their data goes first.
+        packets = [packet('replace', key, replacement)] if replacement else []
+        packets.append(packet('connected', key, configuration))
         if terrain:
             packets.append(packet('terrain', key, terrain))
-        if replacement:
-            packets.append(packet('replace', key, replacement))
         for kind in ('bp', 'rp'):
             if icon is not None:
                 selected[kind]['pack_icon.png'] = icon

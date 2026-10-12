@@ -284,15 +284,19 @@ class OverlaySurfaceTests(unittest.TestCase):
         near_edges = {'north': (2, 8), 'south': (2, -8), 'west': (0, -8), 'east': (0, 8), 'down': (1, 16)}
         for path in (self.rp / 'models/blocks').glob('*.json'):
             for bone in read_json(path)['minecraft:geometry'][0]['bones']:
-                cube, = bone['cubes']
-                face, = cube['uv']
+                cube, *sides = bone['cubes']
                 low = cube['origin']
                 high = [low[axis] + cube['size'][axis] for axis in range(3)]
-                if face == 'up':
-                    self.assertTrue(any(abs(high[1] - (offset + depth)) < 1e-6
+                if 'up' in cube['uv']:
+                    # A top quad reaches down to its host face, and its sides close the gap under its edges.
+                    self.assertEqual(set(cube['uv']), {'up', 'north', 'south'}, bone['name'])
+                    self.assertEqual([side['rotation'] for side in sides], [[0, 0, 90]] * 2, bone['name'])
+                    self.assertTrue(any(abs(low[1] - offset) < 1e-6 and abs(high[1] - (offset + depth)) < 1e-6
                                         for offset in (0, -1, -8) for depth in depths), bone['name'])
-                    self.assertEqual(cube['uv'][face]['uv_size'], [-16, -16])
+                    self.assertEqual(cube['uv']['up']['uv_size'], [-16, -16])
                     continue
+                self.assertEqual(sides, [], bone['name'])
+                face, = cube['uv']
                 axis, edge = near_edges[face]
                 distance = min(abs(low[axis] - edge), abs(high[axis] - edge))
                 self.assertLess(distance, 1, (path.name, bone['name']))

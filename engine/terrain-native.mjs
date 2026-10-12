@@ -649,7 +649,12 @@ export function createOverlaySurfaces({ api, limits, log = () => {}, vanillaType
         if (covered(x + n.x, y + n.y, z + n.z)) continue;
         for (const e of PLANE[face]) {
           const cx = x + e.x + n.x, cy = y + e.y + n.y, cz = z + e.z + n.z;
-          if (open(cx, cy, cz)) enqueue(scans, dimension, cx, cy, cz);
+          if (!open(cx, cy, cz)) continue;
+          // A source's overlay never goes onto a block of its own type (grass next to grass).
+          let host;
+          try { host = dimension.getBlock({ x: x + e.x, y: y + e.y, z: z + e.z }); } catch { continue; }
+          if (host && vanillaType(host.typeId) === vanilla) continue;
+          enqueue(scans, dimension, cx, cy, cz);
         }
       }
       for (const face of provider.hostFaces.get(vanilla) ?? []) {

@@ -480,3 +480,17 @@ test('needs in the pack data are checked', () => {
   assert.throws(() => env.engine.replacements.setSource('other', { ...data, needs: [{ blocks: 'minecraft:cocoa', needs: [], side: 'side' }] }), /Invalid needs/);
   assert.doesNotThrow(() => env.engine.replacements.setSource('other', bad('below')));
 });
+
+test('with tagged replacement blocks the scan asks for the tag, not the list of every replacement', () => {
+  const tagged = { ...data, tag: 'bct:replacement' };
+  const tags = new Map(data.blocks.map(entry => [entry.block, new Set(['bct:replacement'])]));
+  const fake = fakeBedrock({ ...floor([['8,62,8', 'bct_t:r_stone', { 'bct:x': 1, 'bct:y': 1, 'bct:z': 1 }]]), registry, tags });
+  const engine = startEngine(fake.api);
+  publishSources({ system: fake.system, world: fake.world, sources: [packet('replace', 'pack', tagged)] });
+  fake.system.sendScriptEvent('bct:config', JSON.stringify({ replace: { chunkRadius: 1, yBand: 6 } }));
+  fake.player({ x: 2, y: 61, z: 2 });
+  settle(fake);
+  assert.deepEqual(fake.states.get('8,62,8'), { 'bct:x': 0, 'bct:y': 0, 'bct:z': 0 }, 'a placed replacement is found and adopted');
+  assert.ok(engine.replacements.size > 0);
+  assert.ok(!fake.volumes.some(volume => volume.types.includes('bct_t:r_stone')), 'no query lists the replacement types');
+});

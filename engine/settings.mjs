@@ -11,6 +11,8 @@ export const DEFAULT_SETTINGS = Object.freeze({
   // from 10 ms a tick on average, counting more than this budget measures; blocks are written in bulk, so
   // this converts what loads within a few ticks.
   budgetMs: 6,
+  // The budget while chunks next to a player still wait for scans or swaps: they are what players watch change.
+  nearBudgetMs: 7,
   // Chunk scans for connected textures and terrain: scanJobs chunks at a time, at most scanSliceMs of each tick.
   scanJobs: 2,
   scanSliceMs: 4,
@@ -42,11 +44,11 @@ export const DEFAULT_SETTINGS = Object.freeze({
   // a time and converted, each kept at most holdTicks; status 1 shows the areas left on the action bar.
   // chunkRadius 0 turns it off. blocks 0 converts only leaves there, the change seen from far away; blocks 1
   // also swaps blocks and draws overlay surfaces near the surface of each area. Near players everything converts.
-  far: Object.freeze({ chunkRadius: 32, holdTicks: 400, status: 1, blocks: 0 }),
+  far: Object.freeze({ chunkRadius: 32, holdTicks: 400, status: 1, blocks: 1 }),
 });
 
 const LIMITS = {
-  intervalTicks: [1, 100], budgetMs: [1, 50], scanJobs: [1, 8], scanSliceMs: [1, 20],
+  intervalTicks: [1, 100], budgetMs: [1, 50], nearBudgetMs: [1, 50], scanJobs: [1, 8], scanSliceMs: [1, 20],
   'connected.chunkRadius': [0, 16], 'connected.yBand': [4, 384],
   'connected.maxCarriers': [0, 20000], 'connected.maxCarriersPerChunk': [0, 1024],
   'terrain.chunkRadius': [0, 32], 'terrain.yBand': [4, 384],

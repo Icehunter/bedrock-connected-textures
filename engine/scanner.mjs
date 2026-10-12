@@ -17,6 +17,9 @@
  */
 const PROBES_PER_PLAYER = 96;
 const SLAB = 16;
+// A chunk next to a player is scanned again this many milliseconds after its scans: a chunk can
+// report loaded a moment before its blocks can be read.
+const RECHECKS_MS = [1500, 6000];
 
 function spiral(radius) {
   const offsets = [];
@@ -30,10 +33,31 @@ export class Scanner {
    * prepare?(dimension, record, low, high), finish?(context), scan?(dimension, record, low, high) (a generator)}]
    * jobs(): how many chunk scans may run at once. rank(record): the order chunks are scanned in (lower first).
    */
-  constructor({ system, BlockVolume, consumers, jobs = () => 2, now = () => Date.now(), log = () => {}, rank = record => record.distance }) {
-    this.system = system; this.BlockVolume = BlockVolume; this.consumers = consumers; this.jobs = jobs; this.log = log;
+  constructor({ system, BlockVolume, consumers, jobs = () => 2, now = () => Date.now(), log = () => {}, rank = record => record.distance,
+    profile = () => false }) {
+    this.system = system; this.BlockVolume = BlockVolume; this.consumers = consumers; this.jobs = jobs; this.log = log; this.profile = profile;
     this.now = now; this.rank = rank;
     this.chunks = new Map(); this.cursors = new Map(); this.active = new Map(); this.offsets = []; this.radius = -1;
+    // Native calls the scans made since the last backlog(): name -> { calls, ms }.
+    this.calls = new Map(); this.scanned = 0;
+  }
+
+  /** The dimension as scans see it: its block queries timed, for backlog(). */
+  timed(dimension) {
+    const calls = this.calls, now = this.now;
+    return new Proxy(dimension, {
+      get(target, name) {
+        const value = target[name];
+        if (typeof value !== 'function') return value;
+        return (...args) => {
+          const start = now();
+          try { return value.apply(target, args); } finally {
+            const entry = calls.get(name) ?? { calls: 0, ms: 0 };
+            entry.calls++; entry.ms += now() - start; calls.set(name, entry);
+          }
+        };
+      },
+    });
   }
 
   get radiusLimit() { return Math.max(0, ...this.consumers.map(consumer => consumer.radius())); }
@@ -76,6 +100,14 @@ export class Scanner {
       // A player who climbs or digs past half the band needs the new layers.
       if (Math.abs(nearest.player.location.y - record.y) > band / 2) { record.y = Math.floor(nearest.player.location.y); record.dirty = true; }
     }
+    const time = this.now();
+    for (const record of this.chunks.values())
+      if (record.recheckAt !== undefined && time >= record.recheckAt) { record.recheckAt = undefined; record.dirty = true; }
+    this.start();
+  }
+
+  /** Starts the dirty chunks most worth scanning, up to jobs(). */
+  start() {
     if (this.active.size >= this.jobs()) return;
     const pending = [];
     for (const record of this.chunks.values()) if (record.dirty && record.loaded && !this.active.has(record.key)) { record.rank = this.rank(record); pending.push(record); }
@@ -86,8 +118,36 @@ export class Scanner {
       const [record] = pending.splice(best, 1);
       if (!this.loaded(record.dimension, record.x, record.z, record.y)) { record.loaded = false; continue; }
       record.dirty = false;
-      this.active.set(record.key, this.scan(record));
+      // Native calls are timed for status only while debugging: the wrapper costs a little on every call.
+      this.active.set(record.key, this.scan(record, this.profile() ? this.timed(record.dimension) : record.dimension));
     }
+  }
+
+  /** Chunks known, waiting for a scan, being scanned, and the nearest waiting one's distance. */
+  backlog() {
+    let dirty = 0, nearest = Infinity;
+    for (const record of this.chunks.values()) if (record.dirty && record.loaded) { dirty++; nearest = Math.min(nearest, record.distance); }
+    const calls = Object.fromEntries([...this.calls].map(([name, entry]) => [name, [entry.calls, +entry.ms.toFixed(1)]]));
+    const result = { chunks: this.chunks.size, dirty, active: this.active.size, nearestDirty: dirty ? nearest : null, scanned: this.scanned, calls };
+    this.calls.clear(); this.scanned = 0;
+    return result;
+  }
+
+  /** Whether a chunk within `distance` chunks of a player is being scanned or waits for a scan. */
+  nearWork(distance) {
+    for (const record of this.chunks.values())
+      if (record.distance <= distance && record.loaded && (record.dirty || this.active.has(record.key))) return true;
+    return false;
+  }
+
+  /** After a scan: a chunk next to a player is looked at again a few times. */
+  finished(key) {
+    this.scanned++;
+    const record = this.chunks.get(key);
+    if (!record) return;
+    if (record.distance > 1) { record.rechecks = 0; return; }
+    const count = record.rechecks ?? 0;
+    if (count < RECHECKS_MS.length) { record.recheckAt = this.now() + RECHECKS_MS[count]; record.rechecks = count + 1; }
   }
 
   /** Advances the running scans in turn until `until` (a now() time). Returns true while scans remain. */
@@ -96,7 +156,12 @@ export class Scanner {
       for (const [key, scan] of this.active) {
         let result;
         try { result = scan.next(); } catch (error) { result = { done: true }; this.log('chunk scan ' + key + ': ' + String(error)); }
-        if (result.done) this.active.delete(key);
+        if (result.done) {
+          this.active.delete(key);
+          this.finished(key);
+          // The next chunk starts at once rather than at the next poll.
+          this.start();
+        }
         if (this.now() >= until) break;
       }
     }
@@ -125,19 +190,22 @@ export class Scanner {
     const loaded = this.loaded(dimension, x, z, y);
     if (!loaded) { if (record) record.loaded = false; return; }
     if (!record) {
+      // Seen for the first time: its neighbours' scans read it if it was loaded then, so they stay as they are.
       record = { key, dimension, x, z, y: Math.floor(y), loaded: true, dirty: true, distance: 0, rank: 0 };
       this.chunks.set(key, record);
-    } else { record.loaded = true; record.dirty = true; }
-    // A new chunk can complete a connection across its border.
+      return;
+    }
+    record.loaded = true; record.dirty = true;
+    // A chunk that loads again can complete a connection across its border.
     for (let dx = -1; dx <= 1; dx++) for (let dz = -1; dz <= 1; dz++) {
       const neighbor = this.chunks.get(dimension.id + ':' + (x + dx) + ':' + (z + dz));
       if (neighbor && neighbor !== record) neighbor.dirty = true;
     }
   }
 
-  *scan(record) {
+  *scan(record, dimension = record.dimension) {
     try {
-      const dimension = record.dimension, range = dimension.heightRange;
+      const range = dimension.heightRange;
       const reached = this.consumers.filter(consumer => record.distance <= consumer.radius());
       if (!reached.length) return;
       for (const consumer of reached) {
@@ -148,7 +216,7 @@ export class Scanner {
           if (!this.loaded(dimension, record.x, record.z, record.y)) { record.dirty = true; return; }
           for (let x = record.x * 16; x < record.x * 16 + 16; x++) {
             const top = dimension.getTopmostBlock({ x, z });
-            if (top && types.has(top.typeId)) { consumer.surface(dimension, top.location); yield; }
+            if (top && types.has(top.typeId)) { consumer.surface(dimension, top.location, top.typeId); yield; }
             else if (x % 4 === 3) yield;
           }
         }

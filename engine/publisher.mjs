@@ -11,9 +11,14 @@ export function authoredSource(data) {
   return {engine:'authored',provider:String(data?.pack),digest:checksum(text),parts:text.match(/[\s\S]{1,750}/g)??['']};
 }
 
+// Parts sent per tick over all sources, and the ticks a source sent in full waits for its acknowledgement.
+const PARTS_PER_TICK=32;
+const RESEND_TICKS=40;
+
 /** Runs in each BCT pack's behavior pack and sends its data to the engine (sources.mjs) until acknowledged. */
 export function publishSources({system,world,sources}) {
-  const states=sources.map(source=>({...source,index:0,acknowledged:false,nonce:null}));
+  const states=sources.map(source=>({...source,index:0,acknowledged:false,nonce:null,resendAt:0}));
+  let tick=0;
   let started=false;
   const receive=event=>{
     if(event.sourceEntity)return;
@@ -36,9 +41,11 @@ export function publishSources({system,world,sources}) {
   const first=system.run(begin);
   const interval=system.runInterval(()=>{
     if(!started)return;
-    let budget=8;
+    tick++;
+    let budget=PARTS_PER_TICK;
     for(const state of states) {
-      if(state.acknowledged)continue;
+      // A source sent in full waits for its acknowledgement before it is sent again, so it does not hold up the others.
+      if(state.acknowledged||tick<state.resendAt)continue;
       while(budget>0&&state.index<state.parts.length&&!state.acknowledged) {
         const index=state.index;
         const message=JSON.stringify({engine:state.engine,provider:state.provider,digest:state.digest,
@@ -46,7 +53,7 @@ export function publishSources({system,world,sources}) {
         if(message.length>2048)throw new Error('Source message exceeds the script event size limit');
         system.sendScriptEvent('bct:source_data',message);state.index++;budget--;
       }
-      if(state.index>=state.parts.length&&!state.acknowledged)state.index=0;
+      if(state.index>=state.parts.length&&!state.acknowledged){state.index=0;state.resendAt=tick+RESEND_TICKS;}
     }
   },1);
   return {dispose(){system.clearRun(first);system.clearRun(interval);system.afterEvents.scriptEventReceive.unsubscribe(receive);world.afterEvents.worldLoad.unsubscribe(begin);}};

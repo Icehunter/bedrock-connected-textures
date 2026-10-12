@@ -15,6 +15,7 @@ from addon_package import compose_source_addon, packet, read_packets, source_dat
 from bedrock_schema import check_tree
 from carrier_budget import apply_budget, load_budget, rule_targets
 from common import samples_path
+import connected_cases  # noqa: E402
 from native_replacement import (build_replacements, fallback_patterns, load_policy, repeat_index, repeat_moduli,
                                 representative, shaped_over_budget, vanilla_tags_of)
 
@@ -367,8 +368,8 @@ class NativeReplacementTests(unittest.TestCase):
             self.assertEqual(components['minecraft:destructible_by_explosion'], {'explosion_resistance': 6})
             self.assertEqual(components['minecraft:map_color'], '#707070')
             self.assertEqual(components['minecraft:light_dampening'], 15)
-            self.assertEqual(components['minecraft:tags'], ['minecraft:is_pickaxe_item_destructible', 'stone'],
-                             'the pickaxe tag and the vanilla tag of stone')
+            self.assertEqual(components['minecraft:tags'], ['bct:replacement', 'minecraft:is_pickaxe_item_destructible', 'stone'],
+                             'the engine tag, the pickaxe tag and the vanilla tag of stone')
             self.assertEqual(components['minecraft:redstone_conductivity'],
                              {'redstone_conductor': True, 'allows_wire_to_step_down': True})
             self.assertEqual(components['minecraft:instrument_sound'], {'up': 'note.bd'},
@@ -535,6 +536,59 @@ class NativeReplacementTests(unittest.TestCase):
             self.assertEqual([rule['id'] for rule in kept['rules']], ['glass'])
             self.assertNotIn('glass', built['rules'])
 
+    def test_ctm_glass_is_a_replacement_with_a_permutation_per_neighbour_case(self):
+        doc = document()
+        tiles = [CTM + f'glass_ctm/{n}.png' for n in range(47)]
+        doc['rules'] = [rule for rule in doc['rules'] if rule['id'] not in ('glass', 'pane')] + [
+            {'id': 'glass_ctm', 'method': 'ctm', 'blocks': ['minecraft:glass', 'minecraft:glass_pane'],
+             'matchTiles': [TEXTURES + 'glass.png', TEXTURES + 'glass_pane.png'], 'faces': FACES, 'tiles': tiles}]
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            for n in range(47):
+                material(root / 'compiled', CTM + f'glass_ctm/{n}.png', (200, 220, 255, 60 + n))
+            kept, _, data, built = self.build(root, doc=doc)
+            glass = next(entry for entry in data['blocks'] if entry['vanilla'] == 'minecraft:glass')
+            self.assertEqual(glass['ctm']['states'], ['bct:c0', 'bct:c1', 'bct:c2'])
+            self.assertEqual(len(glass['ctm']['cases']), 483)
+            self.assertEqual(glass['ctm']['with'], ['minecraft:glass', 'minecraft:glass_pane'],
+                             'connect by tile joins the blocks that show the matched textures')
+            block = self.block(root, 'r_glass')
+            self.assertEqual(len(block['permutations']), 483)
+            self.assertEqual(built['block_permutations']['minecraft:glass'][0], 16 * 16 * 2)
+            # A block in a row running west to east shows the joined-left-and-right tile (2) on its north face,
+            # and a lone block the tile of a face alone (0).
+            looks, by_case = connected_cases.table()
+            states = connected_cases.digit_states(len(looks))
+
+            def north_texture(case):
+                terms = connected_cases.digits(by_case[case], states)
+                condition = ' && '.join(f"q.block_state('{name}') == {value}" for name, value in terms.items())
+                permutation = next(item for item in block['permutations'] if item['condition'] == condition)
+                return permutation['components']['minecraft:material_instances']['north']['texture']
+
+            row, alone = north_texture(connected_cases.key({2, 3}, set())), north_texture(0)
+            self.assertNotEqual(row, alone)
+            atlas = read_json(root / 'replacement/Replace_RP/textures/terrain_texture.json')['texture_data']
+
+            def tile_of(alias):
+                """Tile n of the test set has alpha 60 + n."""
+                path = root / 'replacement/Replace_RP' / (atlas[alias]['textures'] + '.png')
+                return Image.open(path).convert('RGBA').getpixel((0, 0))[3] - 60
+
+            self.assertEqual((tile_of(row), tile_of(alone)), (2, 0))
+            self.assertNotIn('minecraft:glass', {block for rule in kept['rules'] for block in rule_targets(rule, kept)
+                                                 if block == 'minecraft:glass'} - {'minecraft:glass_pane'})
+            # Panes join too, without diagonals: 64 cases, the post and arms showing each case's tiles.
+            pane = next(entry for entry in data['blocks'] if entry['vanilla'] == 'minecraft:glass_pane')
+            self.assertEqual((len(pane['ctm']['cases']), pane['ctm']['diagonals']), (64, []))
+            pane_block = self.block(root, 'r_glass_pane')
+            looks, _ = connected_cases.pane_table()
+            row = connected_cases.digits(connected_cases.pane_table()[1][(1 << 2) | (1 << 3)], connected_cases.digit_states(len(looks)))
+            condition = ' && '.join(f"q.block_state('{name}') == {value}" for name, value in row.items())
+            permutation = next(item for item in pane_block['permutations'] if item['condition'] == condition)
+            self.assertEqual(tile_of(permutation['components']['minecraft:material_instances']['north_p']['texture']), 2)
+            self.assertNotIn('minecraft:glass_pane', {block for rule in kept['rules'] for block in rule_targets(rule, kept)})
+
 
 class PolicyBlockTests(unittest.TestCase):
     """Grass, glazed terracotta, panes, weighted models and engine behaviors."""
@@ -648,6 +702,14 @@ class PolicyBlockTests(unittest.TestCase):
             east_west = ("q.block_state('bct:connection_north') == 0 && q.block_state('bct:connection_south') == 0 && "
                          "q.block_state('bct:connection_west') == 1 && q.block_state('bct:connection_east') == 1")
             self.assertEqual(boxes[east_west], {'origin': [-8, 0, -1], 'size': [16, 16, 2]})
+            # Bedrock geometry mirrors Java's x: the west arm (Java x 0 to 7) is drawn and collides at +x.
+            west_only = ("q.block_state('bct:connection_north') == 0 && q.block_state('bct:connection_south') == 0 && "
+                         "q.block_state('bct:connection_west') == 1 && q.block_state('bct:connection_east') == 0")
+            self.assertEqual(boxes[west_only], {'origin': [-1, 0, -1], 'size': [9, 16, 2]})
+            model = read_json(root / 'replacement/Replace_RP/models/blocks' / (pane['components']['minecraft:geometry']['identifier'].split('.', 1)[1].replace('.', '_') + '.geo.json'))
+            bones = {bone['name']: bone for bone in model['minecraft:geometry'][0]['bones']}
+            self.assertEqual(bones['arm_west']['cubes'][0]['origin'][0], 1)
+            self.assertGreaterEqual(bones['north_s0_p']['cubes'][0]['origin'][0], 1, 'the strip over the west arm is on its side')
             visibility = pane['components']['minecraft:geometry']['bone_visibility']
             self.assertEqual(visibility['arm_east'], "q.block_state('bct:connection_east')")
             self.assertEqual(visibility['north_s0_p'], "q.block_state('bct:connection_west')",
@@ -665,13 +727,13 @@ class PolicyBlockTests(unittest.TestCase):
             _, _, data, built = self.build(root)
             log = self.block(root, 'r_oak_log')
             self.assertEqual(log['components']['minecraft:tags'],
-                             ['log', 'minecraft:is_axe_item_destructible', 'oak', 'wood'],
+                             ['bct:replacement', 'log', 'minecraft:is_axe_item_destructible', 'oak', 'wood'],
                              'vanilla leaves count blocks tagged log as logs')
             self.assertEqual(built['vanilla_tags']['minecraft:oak_log'], ['log', 'oak', 'wood'])
             self.assertEqual(built['vanilla_tags']['minecraft:stone'], ['stone'])
             self.assertNotIn('minecraft:end_stone', built['vanilla_tags'], 'end stone is in no vanilla tag list')
             self.assertEqual(self.block(root, 'r_end_stone')['components']['minecraft:tags'],
-                             ['minecraft:is_pickaxe_item_destructible'])
+                             ['bct:replacement', 'minecraft:is_pickaxe_item_destructible'])
 
     def test_vanilla_tags_are_vanilla_block_tags(self):
         policy = load_policy()

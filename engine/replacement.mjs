@@ -67,6 +67,10 @@ const PART_SIZE = 30000;
 const SIDES = [[1, 0, 0], [-1, 0, 0], [0, 1, 0], [0, -1, 0], [0, 0, 1], [0, 0, -1]];
 const PANE_SIDES = { north: [0, 0, -1], south: [0, 0, 1], west: [-1, 0, 0], east: [1, 0, 0] };
 const CONNECT_SIDES = { ...PANE_SIDES, up: [0, 1, 0], down: [0, -1, 0] };
+// The twelve blocks that share an edge with a block.
+const EDGE_DIAGONALS = Object.values(CONNECT_SIDES).flatMap((first, index, all) => all.slice(index + 1)
+  .filter(second => first.every((value, axis) => value === 0 || second[axis] === 0))
+  .map(second => first.map((value, axis) => value + second[axis])));
 // Shapes a replacement can have besides the full cube (converter/block_shapes.py).
 const SHAPES = ['slab', 'stairs', 'fence', 'wall'];
 const STAIR_STATES = ['weirdo_direction', 'upside_down_bit', 'minecraft:corner'];
@@ -81,6 +85,15 @@ const LEFT_OF = { north: 'west', west: 'south', south: 'east', east: 'north' };
 const OPPOSITE = { north: 'south', south: 'north', east: 'west', west: 'east' };
 const axisOf = facing => (facing === 'east' || facing === 'west' ? 'x' : 'z');
 const REVEAL_BUDGET = 64;
+// The game reads a block filter's type list on every call, about 1.5 µs a type, so the scan's frequent
+// calls use short lists. Whether anything near a cell is open: air, liquids, leaves and glass.
+const NEAR_OPEN = /(^minecraft:(air|water|flowing_water|lava|flowing_lava)$)|leaves|glass/;
+// Solid blocks common enough to be worth excluding when looking for what shows; a rarer solid block counts
+// as showing, which only swaps a hidden neighbour too. Packs with at most EXACT_SOLID solid types use them all.
+const COMMON_SOLID = /^minecraft:(stone|deepslate|dirt|grass_block|granite|diorite|andesite|tuff|calcite|gravel|sand|red_sand|sandstone|red_sandstone|cobblestone|cobbled_deepslate|netherrack|blackstone|basalt|end_stone|bedrock|clay|coarse_dirt|podzol|mycelium|dirt_with_roots|terracotta|mud|packed_mud|moss_block|snow|ice|packed_ice|soul_sand|soul_soil|magma|obsidian|.*_ore)$/;
+const EXACT_SOLID = 64;
+// Swaps this many chunks or fewer from a real player go to the front of the queue.
+const NEAR_SWAP_CHUNKS = 2;
 // Where a block that needs another sits, seen from the block it needs: on top of it (it needs the block
 // below it), under it (the block above it), beside it, or on any side.
 const NEED_OFFSETS = { below: [[0, 1, 0]], above: [[0, -1, 0]], side: [[1, 0, 0], [-1, 0, 0], [0, 0, 1], [0, 0, -1]], any: SIDES };
@@ -106,6 +119,53 @@ function weighted(weights, draw) {
   return weights.length - 1;
 }
 
+const isOffset = value => Array.isArray(value) && value.length === 3 && value.every(Number.isInteger);
+function validCtm(ctm, id) {
+  return Array.isArray(ctm.with) && ctm.with.every(type => id.test(type)) && Array.isArray(ctm.states) &&
+    ctm.states.length > 0 && ctm.states.every(name => typeof name === 'string') && Array.isArray(ctm.sides) &&
+    ctm.sides.length === 6 && ctm.sides.every(isOffset) && Array.isArray(ctm.diagonals) &&
+    ctm.diagonals.every(pair => Array.isArray(pair) && pair.length === 2 && pair.every(side => Number.isInteger(side) && side >= 0 && side < 6)) &&
+    ctm.cases && typeof ctm.cases === 'object' && Object.values(ctm.cases).every(Number.isInteger);
+}
+
+/**
+ * A connected block's case key (converter/connected_cases.py): bit n for side n when it joins, and bit 6 + n
+ * for diagonal n when its block joins, both of its sides join and a face across the third axis shows.
+ * joins(delta) is true, false, or undefined while that neighbour is unloaded; the key is then undefined.
+ */
+export function ctmCase(ctm, joins) {
+  let key = 0;
+  const sides = [];
+  for (let side = 0; side < 6; side++) {
+    const joined = joins(ctm.sides[side]);
+    if (joined === undefined) return undefined;
+    sides.push(joined);
+    if (joined) key |= 1 << side;
+  }
+  const axis = side => ctm.sides[side].findIndex(value => value !== 0);
+  for (let index = 0; index < ctm.diagonals.length; index++) {
+    const [first, second] = ctm.diagonals[index];
+    if (!sides[first] || !sides[second]) continue;
+    const third = 3 - axis(first) - axis(second);
+    if (sides.every((joined, side) => axis(side) !== third || joined)) continue;
+    const joined = joins(ctm.sides[first].map((value, at) => value + ctm.sides[second][at]));
+    if (joined === undefined) return undefined;
+    if (joined) key += 2 ** (6 + index);
+  }
+  return key;
+}
+
+/** The look states of a case: its look index split into digits of 16 values, the last digit taking the rest. */
+export function ctmStates(ctm, key) {
+  let index = ctm.cases[String(key)] ?? 0;
+  const states = {};
+  ctm.states.forEach((name, position) => {
+    states[name] = position === ctm.states.length - 1 ? index : index % 16;
+    index = Math.floor(index / 16);
+  });
+  return states;
+}
+
 function validate(data) {
   if (!data || data.format_version !== 1 || !Array.isArray(data.blocks) || !Array.isArray(data.open) || !Array.isArray(data.solid))
     throw new Error('Invalid replacement data');
@@ -124,6 +184,7 @@ function validate(data) {
     if (entry.pane && Object.keys(PANE_SIDES).some(side => typeof entry.pane[side] !== 'string')) throw new Error('Invalid pane states');
     if (entry.connect && (!entry.connect.states || Object.keys(CONNECT_SIDES).some(side => typeof entry.connect.states[side] !== 'string') ||
       !Array.isArray(entry.connect.with) || !entry.connect.with.every(type => id.test(type)))) throw new Error('Invalid connect states');
+    if (entry.ctm && !validCtm(entry.ctm, id)) throw new Error('Invalid connected cases');
     if (entry.shape !== undefined && !SHAPES.includes(entry.shape)) throw new Error('Invalid shape');
     if (entry.shape === 'stairs' && !STAIR_STATES.every(name => typeof entry.mirror[name] === 'string')) throw new Error('Invalid stair states');
     if (entry.shape === 'fence' && !FENCE_STATES.every(name => typeof entry.mirror[name] === 'string')) throw new Error('Invalid fence states');
@@ -156,6 +217,9 @@ export function createReplacements({ api, limits, log = () => {}, rescan = () =>
   let byVanilla = new Map(), byCustom = new Map(), open = [], solid = [], solidSet = new Set(), paneConnect = new Set();
   let needers = new Map(), needyRules = new Map(), needyTypes = [];  // needed vanilla type -> rules, needy type -> rules, every needy type
   let vanillaTypes = [], customTypes = [], paneTypes = [], connectTypes = [], neighborTypes = [];  // the types a scan asks for
+  // The filters a scan uses most: replacement blocks (by tag when every pack tags them), open blocks near a cell, and what to leave out when looking for blocks that show.
+  let customFilter = { includeTypes: [] }, nearOpenFilter = { includeTypes: [] }, showsFilter = { excludeTypes: [] };
+  let diagonalJoins = false;  // whether a ctm block reads its edge diagonals
   const owned = new Map();          // chunk key -> { dimension, cx, cz, positions: Set<packed> }
   const urgent = new Map();         // position key -> swap of a block a dig or an explosion uncovered
   const queue = new Map();          // position key -> { swap: 'in' | 'out' | 'adopt', dimension, location, shown?, need? }
@@ -209,6 +273,10 @@ export function createReplacements({ api, limits, log = () => {}, rescan = () =>
     }
     for (const type of openTypes) solidTypes.delete(type);
     open = [...openTypes]; solid = [...solidTypes]; solidSet = solidTypes; needyTypes = [...needy];
+    nearOpenFilter = { includeTypes: open.filter(type => NEAR_OPEN.test(type)) };
+    const common = solid.length <= EXACT_SOLID ? solid
+      : solid.filter(type => COMMON_SOLID.test(type) || COMMON_SOLID.test(byCustom.get(type)?.vanilla ?? ''));
+    showsFilter = { excludeTypes: common };
     refreshScanTypes();
   }
 
@@ -216,9 +284,12 @@ export function createReplacements({ api, limits, log = () => {}, rescan = () =>
   function refreshScanTypes() {
     vanillaTypes = [...byVanilla].filter(([, entry]) => !entry.broken).map(([type]) => type);
     customTypes = [...byCustom].filter(([, entry]) => !entry.broken).map(([type]) => type);
+    const tags = new Set([...sources.values()].map(data => data.tag));
+    customFilter = tags.size === 1 && typeof [...tags][0] === 'string' ? { includeTags: [...tags] } : { includeTypes: customTypes };
     paneTypes = [...byCustom].filter(([, entry]) => entry.pane && !entry.broken).map(([type]) => type);
     neighborTypes = [...byCustom].filter(([, entry]) => ['stairs', 'fence', 'wall'].includes(entry.shape) && !entry.broken).map(([type]) => type);
-    connectTypes = [...byCustom].filter(([, entry]) => entry.connect && !entry.broken).map(([type]) => type);
+    connectTypes = [...byCustom].filter(([, entry]) => (entry.connect || entry.ctm) && !entry.broken).map(([type]) => type);
+    diagonalJoins = [...byCustom.values()].some(entry => entry.ctm && !entry.broken);
   }
 
   const resolve = (type, states) => {
@@ -268,6 +339,7 @@ export function createReplacements({ api, limits, log = () => {}, rescan = () =>
       states[mirrored] = typeof value === 'boolean' ? (value ? 1 : 0) : value;
     }
     if (entry.connect) Object.assign(states, connectionStates(entry, block.dimension, location));
+    if (entry.ctm) Object.assign(states, ctmStatesAt(entry, block.dimension, location) ?? ctmStates(entry.ctm, 0));
     if (entry.shape === 'stairs') {
       const own = stairOf(vanilla);
       if (own) states[entry.mirror['minecraft:corner']] = stairCorner(block.dimension, location, own);
@@ -429,11 +501,27 @@ export function createReplacements({ api, limits, log = () => {}, rescan = () =>
     return states;
   }
 
+  /** A ctm block's look states at a location; undefined while a neighbour it needs is unloaded. */
+  function ctmStatesAt(entry, dimension, location) {
+    const joins = entry.ctm.withSet ??= new Set(entry.ctm.with);
+    const key = ctmCase(entry.ctm, delta => {
+      let neighbor;
+      // Outside the world nothing joins; an unloaded neighbour is not known yet.
+      try { neighbor = dimension.getBlock(offset(location, delta)); } catch { return false; }
+      if (neighbor === undefined) return undefined;
+      const type = neighbor && (byCustom.get(neighbor.typeId)?.vanilla ?? neighbor.typeId);
+      return !!type && joins.has(type);
+    });
+    return key === undefined ? undefined : ctmStates(entry.ctm, key);
+  }
+
   /** Works out a connected block's neighbour states again and writes them when they changed. */
   function refreshConnect(block) {
     const entry = block && byCustom.get(block.typeId);
-    if (!entry?.connect || entry.broken) return false;
-    const states = block.permutation.getAllStates?.() ?? {}, next = { ...states, ...connectionStates(entry, block.dimension, block.location) };
+    if (!(entry?.connect || entry?.ctm) || entry.broken) return false;
+    const found = entry.ctm ? ctmStatesAt(entry, block.dimension, block.location) : connectionStates(entry, block.dimension, block.location);
+    if (!found) return false;
+    const states = block.permutation.getAllStates?.() ?? {}, next = { ...states, ...found };
     if (Object.keys(next).every(name => next[name] === states[name])) return false;
     try { block.setPermutation(resolve(block.typeId, next)); return true; }
     catch (error) { log('connect refresh ' + String(error)); return false; }
@@ -492,9 +580,18 @@ export function createReplacements({ api, limits, log = () => {}, rescan = () =>
 
   /** Queues a change. One that already waits for players to look away keeps waiting, with the newer details, while it would still be seen. */
   function enqueue(key, item) {
-    if (!waiting.has(key)) { queue.set(key, item); return; }
+    // Swaps next to a real player go before the ones the far loader finds.
+    const target = nearPlayer(item) ? urgent : queue;
+    if (!waiting.has(key)) { target.set(key, item); return; }
     if (visible(item)) waiting.set(key, item);
-    else { waiting.delete(key); queue.set(key, item); }
+    else { waiting.delete(key); target.set(key, item); }
+  }
+
+  /** Whether a block lies within NEAR_SWAP_CHUNKS chunks of a real (not virtual) player. */
+  function nearPlayer(item) {
+    const cx = Math.floor(item.location.x / 16), cz = Math.floor(item.location.z / 16);
+    return players.some(player => !player.virtual && player.dimension.id === item.dimension.id &&
+      Math.max(Math.abs(cx - Math.floor(player.location.x / 16)), Math.abs(cz - Math.floor(player.location.z / 16))) <= NEAR_SWAP_CHUNKS);
   }
   const forget = key => { urgent.delete(key); queue.delete(key); waiting.delete(key); parked.delete(key); };
 
@@ -611,8 +708,8 @@ export function createReplacements({ api, limits, log = () => {}, rescan = () =>
     const dimensionId = dimension.id, x0 = chunk.x * 16, z0 = chunk.z * 16, seen = new Set();
     for (let bottom = low; bottom <= high; bottom += SECTION) {
       const min = { x: x0, y: bottom, z: z0 }, max = { x: x0 + 15, y: Math.min(high, bottom + SECTION - 1), z: z0 + 15 }, section = volumeOf(min, max);
-      if (!customTypes.length || !dimension.containsBlock(section, { includeTypes: customTypes }, true)) { yield; continue; }
-      const list = dimension.getBlocks(section, { includeTypes: customTypes }, true);
+      if (!customTypes.length || !dimension.containsBlock(section, customFilter, true)) { yield; continue; }
+      const list = dimension.getBlocks(section, customFilter, true);
       yield;
       let reads = 0;
       for (const at of list.getBlockLocationIterator()) {
@@ -681,29 +778,37 @@ export function createReplacements({ api, limits, log = () => {}, rescan = () =>
     };
     for (let bottom = low; bottom <= high; bottom += SECTION) {
       const min = { x: x0, y: bottom, z: z0 }, max = { x: x0 + 15, y: Math.min(high, bottom + SECTION - 1), z: z0 + 15 };
-      // Nothing to swap, or nothing open near it (deep rock, open sky): the whole section is skipped.
-      if (!dimension.containsBlock(volumeOf(min, max), { includeTypes: vanillaTypes }, true) ||
-        !dimension.containsBlock(volumeOf(min, max, 2), { includeTypes: open }, true)) { yield; continue; }
+      // Nothing open near it (deep rock, open sky): the whole section is skipped.
+      if (!dimension.containsBlock(volumeOf(min, max, 2), nearOpenFilter, true)) { yield; continue; }
+      // The swappable blocks of the section and the ring around it, read with the long vanilla list once
+      // (each call reads the whole list) and kept by local position.
+      const list = dimension.getBlocks(volumeOf(min, max, 1), { includeTypes: vanillaTypes }, true);
       yield;
+      if (!list.getCapacity()) continue;
+      const local = (px, py, pz) => ((py - bottom + 1) * 18 + px - x0 + 1) * 18 + pz - z0 + 1;
+      const swappable = new Set();
+      let reads = 0;
+      for (const at of list.getBlockLocationIterator()) { swappable.add(local(at.x, at.y, at.z)); if (++reads % 64 === 0) yield; }
+      const canSwap = at => at.x >= x0 - 1 && at.x <= x0 + 16 && at.z >= z0 - 1 && at.z <= z0 + 16 && at.y >= bottom - 1 &&
+        at.y <= max.y + 1 && swappable.has(local(at.x, at.y, at.z));
       for (let y = min.y; y <= max.y; y += CELL) for (let x = x0; x < x0 + 16; x += CELL) for (let z = z0; z < z0 + 16; z += CELL) {
-        const cellMin = { x, y, z }, cellMax = { x: x + CELL - 1, y: Math.min(max.y, y + CELL - 1), z: z + CELL - 1 }, cell = volumeOf(cellMin, cellMax);
-        if (!dimension.containsBlock(cell, { includeTypes: vanillaTypes }, true) ||
-          !dimension.containsBlock(volumeOf(cellMin, cellMax, 2), { includeTypes: open }, true)) { yield; continue; }
-        // What lets a block show (anything but an opaque full cube) and what can be swapped, around this cell.
-        const shows = dimension.getBlocks(volumeOf(cellMin, cellMax, 1), { excludeTypes: solid }, true);
+        const cellMin = { x, y, z }, cellMax = { x: x + CELL - 1, y: Math.min(max.y, y + CELL - 1), z: z + CELL - 1 };
+        const inCell = [];
+        for (let cy = cellMin.y; cy <= cellMax.y; cy++) for (let cx = x; cx <= cellMax.x; cx++) for (let cz = z; cz <= cellMax.z; cz++)
+          if (swappable.has(local(cx, cy, cz))) inCell.push({ x: cx, y: cy, z: cz });
+        if (!inCell.length) continue;
+        if (!dimension.containsBlock(volumeOf(cellMin, cellMax, 2), nearOpenFilter, true)) { yield; continue; }
+        // What lets a block show (anything but an opaque full cube) around this cell.
+        const shows = dimension.getBlocks(volumeOf(cellMin, cellMax, 1), showsFilter, true);
         yield;
-        const swappable = dimension.getBlocks(volumeOf(cellMin, cellMax, 1), { includeTypes: vanillaTypes }, true);
-        yield;
-        let reads = 0;
-        for (const at of swappable.getBlockLocationIterator()) {
-          if (at.x < cellMin.x || at.x > cellMax.x || at.y < cellMin.y || at.y > cellMax.y || at.z < cellMin.z || at.z > cellMax.z) continue;
-          const location = { x: at.x, y: at.y, z: at.z }, key = positionKey(dimensionId, location);
+        for (const location of inCell) {
+          const key = positionKey(dimensionId, location);
           if (needed.has(key) || !SIDES.some(side => shows.isInside(offset(location, side)))) { if (++reads % 8 === 0) yield; continue; }
           if (!swapNow(location, key)) enqueue(key, { swap: 'in', dimension, location, shown: true });
           // The blocks behind a shown block are swapped as well, so digging never uncovers a vanilla face.
           for (const side of SIDES) {
             const behind = offset(location, side), behindKey = positionKey(dimensionId, behind);
-            if (needed.has(behindKey) || shows.isInside(behind) || !swappable.isInside(behind) || isOwned(dimensionId, behind)) continue;
+            if (needed.has(behindKey) || shows.isInside(behind) || !canSwap(behind) || isOwned(dimensionId, behind)) continue;
             if (!swapNow(behind, behindKey)) enqueue(behindKey, { swap: 'in', dimension, location: behind });
           }
           if (++reads % 4 === 0) yield;
@@ -1024,6 +1129,31 @@ export function createReplacements({ api, limits, log = () => {}, rescan = () =>
     /** Replacement block types standing for a vanilla block. */
     customsOf: typeId => { const entry = byVanilla.get(typeId); return entry ? [entry.block] : []; },
     blockTypes: () => [...vanillaTypes, ...customTypes],
+    /**
+     * Times the game's block queries on one chunk section, with short and long type lists: the
+     * milliseconds per call of each, over `repeat` calls.
+     */
+    speedTest(dimension, location, repeat = 40) {
+      const x0 = Math.floor(location.x / 16) * 16, y0 = Math.floor(location.y / 16) * 16, z0 = Math.floor(location.z / 16) * 16;
+      const section = volumeOf({ x: x0, y: y0, z: z0 }, { x: x0 + 15, y: y0 + 15, z: z0 + 15 });
+      const cell = volumeOf({ x: x0, y: y0, z: z0 }, { x: x0 + 3, y: y0 + 3, z: z0 + 3 });
+      const one = [vanillaTypes[0] ?? 'minecraft:stone'];
+      const time = fn => { const start = now(); for (let i = 0; i < repeat; i++) fn(); return +((now() - start) / repeat).toFixed(4); };
+      return {
+        types: { vanilla: vanillaTypes.length, open: open.length, solid: solid.length },
+        containsSection: { one: time(() => dimension.containsBlock(section, { includeTypes: one }, true)),
+          vanilla: time(() => dimension.containsBlock(section, { includeTypes: vanillaTypes }, true)),
+          excludeSolid: time(() => dimension.containsBlock(section, { excludeTypes: solid }, true)) },
+        containsCell: { one: time(() => dimension.containsBlock(cell, { includeTypes: one }, true)),
+          vanilla: time(() => dimension.containsBlock(cell, { includeTypes: vanillaTypes }, true)) },
+        getBlocksSection: { one: time(() => dimension.getBlocks(section, { includeTypes: one }, true)),
+          vanilla: time(() => dimension.getBlocks(section, { includeTypes: vanillaTypes }, true)),
+          excludeSolid: time(() => dimension.getBlocks(section, { excludeTypes: solid }, true)) },
+        getBlock: time(() => dimension.getBlock(location)),
+      };
+    },
+    /** Whether swaps next to players are queued (they are what players see change). */
+    hasNearQueued: () => urgent.size > 0,
     scan, run,
     /** Bookkeeping once a tick: player views, ownership from the last session, and every 10 ticks chunks players left and saving. */
     tick(current, maintenance) {
@@ -1057,11 +1187,16 @@ export function createReplacements({ api, limits, log = () => {}, rescan = () =>
     },
     /** A block changed next to these positions: panes and connected blocks around it reconnect. */
     changed(block) {
+      // ctm blocks also read the blocks diagonal to them across an edge.
+      if (diagonalJoins) for (const delta of EDGE_DIAGONALS) {
+        const neighbor = getBlock(block.dimension, offset(block.location, delta));
+        if (neighbor && byCustom.get(neighbor.typeId)?.ctm) refreshConnect(neighbor);
+      }
       for (const delta of Object.values(CONNECT_SIDES)) {
         const neighbor = getBlock(block.dimension, offset(block.location, delta));
         const entry = neighbor && byCustom.get(neighbor.typeId);
         if (entry?.pane && delta[1] === 0) refreshPane(neighbor);
-        if (entry?.connect) refreshConnect(neighbor);
+        if (entry?.connect || entry?.ctm) refreshConnect(neighbor);
         // A wall also reads the block above it.
         if (entry?.shape && (delta[1] === 0 || (entry.shape === 'wall' && delta[1] === -1))) refreshShape(neighbor);
       }

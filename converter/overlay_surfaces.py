@@ -37,7 +37,7 @@ from PIL import Image
 from bedrock_schema import require_valid
 from block_ids import known_blocks
 from common import BLOCKS_FORMAT, read_json, write_json
-from java_block_geometry import cube
+from java_block_geometry import close_top_face, cube
 from native_connected import export_material
 
 FACES = ('up', 'north', 'south', 'west', 'east', 'down')
@@ -930,9 +930,10 @@ def _geometry_definition(geometry_id, channels):
                 # Corner pieces draw over edge pieces of the same rule, as Java draws them after.
                 depth += TILE_STEP * (1 + CORNER_TILES.index(tile))
             material = f'{rule.id}_{tile}'
-            element = _quad_element(channel.face, channel.offset, depth)
-            bones.append({'name': f'c{number}_{rule.id}_{tile}', 'pivot': [0, 0, 0],
-                          'cubes': [cube(element, lambda face, data, material=material: material)]})
+            quad = cube(_quad_element(channel.face, channel.offset, depth), lambda face, data, material=material: material)
+            # A top quad reaches down to its host face, so no gap shows under its edges.
+            cubes = close_top_face(quad, channel.offset) if channel.face == 'up' else [quad]
+            bones.append({'name': f'c{number}_{rule.id}_{tile}', 'pivot': [0, 0, 0], 'cubes': cubes})
     description = {'identifier': geometry_id, 'texture_width': 16, 'texture_height': 16,
                    'visible_bounds_width': 2, 'visible_bounds_height': 2, 'visible_bounds_offset': [0, 0.5, 0]}
     return {'format_version': '1.21.0', 'minecraft:geometry': [{'description': description, 'bones': bones}]}

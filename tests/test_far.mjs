@@ -94,12 +94,12 @@ test('an area the game never finishes loading is skipped after a while', () => {
   assert.equal(env.far.status.failures, 1);
 });
 
-test('beyond the simulation distance only leaves convert unless far.blocks is on', async () => {
+test('beyond the simulation distance blocks convert too, unless far.blocks is off', async () => {
   const { blockConverters } = await import('../engine/engine.mjs');
   const { resolveSettings } = await import('../engine/settings.mjs');
   const real = [{ id: 'p' }], all = [...real, { id: 'bct:far', virtual: true }];
-  assert.deepEqual(blockConverters(all, real, resolveSettings()), real, 'by default blocks convert near real players only');
-  assert.deepEqual(blockConverters(all, real, resolveSettings({ far: { blocks: 1 } })), all);
+  assert.deepEqual(blockConverters(all, real, resolveSettings()), all, 'by default blocks convert far away too');
+  assert.deepEqual(blockConverters(all, real, resolveSettings({ far: { blocks: 0 } })), real);
 });
 
 test('areas in front of the player go before the ones behind', async () => {
