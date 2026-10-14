@@ -1,13 +1,13 @@
-import { readFileSync } from 'node:fs';
-import { join } from 'node:path';
-import { fileURLToPath } from 'node:url';
+const fs = await import('node:fs').catch(() => null);
+const path = await import('node:path').catch(() => null);
+const url = await import('node:url').catch(() => null);
 
 /** bedrock-samples checkout: BEDROCK_SAMPLES, else a sibling folder of the project (like converter/common.py). */
-export const samplesPath = () => process.env.BEDROCK_SAMPLES ?? fileURLToPath(new URL('../../bedrock-samples/', import.meta.url));
+export const samplesPath = () => process.env.BEDROCK_SAMPLES ?? url.fileURLToPath(new URL('../../bedrock-samples/', import.meta.url));
 
 /** Vanilla block types and the values of their states, from metadata/vanilladata_modules/mojang-blocks.json. */
 export function vanillaBlocks(samples = samplesPath()) {
-  const data = JSON.parse(readFileSync(join(samples, 'metadata/vanilladata_modules/mojang-blocks.json'), 'utf8'));
+  const data = JSON.parse(fs.readFileSync(path.join(samples, 'metadata/vanilladata_modules/mojang-blocks.json'), 'utf8'));
   const values = new Map(data.block_properties.map(property => [property.name, property.values.map(item => item.value)]));
   return new Map(data.data_items.map(item => [item.name, new Map((item.properties ?? []).map(property => [property.name, values.get(property.name)]))]));
 }

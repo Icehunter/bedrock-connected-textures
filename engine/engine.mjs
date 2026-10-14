@@ -146,6 +146,9 @@ export function startEngine(api) {
 
   let enabled = true, started = false, suspended = false, passes = 0, refreshPasses = 0, overlayPasses = 0;
 
+  // Cells near changed blocks wait here, once each, until the tick has time left to refresh them.
+  const pendingCells = new Map();
+
   function changed({ block }, { byPlayer = false } = {}) {
     if (!block) return;
     replacements.changed(block);
@@ -155,10 +158,24 @@ export function startEngine(api) {
     terrain.changed(block);
     connected.invalidate();
     const { dimension, location } = block;
-    system.run(() => {
-      for (let x = -1; x <= 1; x++) for (let y = -1; y <= 1; y++) for (let z = -1; z <= 1; z++)
-        connected.update(dimension, { x: location.x + x, y: location.y + y, z: location.z + z });
-    });
+    queueRefresh(dimension, location);
+    if (byPlayer) system.run(() => budget.measure(() => { refreshCells(now() + settings.scanSliceMs); }, 'playerEdits'));
+  }
+
+  function queueRefresh(dimension, location) {
+    for (let x = -1; x <= 1; x++) for (let y = -1; y <= 1; y++) for (let z = -1; z <= 1; z++) {
+      const key = dimension.id + '|' + (location.x + x) + ',' + (location.y + y) + ',' + (location.z + z);
+      if (!pendingCells.has(key)) pendingCells.set(key, { dimension, x: location.x + x, y: location.y + y, z: location.z + z });
+    }
+  }
+
+  function refreshCells(until) {
+    for (const [key, cell] of pendingCells) {
+      if (now() >= until) return true;
+      pendingCells.delete(key);
+      connected.update(cell.dimension, { x: cell.x, y: cell.y, z: cell.z });
+    }
+    return false;
   }
 
   // Replaced blocks stay replaced while players are near: breaking, using and
@@ -228,7 +245,7 @@ export function startEngine(api) {
     overlays.setEnabled(value);
     far.setEnabled(value);
     if (value) { scanner.reset(); replaceScanner.reset(); overlayScanner.reset(); }
-    else { connected.clear(); scanner.stop(); replaceScanner.stop(); overlayScanner.stop(); }
+    else { connected.clear(); pendingCells.clear(); scanner.stop(); replaceScanner.stop(); overlayScanner.stop(); }
   }
 
   /** Entity carriers cannot draw in ray tracing: with every player in ray tracing they are removed and blocks show their own faces. */
@@ -239,7 +256,7 @@ export function startEngine(api) {
     const next = real.length > 0 && !drawn.length;
     if (next !== suspended) {
       suspended = next;
-      if (suspended) { scanner.stop(); connected.clear(); connected.setEnabled(false); terrain.suspend(); }
+      if (suspended) { scanner.stop(); connected.clear(); connected.setEnabled(false); terrain.suspend(); pendingCells.clear(); }
       else { connected.setEnabled(enabled); terrain.resume(); scanner.reset(); }
     }
     return drawn;
@@ -404,6 +421,7 @@ export function startEngine(api) {
     { name: 'leaves', run: until => leaves.run(until), cap: () => (nearBusy() ? BACKGROUND_MS : settings.leaves.sliceMs) },
     { name: 'replaceScan', run: until => replaceScanner.run(until), cap: () => settings.scanSliceMs, first: () => replaceScanner.nearWork(NEAR_CHUNKS) },
     { name: 'scan', run: until => scanner.run(until), cap: () => settings.scanSliceMs },
+    { name: 'blockChanges', run: refreshCells, cap: () => settings.scanSliceMs },
     { name: 'overlayScan', run: until => overlayScanner.run(until), cap: () => settings.overlay.sliceMs },
     { name: 'overlays', run: until => overlays.tick(blockPlayers(), until), cap: () => settings.overlay.sliceMs },
     { name: 'restoreLeaves', run: until => { if (restoring) leaves.restore(until); }, cap: () => settings.leaves.sliceMs },
