@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+World:
+- The distant loading pass is remembered per pack. Switching to another pack, or updating a pack, runs it again, and the earlier pack's list is deleted. Worlds from 1.2.2 run it once more.
+- `/scriptevent bct:control rescan` starts the distant pass over and has the engine look at the chunks around players again.
+
 ## 1.2.2
 
 Bedrock pack authors:

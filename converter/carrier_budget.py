@@ -12,6 +12,7 @@ carrier types than the budget allows.
 """
 from fnmatch import fnmatchcase
 import json
+import math
 from pathlib import Path
 
 
@@ -46,13 +47,47 @@ def carried(block, budget):
     return _matches_any(block, budget['entity_allowlist']) and not _matches_any(block, budget['native_only'])
 
 
+# Cache of {tile: [rules that draw it]}: [rules list object, its length, the index].
+_TILE_DRAWERS = [None, 0, {}]
+
+
 def rule_targets(rule, document):
-    """Blocks a rule can draw on: its listed blocks plus the blocks whose faces show a matched texture."""
+    """Blocks a rule can draw on: its listed blocks, the blocks whose faces show a matched texture, and the
+    blocks of the rules that draw a matched tile (rules chain through the tiles they draw)."""
+    return _targets(rule, document, {rule['id']})
+
+
+def _targets(rule, document, seen):
     targets = set(rule.get('blocks', []))
     matched_textures = set(rule.get('matchTiles', []))
     if matched_textures:
         targets.update(_blocks_showing(matched_textures, document))
+        index = _tile_index(document)
+        for tile in matched_textures - _PLACEHOLDER_TILES:
+            for source in index.get(tile, []):
+                if source['id'] not in seen:
+                    seen.add(source['id'])
+                    targets.update(_targets(source, document, seen))
     return targets
+
+
+def _tile_index(document):
+    """{tile: [rules that draw it]}, rebuilt when the rules list object or its length changes."""
+    rules = document.get('rules', [])
+    if _TILE_DRAWERS[0] is not rules or _TILE_DRAWERS[1] != len(rules):
+        index = {}
+        for item in rules:
+            for tile in item.get('tiles', []):
+                if tile not in _PLACEHOLDER_TILES:
+                    index.setdefault(tile, []).append(item)
+        _TILE_DRAWERS[:] = [rules, len(rules), index]
+    return _TILE_DRAWERS[2]
+
+
+def _is_chained(rule, document, targets):
+    """A rule whose matched tiles no block shows, drawn on blocks only through other rules' tiles."""
+    matched = set(rule.get('matchTiles', []))
+    return bool(matched and targets and not any(True for _ in _blocks_showing(matched, document)))
 
 
 def apply_budget(document, budget, native=(), random_mosaic=None):
@@ -72,11 +107,11 @@ def apply_budget(document, budget, native=(), random_mosaic=None):
     uncarried = {}
     for rule in document['rules']:
         targets = rule_targets(rule, document)
-        as_variations = _is_variation_rule(rule) or (
-            random_mosaic is not None and _is_plain_mosaic(rule) and random_mosaic(rule, targets))
+        as_variations = not _is_chained(rule, document, targets) and (_is_variation_rule(rule) or (
+            random_mosaic is not None and _is_plain_mosaic(rule) and random_mosaic(rule, targets)))
         textures = _variation_textures(rule, document, targets) if as_variations else []
         if textures:
-            _add_variations(variations, rule, textures)
+            _add_variations(variations, rule, textures, document, random_mosaic)
             dropped_rules.append({**_rule_summary(rule, targets), 'native_variation': True})
             continue
         allowed = sorted(block for block in targets - native if carried(block, budget))
@@ -121,9 +156,17 @@ def _is_plain_mosaic(rule):
     """Unconditional repeat rules with real tiles; whether they look right at random is checked separately."""
     if rule['method'] != 'repeat':
         return False
-    if any(rule.get(field) for field in _CONDITION_FIELDS):
+    # Bedrock blocks are never snowy, so this filter always holds and must not disqualify a plain mosaic.
+    if not _only_not_snowy(rule.get('blockMatchers', [])):
+        return False
+    if any(rule.get(field) for field in _CONDITION_FIELDS if field != 'blockMatchers'):
         return False
     return not _PLACEHOLDER_TILES.intersection(rule['tiles'])
+
+
+def _only_not_snowy(matchers):
+    """True when every blockMatcher clause has states exactly equal to {'bct:snowy': ['false']}."""
+    return all(clause.get('states') == {'bct:snowy': ['false']} for clause in matchers)
 
 
 def _variation_textures(rule, document, targets):
@@ -138,12 +181,36 @@ def _variation_textures(rule, document, targets):
                    if face in faces})
 
 
-def _add_variations(variations, rule, textures):
+def _add_variations(variations, rule, textures, document, random_mosaic):
     """The first rule to claim a texture wins; zero-weight tiles never draw."""
     weights = rule.get('weights') or [1] * len(rule['tiles'])
     for texture in textures:
         weighted_tiles = [[tile, weight] for tile, weight in zip(rule['tiles'], weights) if weight > 0]
+        if rule['method'] == 'random':
+            weighted_tiles = _expanded_tiles(weighted_tiles, document, random_mosaic)
         variations.setdefault(texture, weighted_tiles)
+
+
+def _expanded_tiles(weighted_tiles, document, random_mosaic):
+    """A random pick followed by a repeat mosaic on the picked tile (Continuity chains them): when the mosaic may
+    draw at random, the pick becomes the mosaic's tiles, which share its weight."""
+    rules = document.get('rules', [])
+    expansions = []
+    for tile, weight in weighted_tiles:
+        mosaic = next((item for item in rules if _is_plain_mosaic(item) and tile in item.get('matchTiles', [])), None)
+        accepted = (mosaic is not None and random_mosaic is not None
+                    and random_mosaic(mosaic, rule_targets(mosaic, document)))
+        expansion = list(dict.fromkeys(mosaic['tiles'])) if accepted else (
+            [mosaic['tiles'][0]] if mosaic else [tile])
+        expansions.append((weight, expansion))
+    if all(tiles == [tile] for (tile, _), (_, tiles) in zip(weighted_tiles, expansions)):
+        return weighted_tiles
+    scale = math.lcm(*(len(tiles) for _, tiles in expansions))
+    merged = {}
+    for weight, tiles in expansions:
+        for tile in tiles:
+            merged[tile] = merged.get(tile, 0) + weight * scale // len(tiles)
+    return [[tile, weight] for tile, weight in merged.items()]
 
 
 def _rule_summary(rule, targets):

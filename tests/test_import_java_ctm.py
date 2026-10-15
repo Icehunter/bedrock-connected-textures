@@ -114,6 +114,17 @@ class JavaImportTests(unittest.TestCase):
             self.assertEqual(len(continuity['importAccounting']['excludedRules']), 1)
             self.assertEqual(len(optifine['importAccounting']['ignoredProperties']), 3)
 
+    def test_default_dialect_is_continuity(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            folder = ctm_folder(root)
+            (folder / 'a.properties').write_text('matchBlocks=stone\nmethod=fixed\ntiles=0\noptifineOnly=true')
+            (folder / 'b.properties').write_text('matchBlocks=andesite\nmethod=fixed\ntiles=1')
+            document = import_rules(root, {})
+            self.assertEqual(document['dialect'], 'continuity')
+            self.assertEqual(len(document['rules']), 1)
+            self.assertEqual(len(document['importAccounting']['excludedRules']), 1)
+
     def test_state_axis_repeat_is_retained_and_texture_orientation_is_not_guessed(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)

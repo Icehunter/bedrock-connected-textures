@@ -240,7 +240,8 @@ export function fakeBedrock({ blocks = new Map(), states = new Map(), height = {
     getDimension: () => dimension,
     getDynamicProperty: name => { charge('property'); return properties.get(name); },
     setDynamicProperty: (name, value) => { charge('property'); if (value === undefined) properties.delete(name); else properties.set(name, value); },
-    structureManager: { place(name, target, location) { target.spawnEntity(name, { x: location.x + .5, y: location.y, z: location.z + .5 }); } },
+    getDynamicPropertyIds: () => [...properties.keys()],
+    structureManager: { place(name, target, location) { if (target !== dimension) throw new TypeError('Object has an invalid native handle. Function argument [1] expected type: Dimension'); target.spawnEntity(name, { x: location.x + .5, y: location.y, z: location.z + .5 }); } },
     gameRules: { doTileDrops: true },
     getLootTableManager: () => ({ generateLootFromBlock: block => loot.of(block) }),
   };
@@ -259,7 +260,7 @@ export function fakeBedrock({ blocks = new Map(), states = new Map(), height = {
   const api = { world, system, BlockVolume: class { constructor(from, to) { this.from = from; this.to = to; } },
     ListBlockVolume: class { constructor(locations) { this.locations = locations.map(at => ({ x: at.x, y: at.y, z: at.z })); }
       getBlockLocationIterator() { return this.locations[Symbol.iterator](); } },
-    BlockTypes: { get: id => (!registry || registry.has(id) ? { id } : undefined) }, BlockPermutation: { resolve: (type, states = {}) => {
+    BlockTypes: { get: id => (!registry || registry.has(id) ? { id } : undefined), getAll: () => [...(registry?.keys() ?? [])].map(id => ({ id })) }, BlockPermutation: { resolve: (type, states = {}) => {
       checkStates(type, states);
       // Like the game: states not given take their first value, which getAllStates reports.
       const all = { ...Object.fromEntries([...(registry?.get(type) ?? new Map())].map(([name, values]) => [name, values[0]])), ...states };

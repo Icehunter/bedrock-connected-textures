@@ -267,7 +267,7 @@ export function createTerrain({ api, limits, inReach = () => true, log = () => {
           if (effect.spawn_structure) {
             const nearby = { type: output.entity, location: target, maxDistance: .2 };
             const existing = new Set(dimension.getEntities(nearby).map(entity => entity.id));
-            world.structureManager.place(effect.spawn_structure, dimension, { x: location.x, y: location.y + 1, z: location.z }, { includeEntities: true, includeBlocks: false });
+            world.structureManager.place(effect.spawn_structure, world.getDimension(dimension.id), { x: location.x, y: location.y + 1, z: location.z }, { includeEntities: true, includeBlocks: false });
             entity = dimension.getEntities(nearby).find(entity => !existing.has(entity.id) && !entity.hasTag(TAG));
             if (!entity) throw new Error('carrier template did not create an entity');
           } else entity = dimension.spawnEntity(output.entity, target);

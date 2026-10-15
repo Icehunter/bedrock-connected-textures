@@ -84,6 +84,7 @@ DYED = re.compile(r'_(concrete|wool|terracotta)_|stained_glass')
 # Block permutations a replacement may have unless the policy sets max_permutations.
 DEFAULT_MAX_PERMUTATIONS = 4096
 SKIP = ('<skip>', '<default>')
+MAX_PASSES = 4
 CONDITIONS = ('biomes', 'heights', 'states', 'connectBlocks', 'connectTiles', 'connectBlockMatchers')
 # World face shown by each local face of a pillar block lying along an axis.
 AXIS_FACES = {
@@ -584,7 +585,8 @@ class _ReplacementWriter:
         self.block_permutations[block] = (cost, shape_of(block) if not pane else None)
         entry = self._engine_entry(block, identifier, mirror, vanilla_states, plan, entry_extra, transparent, profile)
         self.entries.append(entry)
-        for rule_id in rule_ids:
+        drawn = [rule['id'] for rule in plan['rules']] if isinstance(plan, dict) and 'rules' in plan else rule_ids
+        for rule_id in drawn:
             self.replaced.setdefault(rule_id, []).append(block)
 
     def add_model_blocks(self, model_blocks, known_items, tints):
@@ -759,14 +761,24 @@ class _ReplacementWriter:
     def _plan_within_limit(self, block, block_rules, vanilla_states):
         """The block's plan; the weighted Java model turns are dropped when they exceed the permutation limit."""
         limit = self.policy.get('max_permutations', DEFAULT_MAX_PERMUTATIONS)
+        single = False
         plan = _plan_block(self.document, block, block_rules, vanilla_states)
         if self._permutation_count(plan, vanilla_states) > limit and plan['choices']:
             plan = _plan_block(self.document, block, block_rules, vanilla_states, single_choice=True)
             self.notes.append({'block': block,
                                'note': 'weighted Java model turns dropped: they exceed the permutation limit'})
+            single = True
         if not plan['combos']:
             raise ValueError('no consistent state combination')
         count = self._permutation_count(plan, vanilla_states)
+        if count > limit:
+            dropped = [rule for rule in block_rules if _chain_only(plan, rule)]
+            fed = {tile for rule in dropped for tile in rule.get('matchTiles', [])}
+            direct = [rule for rule in block_rules if rule not in dropped and not fed.intersection(rule['tiles'])]
+            if len(direct) < len(block_rules) and direct:
+                plan = _plan_block(self.document, block, direct, vanilla_states, single_choice=single)
+                self.notes.append({'block': block, 'note': 'chained rules dropped: they exceed the permutation limit'})
+                count = self._permutation_count(plan, vanilla_states)
         if count > limit:
             raise ValueError(f'{count} block permutations exceed the limit of {limit}')
         return plan
@@ -1075,6 +1087,25 @@ def _rule_applies(rule, block, logical, face, texture, states):
     return True
 
 
+def _face_tiles(rules, block, logical, world, texture, states):
+    """Every tile a face can show: its texture, then the tiles the base rules draw over the tiles it can show, for MAX_PASSES passes."""
+    reachable, frontier = [texture], [texture]
+    for _ in range(MAX_PASSES):
+        found = []
+        for tile in frontier:
+            for rule in rules:
+                if rule['method'] in OVERLAY_METHODS or not _rule_applies(rule, block, logical, world, tile, states):
+                    continue
+                for drawn in rule['tiles']:
+                    if drawn not in SKIP and drawn not in reachable:
+                        reachable.append(drawn)
+                        found.append(drawn)
+        frontier = found
+        if not frontier:
+            break
+    return reachable
+
+
 def _look_of(entry, states):
     """A look (faces, orientations, layers, tint indices, states) of a binding entry; None without six faces."""
     faces = entry.get('faces', {})
@@ -1153,7 +1184,9 @@ def _look_textures(info):
 
 
 def _tint_of(document, block, logical, tint_index):
-    """Fixed RGB multiplier for a face, [1,1,1] for none, or the Bedrock tint_method of a biome tint."""
+    """Fixed RGB multiplier for a face, [1,1,1] for none, or the Bedrock tint_method of a biome tint.
+
+    A custom colour map Bedrock cannot sample per biome gives the average of its biome colours."""
     custom = block in set(document.get('customTintBlocks', []))
     if tint_index < 0 and not custom:
         return [1, 1, 1]
@@ -1164,7 +1197,27 @@ def _tint_of(document, block, logical, tint_index):
         return [float(value) for value in kind]
     if kind in BIOME_TINTS:
         return BIOME_TINTS[kind]
+    table = document.get('customTints', {}).get(kind) if isinstance(kind, str) else None
+    if table:
+        colours = list(table.values())
+        return [round(sum(colour[channel] for colour in colours) / len(colours), 6) for channel in range(3)]
     raise ValueError('tint ' + str(kind) + ' has no Bedrock tint method')
+
+
+def _chain_only(plan, rule):
+    """A rule that applies only to tiles other rules draw, not to a face's own texture, layer or model part."""
+    return rule not in plan['decal_rules'] and not _rule_can_draw(rule, plan['block'], plan['logical'], plan['looks'])
+
+
+def _rule_can_draw(rule, block, logical, looks, rules=()):
+    """Whether a rule applies to some face, or some layer on a face, of one of the block's looks."""
+    for look in looks.values():
+        for world, texture in look['faces'].items():
+            textures = _face_tiles(rules, block, logical, world, texture, look['states']) + [
+                layer['texture'] for layer in look['layers'].get(world, [])]
+            if any(_rule_applies(rule, block, logical, world, candidate, look['states']) for candidate in textures):
+                return True
+    return False
 
 
 def _plan_block(document, block, rules, vanilla_states=(), single_choice=False):
@@ -1197,9 +1250,11 @@ def _plan_block(document, block, rules, vanilla_states=(), single_choice=False):
         if matched & part_textures and not matched & (face_textures | layer_textures):
             decal_rules.append(rule)
         elif rule['method'] in RANDOM_METHODS:
-            randoms.append(rule)
+            if _rule_can_draw(rule, block, logical, looks, rules):
+                randoms.append(rule)
         elif rule['method'] in NATIVE_CONNECTED_METHODS:
-            connected.append(rule)
+            if _rule_can_draw(rule, block, logical, looks, rules):
+                connected.append(rule)
     plan = {'block': block, 'logical': logical, 'rules': rules, 'looks': looks, 'state': state, 'turns': turns,
             'connected': _connected_plan(connected, turns)}
     coordinates = _axis_states(_repeat_axes(plan))
@@ -1256,12 +1311,13 @@ def _repeat_axes(plan):
     for key, look in plan['looks'].items():
         for local in FACES:
             world = AXIS_FACES[key[0] if plan['turns'] else 'y'][local]
-            for rule in plan['rules']:
-                if rule['method'] == 'repeat' and _rule_applies(rule, plan['block'], plan['logical'], world,
-                                                                look['faces'][world], look['states']):
+            for tile in _face_tiles(plan['rules'], plan['block'], plan['logical'], world, look['faces'][world],
+                                    look['states']):
+                rule = next((rule for rule in plan['rules'] if rule['method'] == 'repeat'
+                             and _rule_applies(rule, plan['block'], plan['logical'], world, tile, look['states'])), None)
+                if rule is not None:
                     orientation = 0 if rule.get('orient') == 'none' else look['orientations'][world]
                     pairs |= _rule_moduli(rule, world, orientation)
-                    break
             for layer in look['layers'].get(world, []):
                 rule = _layer_rule(plan, layer['texture'], world, look)
                 if rule and rule['method'] == 'repeat':
@@ -1382,7 +1438,6 @@ def _face_look(plan, document, key, local, location, picks, case=None):
     world = AXIS_FACES[key[0] if plan['turns'] else 'y'][local]
     texture = look['faces'][world]
     base, overlays = texture, []
-    chosen = False
     for rule in plan['rules']:
         if not _rule_applies(rule, plan['block'], plan['logical'], world, texture, look['states']):
             continue
@@ -1394,11 +1449,15 @@ def _face_look(plan, document, key, local, location, picks, case=None):
             if tile not in SKIP:
                 overlays.append(tile)
             continue
-        # The first base rule picks the face's tile.
-        if chosen:
-            continue
-        chosen = True
-        base = _rule_tile(plan, rule, world, location, picks, look['orientations'][world], texture, case)
+    for _ in range(MAX_PASSES):
+        rule = next((item for item in plan['rules'] if item['method'] not in OVERLAY_METHODS
+                     and _rule_applies(item, plan['block'], plan['logical'], world, base, look['states'])), None)
+        if rule is None:
+            break
+        tile = _rule_tile(plan, rule, world, location, picks, look['orientations'][world], base, case)
+        if tile == base:
+            break
+        base = tile
     layers, layer_tints = [], []
     for layer in look['layers'].get(world, []):
         rule = _layer_rule(plan, layer['texture'], world, look)

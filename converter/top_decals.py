@@ -20,6 +20,8 @@ from common import read_json, write_json
 
 # Versions of each top tile: one in SLOTS is bare when the model is bare a quarter of the time.
 SLOTS = 4
+# Bedrock refuses a variations array of more than this many textures.
+MAX_VARIATIONS = 255
 # A flat decal lies at most this far above the top face (pixels), covering the whole face.
 DECAL_HEIGHT = 1.0
 
@@ -108,13 +110,15 @@ def bake_top_decals(materials, tops, decals, bare_share, output):
 
     tops and decals: [[sprite, weight]] (sprites relative to materials). Each top tile gets SLOTS
     versions: round(SLOTS * bare_share) bare ones (the tile itself), the others each with the next
-    decal variant in turn, so every decal variant shows about equally often.
+    decal variant in turn, so every decal variant shows about equally often. Fewer when that would
+    pass Bedrock's 255-variation limit.
     """
     materials, output = Path(materials), Path(output)
-    bare_slots = min(SLOTS, max(0, round(SLOTS * bare_share)))
+    slots = max(1, min(SLOTS, MAX_VARIATIONS // (len(tops) or 1)))
+    bare_slots = min(slots, max(0, round(slots * bare_share)))
     choices, turn = [], 0
     for top, weight in tops:
-        for slot in range(SLOTS):
+        for slot in range(slots):
             if slot < bare_slots:
                 choices.append([top, weight])
                 continue

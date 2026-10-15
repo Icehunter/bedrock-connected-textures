@@ -169,6 +169,7 @@ With commands on:
 /scriptevent bct:control status
 /scriptevent bct:control off
 /scriptevent bct:control restore
+/scriptevent bct:control rescan
 /scriptevent bct:control on
 /scriptevent bct:config {"connected":{"chunkRadius":4,"maxCarriers":2000}}
 /scriptevent bct:config {"debug":true}
@@ -177,7 +178,11 @@ With commands on:
 
 `off` stops converting. It removes the carriers and overlay surfaces and swaps blocks back, but only in the chunks near players. It is saved in the world.
 
+`rescan` makes the engine look at the world again. The far worker forgets which areas it finished for the pack in use and starts over from the nearest, and the scanners look at the chunks around players again. Use it after copying a world or when distant blocks stayed vanilla. It does nothing while a restore runs.
+
 `restore` puts the whole world back to vanilla blocks. It turns the engine off. The far worker then loads every chunk the engine changed, one area at a time, and each part of the engine puts its blocks back there: swapped blocks, leaves, overlay surfaces and edges. The world keeps the list of these chunks. Restore goes on after a restart and shows the chunks left on the action bar. When it is done, it tells the players, and the packs can be removed. `on` cancels it.
+
+The far worker saves the areas it finished per pack, under a key made from the packs that are loaded (not counting connected-texture data), once the packs have held still for 10 seconds. A pack the world has not seen, or an updated pack, gets the far pass again. The list of the earlier pack is deleted. Blocks the earlier pack swapped in stay in the world under that pack's names, and show as unknown blocks without it; to change packs, run `restore` first.
 
 If a pack is removed first, its blocks show as unknown blocks, but they keep their names. Add the pack back and they come back; restore can run then.
 

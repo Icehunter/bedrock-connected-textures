@@ -61,7 +61,7 @@ PLAIN_BLOCK_ID = re.compile(r'[a-z0-9_]+:[a-z0-9_]+')
 
 
 def import_rules(pack, base_textures, block_names=None, compiled_pack=None, biome_names=None, state_names=None,
-                 material_policy=None, dialect='optifine', texture_orientations=None, double_slab_blocks=None,
+                 material_policy=None, dialect='continuity', texture_orientations=None, double_slab_blocks=None,
                  biome_unions=None, block_state_resolver=None):
     """Validate a complete import before publishing any converted files.
 
@@ -161,7 +161,7 @@ def integers(value):
 
 
 def _import_rules(pack, base_textures, block_names=None, compiled_pack=None, biome_names=None, state_names=None,
-                  material_policy=None, dialect='optifine', texture_orientations=None, double_slab_blocks=None,
+                  material_policy=None, dialect='continuity', texture_orientations=None, double_slab_blocks=None,
                   biome_unions=None, block_state_resolver=None):
     """import_rules, writing into compiled_pack (the staging folder) when one is given."""
     pack = pack.resolve()

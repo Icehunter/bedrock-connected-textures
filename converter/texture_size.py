@@ -15,6 +15,12 @@ import zipfile
 from PIL import Image
 
 
+def resize_channels(image, size):
+    """Resize each channel on its own, so the colour of a clear pixel survives (a premultiplied resize wipes it)."""
+    image = image.convert('RGBA')
+    return Image.merge('RGBA', [band.resize(size, Image.LANCZOS) for band in image.split()])
+
+
 def most_common_width(folder):
     """The width most block textures in the folder have, or None when it holds none."""
     widths = Counter()
@@ -69,7 +75,7 @@ def cap_addon_block_textures(addon, width, resource_folder='Source_RP/', also=()
                     if image.width > width:
                         height = max(1, round(image.height * width / image.width))
                         buffer = io.BytesIO()
-                        image.resize((width, height), Image.LANCZOS).save(buffer, 'PNG')
+                        resize_channels(image, (width, height)).save(buffer, 'PNG')
                         data = buffer.getvalue()
                         scaled += 1
             output.writestr(info, data)

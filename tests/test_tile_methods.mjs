@@ -75,3 +75,33 @@ test('connect=tile joins blocks that show the same texture', () => {
   assert.equal(chooseTile({ method: 'horizontal', connect: 'tile' }, get(0, 0, 0), 'up', texture).tile, 0);
   assert.equal(chooseTile({ method: 'horizontal', connect: 'block' }, get(0, 0, 0), 'up', texture).tile, 3);
 });
+
+test('faces on an axis block follow Continuity: the rule face is rotated into the block frame', () => {
+  const air = { location: { x: 0, y: 0, z: 0 }, typeId: 'minecraft:air', offset: () => air };
+  const axisBlock = axis => ({ location: { x: 0, y: 0, z: 0 }, typeId: 'minecraft:oak_log',
+    permutation: { getState: name => name === 'pillar_axis' ? axis : undefined }, offset: () => air });
+  const appliesOn = (axis, ruleFace, providers = { dialect: 'continuity' }) => {
+    const resolver = ruleResolver([{ id: 'cap', method: 'fixed', blocks: ['minecraft:oak_log'], faces: [ruleFace], tiles: ['cap'] }], providers);
+    return ['north', 'east', 'south', 'west', 'up', 'down'].filter(face => {
+      const result = resolver(axisBlock(axis), face);
+      return result.visible && result.texture === 'cap';
+    });
+  };
+  const worldFace = {
+    y: { up: 'up', down: 'down', north: 'north', south: 'south', east: 'east', west: 'west' },
+    x: { up: 'west', down: 'east', east: 'up', west: 'down', north: 'north', south: 'south' },
+    z: { up: 'north', down: 'south', north: 'down', south: 'up', east: 'east', west: 'west' },
+  };
+  for (const [axis, table] of Object.entries(worldFace)) {
+    for (const [ruleFace, expected] of Object.entries(table)) {
+      assert.deepEqual(appliesOn(axis, ruleFace), [expected], `axis ${axis}, rule face ${ruleFace}`);
+    }
+  }
+  for (const providers of [{}, { dialect: 'optifine' }]) {
+    for (const axis of ['y', 'x', 'z']) {
+      for (const face of ['north', 'east', 'south', 'west', 'up', 'down']) {
+        assert.deepEqual(appliesOn(axis, face, providers), [face], `packs without the continuity dialect keep world faces: ${axis} ${face} ${JSON.stringify(providers)}`);
+      }
+    }
+  }
+});

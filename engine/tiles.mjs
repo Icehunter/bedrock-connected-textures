@@ -51,6 +51,9 @@ const AXIS_ORIENTATION = {
   z: { east: 4, west: 4, up: 0, down: 0, north: 0, south: 0 },
 };
 
+// Continuity's Direction.getClockWise(Z) for axis x and getCounterClockWise(X) for axis z.
+const AXIS_FACE_FRAME = { x: { east: 'down', west: 'up', up: 'east', down: 'west' }, z: { north: 'up', south: 'down', up: 'south', down: 'north' } };
+
 /** Texture orientation implied by a pillar_axis state; undefined when the state is not an axis. */
 export function axisOrientation(block, face) {
   const axis = block.permutation?.getState?.('pillar_axis');
@@ -314,9 +317,15 @@ const stateMatches = (states, block, providers) => Object.entries(states ?? {}).
   return (Array.isArray(values) ? values : [values]).map(String).includes(String(value));
 });
 
+function ruleFrameFace(block, face, providers) {
+  if (providers.dialect !== 'continuity') return face;
+  const axis = providers.stateOf ? providers.stateOf(block, 'pillar_axis') : block.permutation?.getState?.('pillar_axis');
+  return AXIS_FACE_FRAME[axis]?.[face] ?? face;
+}
+
 /** true, false, or a {known: false} result when a provider is missing. */
 function ruleMatches(rule, block, face, texture, providers) {
-  if (rule.faces && !rule.faces.includes(face)) return false;
+  if (rule.faces && !rule.faces.includes(ruleFrameFace(block, face, providers))) return false;
   if (rule.matchTiles?.length && !rule.matchTiles.includes(texture)) return false;
   const ids = [block.typeId, logicalOf(providers)(block)];
   if (rule.blocks?.length && !rule.blocks.some(id => ids.includes(id))) return false;

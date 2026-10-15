@@ -143,6 +143,36 @@ class MaterialTests(unittest.TestCase):
             self.assertEqual((output / 'conversion_sources/textures/a_normal.png').read_bytes(), source['a_n.png'])
             self.assertFalse(receipt['binding_verified'])
 
+    def test_material_maps_of_another_size_are_resized_to_the_color(self):
+        source = {'a.png': png((1, 2, 3, 255), (4, 4)),
+                  'a_n.png': png((128, 128, 255, 255), (8, 8)),
+                  'a_s.png': png((10, 20, 0, 255), (8, 8))}
+        policy = MaterialPolicy('labpbr-1.3', 'directx', 'linear', True)
+        with tempfile.TemporaryDirectory() as temporary:
+            output = Path(temporary) / 'output'
+            receipt = compile_stack_material(MemoryStack(source), 'a.png', output, 'textures/a.png', policy=policy)
+            for entry in receipt['outputs']:
+                if entry['path'].endswith('.png') and 'conversion_sources' not in entry['path'] and 'conversion_channels' not in entry['path']:
+                    with Image.open(output / entry['path']) as written:
+                        self.assertEqual(written.size, (4, 4))
+            self.assertEqual((output / 'conversion_sources/textures/a_normal.png').read_bytes(), source['a_n.png'])
+            self.assertEqual((output / 'conversion_sources/textures/a_specular.png').read_bytes(), source['a_s.png'])
+            self.assertEqual(receipt['resized_channels'], {'normal': [[8, 8], [4, 4]], 'specular': [[8, 8], [4, 4]]})
+        with tempfile.TemporaryDirectory() as temporary:
+            output = Path(temporary) / 'output'
+            source2 = {'a.png': png((4, 4, 4, 255), (4, 4)),
+                       'a_n.png': png((128, 128, 255, 255), (8, 8)),
+                       'a_s.png': png((10, 20, 0, 255), (4, 4))}
+            receipt = compile_stack_material(MemoryStack(source2), 'a.png', output, 'textures/a.png', policy=policy)
+            self.assertEqual(receipt['resized_channels'], {'normal': [[8, 8], [4, 4]]})
+        with tempfile.TemporaryDirectory() as temporary:
+            output = Path(temporary) / 'output'
+            source3 = {'a.png': png((1, 2, 3, 255), (4, 4)),
+                       'a_n.png': png((128, 128, 255, 255), (4, 4)),
+                       'a_s.png': png((10, 20, 0, 255), (4, 4))}
+            receipt = compile_stack_material(MemoryStack(source3), 'a.png', output, 'textures/a.png', policy=policy)
+            self.assertEqual(receipt['resized_channels'], {})
+
     def test_animated_encoded_maps_are_synchronized_before_decode(self):
         metadata = json.dumps({'animation': {'frametime': 2, 'interpolate': True}}).encode()
         source = {'a.png': column_png([(20, 30, 40, 19), (100, 110, 120, 200)]),

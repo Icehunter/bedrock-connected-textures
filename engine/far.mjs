@@ -11,7 +11,7 @@
  * virtual player stands at its centre, so the leaves, the replacement blocks
  * and the overlay surfaces convert it exactly as they convert the area around
  * a real player. Once their work there is done (or holdTicks have passed) the
- * area is released, recorded as done in the world, and the next one is loaded.
+ * area is released, recorded as done in the world for the pack in use (a pack new to the world gets the pass again, and the earlier pack's list is deleted), and the next one is loaded.
  * Converted blocks stay converted, so over time the whole explored world is.
  *
  * While work remains, players see on the action bar how many of the chunks
@@ -39,29 +39,40 @@ const areaKey = (dimensionId, size, ax, az) => dimensionId + '|' + size + '|' + 
  * api: @minecraft/server objects. limits(): the `far` settings { chunkRadius, holdTicks, status }.
  * idle(): whether the engine has no conversion work left (leaves, replacements, overlays).
  */
-export function createFar({ api, limits, log = () => {}, idle = () => true }) {
+export function createFar({ api, limits, log = () => {}, idle = () => true, packKey = () => undefined, settle = 200 }) {
   const { world, system } = api;
   const done = new Set();
-  let current, loadedDone = false, enabled = true, statusTick = 0, failures = 0, size;
+  let current, activeKey, seenKey, seenTick = 0, enabled = true, statusTick = 0, failures = 0, size;
   // While restoring: () => the chunks still to bring back [{ dimension (id), cx, cz }], and how often each area was loaded.
-  let targets;
+  let targets, targetLabel = 'Restoring the world';
   const tries = new Map();
 
-  function loadDone() {
-    if (loadedDone) return;
-    loadedDone = true;
+  const doneName = (key, part) => DONE_KEY + ':' + key + ':' + part;
+  function clearList(key) {
+    for (let part = 0; world.getDynamicProperty(doneName(key, part)) !== undefined; part++) world.setDynamicProperty(doneName(key, part), undefined);
+  }
+  function dropOtherLists(key) {
+    const keep = DONE_KEY + ':' + key + ':';
+    let ids = [];
+    try { ids = world.getDynamicPropertyIds?.() ?? []; } catch { /* nothing to delete */ }
+    for (const id of ids) if (id.startsWith(DONE_KEY + ':') && !id.startsWith(keep)) world.setDynamicProperty(id, undefined);
+  }
+  function loadDone(key) {
+    dropOtherLists(key);
+    done.clear();
     let text = '';
     for (let part = 0; ; part++) {
-      const value = world.getDynamicProperty(DONE_KEY + ':' + part);
+      const value = world.getDynamicProperty(doneName(key, part));
       if (typeof value !== 'string') break;
       text += value;
     }
     for (const name of text.split(';')) if (name) done.add(name);
+    activeKey = key;
   }
   function saveDone() {
-    for (let part = 0; world.getDynamicProperty(DONE_KEY + ':' + part) !== undefined; part++) world.setDynamicProperty(DONE_KEY + ':' + part, undefined);
+    clearList(activeKey);
     const text = [...done].join(';');
-    for (let part = 0; part * PART_SIZE < text.length; part++) world.setDynamicProperty(DONE_KEY + ':' + part, text.slice(part * PART_SIZE, (part + 1) * PART_SIZE));
+    for (let part = 0; part * PART_SIZE < text.length; part++) world.setDynamicProperty(doneName(activeKey, part), text.slice(part * PART_SIZE, (part + 1) * PART_SIZE));
   }
 
   const manager = () => { try { return world.tickingAreaManager; } catch { return undefined; } };
@@ -133,7 +144,7 @@ export function createFar({ api, limits, log = () => {}, idle = () => true }) {
   function progressText(player) {
     if (targets) {
       const chunks = targets().length;
-      return chunks ? `§7Restoring the world: ${chunks.toLocaleString('en-US')} chunks to go` : undefined;
+      return chunks ? `§7${targetLabel}: ${chunks.toLocaleString('en-US')} chunks to go` : undefined;
     }
     const left = areasAround(player).length;
     if (!left) return undefined;
@@ -182,8 +193,13 @@ export function createFar({ api, limits, log = () => {}, idle = () => true }) {
     /** Once per engine pass with the real players. */
     tick(players) {
       const { chunkRadius, holdTicks, status } = limits();
+      const trackedKey = packKey();
+      if (trackedKey !== seenKey) { seenKey = trackedKey; seenTick = system.currentTick; }
       if (!enabled || (!chunkRadius && !targets) || !players.length || !manager() || !areaSize()) { release(); return; }
-      loadDone();
+      if (!targets) {
+        if (trackedKey === undefined || system.currentTick - seenTick < settle) { release(); return; }
+        if (trackedKey !== activeKey) { release(); loadDone(trackedKey); }
+      }
       // The progress line first, refreshed before the game fades it, so it stays up while work remains.
       if (status && system.currentTick - statusTick >= STATUS_TICKS) {
         statusTick = system.currentTick;
@@ -228,12 +244,21 @@ export function createFar({ api, limits, log = () => {}, idle = () => true }) {
       if (next) start(next);
     },
     setEnabled(value) { enabled = value; if (!value) release(); },
+    /** Forgets what is done for the pack in use, so the far pass starts over. */
+    rescan() {
+      release();
+      done.clear();
+      const key = packKey() ?? activeKey;
+      if (key !== undefined) clearList(key);
+    },
     /** Restoring: load the areas holding these chunks (a function giving the chunks still to bring back) until none
-     * are left, ignoring chunkRadius and the areas already done. Without one the worker converts again. */
-    setTargets(list) { targets = list; tries.clear(); release(); },
+     * are left, ignoring chunkRadius and the areas already done. Without one the worker converts again.
+     * label is what the action bar line says. */
+    setTargets(list, label = 'Restoring the world') { targets = list; targetLabel = label; tries.clear(); release(); },
     get status() {
-      loadDone();
       return { areaChunks: size ?? null, done: done.size, loading: current ? current.name : null, ready: Boolean(current?.ready), failures };
     },
+    /** Whether the loaded packs have held still for `settle` ticks, so their data can be taken as complete. */
+    get settled() { const key = packKey(); return key !== undefined && key === seenKey && system.currentTick - seenTick >= settle; },
   };
 }

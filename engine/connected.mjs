@@ -258,7 +258,7 @@ function spawnCarrier(dimension,location,rule) {
   if(!rule.spawn_structure)return dimension.spawnEntity(rule.entity,above);
   const nearby={type:rule.entity,location:above,maxDistance:.2};
   const existing=new Set(dimension.getEntities(nearby).map(actor=>actor.id));
-  world.structureManager.place(rule.spawn_structure,dimension,{x:location.x,y:location.y+1,z:location.z},{includeEntities:true,includeBlocks:false});
+  world.structureManager.place(rule.spawn_structure,world.getDimension(dimension.id),{x:location.x,y:location.y+1,z:location.z},{includeEntities:true,includeBlocks:false});
   return dimension.getEntities(nearby).find(actor=>!existing.has(actor.id)&&!actor.hasTag(TAG));
 }
 function update(dimension,location) {

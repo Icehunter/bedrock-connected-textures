@@ -58,6 +58,21 @@ class TopDecalTests(unittest.TestCase):
             texture_set = json.loads((materials / choices[1][0]).with_suffix('.texture_set.json').read_text())
             self.assertTrue((materials / choices[1][0]).with_name(texture_set['minecraft:texture_set']['normal'] + '.png').exists())
 
+    def test_the_variations_stay_within_the_games_limit_of_255_per_texture(self):
+        with tempfile.TemporaryDirectory() as folder:
+            materials = Path(folder)
+            Image.new('RGBA', (4, 4), (40, 200, 40, 0)).save(materials / 'clover.png')
+            tops = []
+            for index in range(72):
+                Image.new('RGBA', (4, 4), (index, 80, 40, 255)).save(materials / f'top{index}.png')
+                tops.append([f'top{index}.png', 1])
+            choices = bake_top_decals(materials, tops, [['clover.png', 1]], 0.25, materials)
+            self.assertLessEqual(len(choices), 255)
+            self.assertEqual({tile for tile, _ in choices if tile.startswith('top')}, {tile for tile, _ in tops},
+                             'every top tile still draws')
+            per_top = {sum(1 for tile, _ in choices if tile.split('_decal')[0].replace('bct-decals/', '').split('/')[-1] == f'top{index}.png'.replace('.png', '') or tile == f'top{index}.png') for index in range(72)}
+            self.assertEqual(len(per_top), 1, 'each top tile gets the same number of versions')
+
 
 if __name__ == '__main__':
     unittest.main()

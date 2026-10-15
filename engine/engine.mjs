@@ -14,7 +14,7 @@ import { resolveSettings, createLog, createCarrierBudget, withinReach } from './
 import { createConnected } from './connected.mjs';
 import { createTerrain } from './terrain.mjs';
 import { Scanner } from './scanner.mjs';
-import { listenSources } from './sources.mjs';
+import { listenSources, checksum } from './sources.mjs';
 import { installRepeatBlocks } from './repeat-blocks.mjs';
 import { createReplacements } from './replacement.mjs';
 import { createViews } from './views.mjs';
@@ -22,6 +22,7 @@ import { createBudget } from './budget.mjs';
 import { createLeaves } from './leaves.mjs';
 import { createOverlaySurfaces } from './terrain-native.mjs';
 import { createFar } from './far.mjs';
+import { createStale } from './stale.mjs';
 import { AuthoredError, compileAuthored } from './authored.mjs';
 // Chunks this close to a player scan before other work shares the tick.
 const NEAR_CHUNKS = 1;
@@ -75,7 +76,7 @@ export function startEngine(api) {
   const now = () => (api.now ?? Date.now)();
   const budget = createBudget({ system, now, limit: () => (nearBusy() ? Math.max(settings.budgetMs, settings.nearBudgetMs) : settings.budgetMs) });
   // An area beyond the simulation distance is released once nothing is left to convert.
-  far = createFar({ api, limits: () => settings.far, log, idle: () => {
+  far = createFar({ api, limits: () => settings.far, log, packKey: () => farPackKey(), idle: () => {
     const leaf = leaves.status, swap = replacements.status, overlay = overlays.status;
     return leaf.toConvert === 0 && leaf.queued === 0 && swap.queued === 0 && overlay.queued === 0;
   } });
@@ -106,6 +107,15 @@ export function startEngine(api) {
     { radius: () => settings.overlay.chunkRadius, band: () => settings.overlay.yBand, types: () => overlays.blockTypes(),
       prepare: overlays.prepare, found: overlays.found, surface: overlays.surface },
   ] });
+
+  // Blocks of a pack the world does not have go back to vanilla (stale.mjs) after the loaded packs settle.
+  const stale = createStale({ api, log: message => console.warn('[BCT] ' + message), now, players: currentPlayers, far, ready: () => far.settled,
+    chunks: () => changedChunks(),
+    types: () => [
+      ...replacements.customTypes().map(type => [type, replacements.vanillaOf(type) ?? null]),
+      ...leaves.customTypes().map(type => [type, leaves.vanillaOf(type) ?? null]),
+      ...[...overlays.surfaceTypes(), ...terrain.nativeTypes()].map(type => [type, null]),
+    ] });
 
   const terrainSources = new Map();
   /** A pack's terrain data: generated edges (terrain providers) and its overlay surfaces as one {overlay} entry. */
@@ -143,6 +153,12 @@ export function startEngine(api) {
     scanner.reset();
   } });
   installRepeatBlocks(system);
+
+  // The packs whose data converts the world (everything but the connected-texture carriers) decide which far-loader list is in use; undefined while none has arrived.
+  function farPackKey() {
+    const ids = [...sources.loaded].filter(([id]) => !id.startsWith('connected/')).map(([id, digest]) => id + ':' + digest).sort();
+    return ids.length ? checksum(ids.join(',')) : undefined;
+  }
 
   let enabled = true, started = false, suspended = false, passes = 0, refreshPasses = 0, overlayPasses = 0;
 
@@ -296,7 +312,7 @@ export function startEngine(api) {
     return { enabled, suspended, tick: system.currentTick, budget: budget.stats(), scans: {
       replace: replaceScanner.backlog(), connectedAndTerrain: scanner.backlog(), overlay: overlayScanner.backlog() },
       connected: connected.status, carriers: carriers.total, terrain: terrain.status, chunks: scanner.chunks.size,
-      replacements: replacements.status, leaves: leaves.status, overlays: overlays.status, far: far.status, settings };
+      replacements: replacements.status, leaves: leaves.status, overlays: overlays.status, far: far.status, stale: stale.status, settings };
   }
 
   system.afterEvents.scriptEventReceive.subscribe(event => {
@@ -306,6 +322,12 @@ export function startEngine(api) {
       if (command === 'off' || command === 'clear') setEnabled(false);
       else if (command === 'on') { if (restoring) setRestoring(false); setEnabled(true); }
       else if (command === 'restore') setRestoring(true);
+      else if (command === 'rescan') {
+        if (restoring) { reply('[BCT] rescan: the world is being restored; use "on" first'); return; }
+        far.rescan();
+        scanner.reset(); replaceScanner.reset(); overlayScanner.reset();
+        reply('[BCT] rescan: looking at the world again, near you and in the distance');
+      }
       else if (command === 'speed' && event.sourceEntity?.typeId === 'minecraft:player') {
         const player = event.sourceEntity;
         const text = '[BCT] speed ' + JSON.stringify(replacements.speedTest(player.dimension, player.location));
@@ -331,8 +353,9 @@ export function startEngine(api) {
       system.run(() => { if ((event.message ?? '').trim() === 'reset') terrain.settings.reset(player); else void terrain.settings.open(player); });
     } else if (event.id === 'bct:probe' && settings.debug && event.sourceEntity?.typeId === 'minecraft:player') {
       const hit = event.sourceEntity.getBlockFromViewDirection({ maxDistance: 12 });
-      if (hit) log('probe ' + JSON.stringify({ block: hit.block.typeId, location: hit.block.location, face: hit.face, connected: connected.probe(hit.block),
-        overlays: overlays.probe(hit.block) }));
+      if (hit) log('probe ' + JSON.stringify({ block: hit.block.typeId, location: hit.block.location, face: hit.face,
+        states: (() => { try { return hit.block.permutation.getAllStates(); } catch (error) { return 'unreadable: ' + String(error); } })(),
+        connected: connected.probe(hit.block), overlays: overlays.probe(hit.block) }));
       try { log('terrain trace ' + JSON.stringify(terrain.trace(event.sourceEntity))); } catch (error) { log('terrain trace ' + String(error)); }
     }
   });
@@ -405,6 +428,7 @@ export function startEngine(api) {
     // Water, mobs and other packs change blocks without events; rescan now and then.
     if (++refreshPasses % Math.max(1, Math.round(settings.replace.refreshTicks / settings.intervalTicks)) === 0) replaceScanner.reset();
     if (++overlayPasses % Math.max(1, Math.round(settings.overlay.refreshTicks / settings.intervalTicks)) === 0) overlayScanner.reset();
+    if (enabled && !restoring) stale.tick();
     if (enabled || restoring) far.tick(realPlayers);
     if (restoring) restoreStep();
     terrain.maintain();
@@ -424,6 +448,7 @@ export function startEngine(api) {
     { name: 'blockChanges', run: refreshCells, cap: () => settings.scanSliceMs },
     { name: 'overlayScan', run: until => overlayScanner.run(until), cap: () => settings.overlay.sliceMs },
     { name: 'overlays', run: until => overlays.tick(blockPlayers(), until), cap: () => settings.overlay.sliceMs },
+    { name: 'stale', run: until => { if (enabled && !restoring) stale.run(until); }, cap: () => settings.replace.sliceMs },
     { name: 'restoreLeaves', run: until => { if (restoring) leaves.restore(until); }, cap: () => settings.leaves.sliceMs },
     { name: 'restoreSweep', run: until => { if (restoring) restoreSweep(until); }, cap: () => settings.replace.sliceMs },
   ];

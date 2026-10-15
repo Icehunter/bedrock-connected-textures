@@ -59,6 +59,32 @@ class AddonTextureSizeTests(unittest.TestCase):
             self.assertEqual(sizes['Source_RP/textures/entity/pig.png'], (512, 512), 'not in the terrain atlas')
             self.assertEqual(sizes['Source_RP/textures/blocks/small.png'], (64, 64), 'never scaled up')
 
+    def test_scaling_keeps_the_colour_under_transparent_pixels(self):
+        with tempfile.TemporaryDirectory() as folder:
+            addon = Path(folder) / 'pack.mcaddon'
+            image = Image.new('RGBA', (8, 8), (200, 100, 50, 0))
+            for x in range(4):
+                for y in range(8):
+                    image.putpixel((x, y), (10, 20, 30, 255))
+            buffer = io.BytesIO()
+            image.save(buffer, 'PNG')
+            with zipfile.ZipFile(addon, 'w') as archive:
+                archive.writestr('Source_RP/textures/blocks/grass_side.png', buffer.getvalue())
+
+            cap_addon_block_textures(addon, 4)
+
+            with zipfile.ZipFile(addon) as archive:
+                scaled = Image.open(io.BytesIO(archive.read('Source_RP/textures/blocks/grass_side.png'))).convert('RGBA')
+            self.assertEqual(scaled.size, (4, 4))
+            clear = scaled.getpixel((3, 0))
+            self.assertEqual(clear[3], 0)
+            for got, want in zip(clear[:3], (200, 100, 50)):
+                self.assertAlmostEqual(got, want, delta=8, msg='Bedrock reads the colour of a clear pixel')
+            solid = scaled.getpixel((0, 0))
+            self.assertEqual(solid[3], 255)
+            for got, want in zip(solid[:3], (10, 20, 30)):
+                self.assertAlmostEqual(got, want, delta=8)
+
 
 if __name__ == '__main__':
     unittest.main()

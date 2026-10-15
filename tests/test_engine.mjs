@@ -153,6 +153,16 @@ test('off and on clear and redraw; status replies to the player', () => {
   assert.match(env.player.messages.at(-1), /"carriers":6/);
 });
 
+test('rescan makes the engine look at the world again and says so', () => {
+  const env = setup({ blocks: [['8,70,8', 'minecraft:stone']] });
+  env.step(20);
+  const scanned = env.volumes.length;
+  env.system.afterEvents.scriptEventReceive.emit({ id: 'bct:control', message: 'rescan', sourceEntity: env.player });
+  assert.match(env.player.messages.at(-1), /^\[BCT\] rescan/);
+  env.step(20);
+  assert.ok(env.volumes.length > scanned, 'chunks are scanned again');
+});
+
 test('ray tracing suspends carriers without touching other entities or the saved setting', () => {
   const env = setup({ blocks: [['8,70,8', 'minecraft:stone']] });
   const other = env.dimension.spawnEntity('bct:stone', { x: 0, y: 0, z: 0 });
@@ -211,4 +221,28 @@ test('terrain rules naming a block the game does not know still draw their other
   fake.step(40);
   assert.ok(fake.entities.some(entity => entity.typeId === 'bct:grass_edge' && entity.isValid), 'the dirt next to grass gets its edge');
   assert.ok(engine.scanner.chunks.size > 0);
+});
+
+test('blocks of a pack the world does not have go back to vanilla once the new pack has settled', () => {
+  const env = setup({ blocks: [['9,70,9', 'minecraft:stone'], ['10,70,9', 'bct_old:grass_surface'], ['11,70,9', 'bct_old:r_oak_log'], ['12,70,9', 'mod:keep']],
+    sources: [['terrain', 'newpack', grassProvider]] });
+  env.properties.set('bct:made:0', 'bct_old:grass_surface;bct_old:r_oak_log>minecraft:oak_log');
+  env.step(30);
+  assert.equal(env.blocks.get('11,70,9'), 'bct_old:r_oak_log', 'nothing happens before the packs have held still');
+  env.step(40);
+  assert.equal(env.blocks.get('11,70,9'), 'minecraft:oak_log', 'a replacement of the old pack is its vanilla block again');
+  assert.equal(env.blocks.has('10,70,9'), false, 'an overlay surface of the old pack is gone');
+  assert.equal(env.blocks.get('9,70,9'), 'minecraft:stone');
+  assert.equal(env.blocks.get('12,70,9'), 'mod:keep', 'a block that is not a pack block is left alone');
+  assert.equal(env.properties.has('bct:made:0') && env.properties.get('bct:made:0').includes('bct_old'), false, 'the old pack is forgotten');
+});
+
+test('carriers are still drawn with debug on, when scans see a timed copy of the dimension', () => {
+  const fake = fakeBedrock({ blocks: new Map([['8,70,8', 'minecraft:stone']]) });
+  startEngine(fake.api);
+  fake.system.sendScriptEvent('bct:config', JSON.stringify({ debug: true }));
+  publishSources({ system: fake.system, world: fake.world, sources: [packet('connected', 'pack', stoneRules)] });
+  fake.player({ x: 8, y: 70, z: 8 });
+  fake.step(5);
+  assert.equal(fake.entities.filter(entity => entity.isValid).length, 6);
 });

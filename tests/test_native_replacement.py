@@ -589,6 +589,93 @@ class NativeReplacementTests(unittest.TestCase):
             self.assertEqual(tile_of(permutation['components']['minecraft:material_instances']['north_p']['texture']), 2)
             self.assertNotIn('minecraft:glass_pane', {block for rule in kept['rules'] for block in rule_targets(rule, kept)})
 
+    def test_a_ctm_rule_for_other_blocks_gives_a_block_no_edge_states(self):
+        doc = document()
+        tiles = [CTM + f'pane_ctm/{n}.png' for n in range(47)]
+        doc['rules'] = [rule for rule in doc['rules'] if rule['id'] not in ('glass', 'pane')] + [
+            {'id': 'glass_random', 'method': 'random', 'blocks': [], 'matchTiles': [TEXTURES + 'glass.png'], 'faces': FACES,
+             'tiles': [CTM + 'glass_random/0.png', CTM + 'glass_random/1.png']},
+            {'id': 'pane_ctm', 'method': 'ctm', 'blocks': ['minecraft:glass_pane'],
+             'matchTiles': [TEXTURES + 'glass.png', TEXTURES + 'glass_pane.png'], 'faces': FACES, 'tiles': tiles}]
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            for n in range(47):
+                material(root / 'compiled', CTM + f'pane_ctm/{n}.png', (200, 220, 255, 60 + n))
+            for n in range(2):
+                material(root / 'compiled', CTM + f'glass_random/{n}.png', (210, 230, 255, 90 + n))
+            _, _, data, built = self.build(root, doc=doc)
+            glass = next(entry for entry in data['blocks'] if entry['vanilla'] == 'minecraft:glass')
+            self.assertNotIn('ctm', glass, 'the rule lists only the pane; Java applies matchBlocks and matchTiles together')
+            self.assertEqual(built['block_permutations']['minecraft:glass'][0], 2)
+
+
+class ChainedRuleTests(unittest.TestCase):
+    """A random pick followed by a repeat mosaic on the picked tile, as Patrix draws cobblestone."""
+
+    PICKS = [CTM + 'chain/pick0.png', CTM + 'chain/pick1.png']
+
+    def chained_document(self):
+        mosaic = lambda rule_id, pick, folder: {
+            'id': rule_id, 'method': 'repeat', 'blocks': [], 'matchTiles': [pick], 'faces': FACES,
+            'width': 2, 'height': 2, 'tiles': [CTM + f'chain/{folder}{n}.png' for n in range(4)]}
+        rules = [{'id': 'pick', 'method': 'random', 'blocks': [], 'matchTiles': [TEXTURES + 'stone.png'],
+                  'faces': FACES, 'tiles': self.PICKS},
+                 mosaic('mosaic0', self.PICKS[0], 'a'), mosaic('mosaic1', self.PICKS[1], 'b')]
+        return {'format_version': 1, 'rules': rules, 'baseTextures': {'minecraft:stone': cube('stone')},
+                'fullCubeBlocks': ['minecraft:stone'], 'opaqueBlocks': ['minecraft:stone']}
+
+    def build(self, root, policy):
+        source = root / 'compiled'
+        source_pack(source)
+        colors = {}
+        for pick, name in enumerate(self.PICKS):
+            material(source, name, (30 + pick, 30, 30, 255))
+            for prefix, red in (('a', 100), ('b', 200)):
+                for n in range(4):
+                    colors[prefix, n] = (red, 10 + 20 * n, 50, 255)
+                    material(source, CTM + f'chain/{prefix}{n}.png', colors[prefix, n])
+        doc = self.chained_document()
+        budget = load_budget()
+        budget['carrier_fallback'] = fallback_patterns(policy)
+        _, variations, first = apply_budget(doc, budget)
+        dropped = {item['rule'] for item in first['dropped_rules'] if item.get('native_variation')}
+        self.assertEqual(dropped, {'pick'})
+        targets = {rule['id']: sorted(rule_targets(rule, doc)) for rule in doc['rules']}
+        data, built = build_replacements(
+            doc, {rule: blocks for rule, blocks in targets.items() if rule not in dropped}, policy,
+            source=source, samples=samples_path(), key='pack-test', output=root / 'replacement',
+            passengers={rule: blocks for rule, blocks in targets.items() if rule in dropped})
+        return colors, built
+
+    def test_the_picked_tile_chooses_the_mosaic_and_position_chooses_its_tile(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            colors, built = self.build(root, load_policy())
+            self.assertEqual(sorted(built['rules']), ['mosaic0', 'mosaic1', 'pick'])
+            stone = read_json(root / REPLACE_BP / 'blocks/r_stone.json')['minecraft:block']
+            states = stone['description']['states']
+            self.assertEqual(sorted(states), ['bct:r0', 'bct:x', 'bct:y', 'bct:z'])
+            self.assertEqual(len(stone['permutations']), 2 * 8)
+            atlas = read_json(root / REPLACE_RP / 'textures/terrain_texture.json')['texture_data']
+            for permutation in stone['permutations']:
+                values = condition_values(permutation)
+                location = tuple(int(values['bct:' + axis]) for axis in 'xyz')
+                prefix = 'ab'[int(values['bct:r0'])]
+                for face in FACES:
+                    alias = permutation['components']['minecraft:material_instances'][face]['texture']
+                    color = Image.open(root / REPLACE_RP / (atlas[alias]['textures'] + '.png')).getpixel((0, 0))
+                    self.assertEqual(color, colors[prefix, repeat_index(location, face, 2, 2)])
+
+    def test_a_block_over_the_limit_drops_the_picks_that_feed_its_mosaics_too(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            policy = load_policy()
+            policy['max_permutations'] = 8
+            _, built = self.build(root, policy)
+            self.assertFalse((root / REPLACE_BP / 'blocks/r_stone.json').exists(),
+                             'a pick alone would show the selector tile, which is only a stand-in for its mosaic')
+            self.assertEqual(built['rules'], {})
+
 
 class PolicyBlockTests(unittest.TestCase):
     """Grass, glazed terracotta, panes, weighted models and engine behaviors."""

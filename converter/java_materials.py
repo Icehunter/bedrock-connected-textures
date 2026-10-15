@@ -143,6 +143,7 @@ def compile_stack_material(stack, sprite, destination, relative, *, policy, anim
     animations, animation_diagnostics = _source_animations(metadata, decoded)
     flipbook = None
     native_blend = False
+    resized_channels = {}
     if animations:
         animation = animations.get('color')
         if animation is None:
@@ -163,8 +164,13 @@ def compile_stack_material(stack, sprite, destination, relative, *, policy, anim
                                            layout=animation_layout,
                                            max_side=65536 if interpolation == 'native' else 16384)
         flipbook['blend_frames'] = native_blend
-    elif any(image.size != decoded['color'].size for image in decoded.values()):
-        raise ValueError('Material maps must match color dimensions')
+    else:
+        color_size = decoded['color'].size
+        for channel, image in decoded.items():
+            if channel == 'color' or image.size == color_size:
+                continue
+            resized_channels[channel] = [list(image.size), list(color_size)]
+            decoded[channel] = image.resize(color_size, Image.NEAREST)
     result = decode_labpbr(decoded.get('normal'), decoded.get('specular'), policy=policy)
     if result['renderer_losses'] and not policy.allow_losses:
         raise ValueError('Target cannot represent material channels: ' + ', '.join(result['renderer_losses']))
@@ -216,6 +222,7 @@ def compile_stack_material(stack, sprite, destination, relative, *, policy, anim
             'decoder_revision': MATERIAL_DECODER_REVISION, 'channel_manifest': channel_manifest,
             'extracted_channels': list(result['preserved_channels']),
             'source_repairs': repairs,
+            'resized_channels': resized_channels,
             'animation_diagnostics': animation_diagnostics,
             'interpolation_policy': interpolation,
             'interpolation_differences': (['Bedrock blends decoded material channels and alpha between keyframes']
