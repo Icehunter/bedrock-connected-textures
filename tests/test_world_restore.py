@@ -1,4 +1,5 @@
 import struct
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -73,6 +74,17 @@ class LogTest(unittest.TestCase):
         self.assertEqual(latest, {b'small': b'2', b'big': big})
         self.assertEqual(last, 9)
 
+    def test_log_files_without_a_number_in_their_name_are_ignored(self):
+        with tempfile.TemporaryDirectory() as folder:
+            (Path(folder) / '000005.log').write_bytes(b'')
+            (Path(folder) / 'notes.log').write_bytes(b'not a leveldb log')
+            (Path(folder) / '\u00b2.log').write_bytes(b'not a leveldb log')
+            append_batch(folder, {b'small': b'1'}, 7)
+            latest, last = read_database(folder)
+            self.assertEqual((Path(folder) / 'notes.log').read_bytes(), b'not a leveldb log')
+        self.assertEqual(latest, {b'small': b'1'})
+        self.assertEqual(last, 7)
+
 
 @unittest.skipUnless((SAMPLES / 'metadata/vanilladata_modules/mojang-blocks.json').is_file(), 'needs bedrock-samples')
 class RestoreTest(unittest.TestCase):
@@ -103,6 +115,37 @@ class RestoreTest(unittest.TestCase):
         self.assertEqual(other[0]['name'][1], 'minecraft:oak_leaves')
         self.assertEqual(other[0]['states'][1]['persistent_bit'], (1, 1))
         self.assertEqual(other[1]['name'][1], 'minecraft:air')
+
+    @unittest.skipIf(sys.platform == 'win32', 'uses fcntl file locks')
+    def test_a_world_the_game_holds_open_is_refused_even_though_its_lock_can_be_renamed(self):
+        stairs = entry('bct_pack:r_oak_stairs', {'bct:t': (3, 5)})
+        palette = [entry('minecraft:air', {}), stairs]
+        indices = [position % 2 for position in range(4096)]
+        code = (
+            "import fcntl, sys\n"
+            "handle = open(sys.argv[1], 'r+b')\n"
+            "fcntl.lockf(handle, fcntl.LOCK_EX | fcntl.LOCK_NB)\n"
+            "print('locked', flush=True)\n"
+            "sys.stdin.read()\n"
+        )
+        with tempfile.TemporaryDirectory() as world:
+            db = Path(world) / 'db'
+            db.mkdir()
+            (db / '000003.log').write_bytes(b'')
+            append_batch(db, {KEY: subchunk(palette, indices)}, 1)
+            lock_path = str(db / 'LOCK')
+            with open(lock_path, 'wb'):
+                pass
+            proc = subprocess.Popen([sys.executable, '-c', code, lock_path],
+                                    stdin=subprocess.PIPE, stdout=subprocess.PIPE, text=True)
+            try:
+                self.assertEqual(proc.stdout.readline().rstrip('\n'), 'locked')
+                with self.assertRaises(world_restore.WorldRestoreError) as context:
+                    restore_world(world, SAMPLES, backup=False)
+            finally:
+                proc.stdin.close()
+                proc.wait()
+        self.assertIn('open in the game', str(context.exception))
 
     def test_an_authored_packs_swapped_blocks_go_back_but_its_other_blocks_stay(self):
         palette = [entry('minecraft:stone', {}),

@@ -332,3 +332,17 @@ test('model layers keep connected-texture matching, source tint, alpha fallbacks
   assert.deepEqual(runtime.paletteSelection(candidate,[.4,.5,.6]),{...candidate,tint:[.4,.5,.6],palette:2});
   assert.equal(runtime.paletteSelection(candidate,[.9,.1,.2]),undefined,'unknown colors do not silently select the white texture');
 });
+
+test('snowy state reads snow above, and is false rather than failing at the top of the world',async()=>{
+  const env=fixture(),createSource=await runtimeFactory(env),dimension=env.dimension;
+  let above='minecraft:air',top=false;
+  const get=location=>({location,dimension,typeId:location.y===4?'minecraft:grass_block':above,permutation:{getState:()=>undefined,getAllStates:()=>({})},offset(delta){const p=Object.fromEntries(['x','y','z'].map(axis=>[axis,location[axis]+delta[axis]]));if(top&&p.y>4)throw new Error('LocationOutOfWorldBoundariesError');return get(p);}});
+  dimension.getBlock=get;
+  const runtime=createSource({rules:[],fullCubeBlocks:['minecraft:grass_block'],baseTextureVariants:{'minecraft:grass_block':[true,false].map(snowy=>({states:{'bct:snowy':snowy},modelParts:[]}))}});
+  const selected=()=>runtime.variantOf(get({x:0,y:4,z:0}))?.states['bct:snowy'];
+  assert.equal(selected(),false);
+  above='minecraft:snow_layer';assert.equal(selected(),true);
+  above='minecraft:air';top=true;assert.doesNotThrow(selected);
+  assert.equal(selected(),false,'no block above the world top means no snow');
+  runtime.dispose();
+});

@@ -17,6 +17,17 @@ import { LEAF_DECAY, VANILLA_LEAVES, VANILLA_LOGS, VANILLA_OPEN, VANILLA_SOLID }
 
 const PACK_ID = /^[a-z0-9_-]{1,80}$/;
 const BLOCK_ID = /^[a-z0-9_.-]+:[a-z0-9_./-]+$/;
+// Keys an authored `blocks` entry may hold.
+const BLOCK_KEYS = ['block', 'pattern', 'strip', 'xp', 'tool', 'open', 'leafGuard', 'cost', 'shape'];
+// Keys an authored `connected` entry may hold: the block keys plus connect.
+const CONNECTED_KEYS = [...BLOCK_KEYS, 'connect'];
+// Keys an authored `leaves` entry may hold.
+const LEAF_KEYS = ['block', 'models'];
+/** Warn about unknown keys in an authored entry without rejecting it: pushes one message per stray key into warnings. */
+function warnUnknown(entry, allowed, where, section, warnings) {
+  if (!entry || typeof entry !== 'object') return;
+  for (const key of Object.keys(entry)) if (!allowed.includes(key)) warnings.push(where + '.' + key + ': is not a key of a ' + section + ' entry');
+}
 // Sections a pack may have; later engine versions add to them.
 // overlaySurfaces and carrierSurfaces are not written by hand: main.js adds what `python bct.py overlays` and
 // `python bct.py carriers` built (scripts/bct-overlays.js, scripts/bct-carriers.js).
@@ -41,9 +52,10 @@ function statesOf(api, type) {
 }
 
 /** One `blocks` entry: the pattern the engine gives the pack's block. */
-function compileBlock(api, vanilla, entry, where) {
+function compileBlock(api, vanilla, entry, where, warnings, keys = BLOCK_KEYS, section = 'blocks') {
   if (!BLOCK_ID.test(vanilla)) fail(where, 'the key must be a block id such as minecraft:stone');
   if (!entry || typeof entry !== 'object') fail(where, 'must be an object such as { block: "mypack:stone", pattern: { repeat: [3, 3] } }');
+  warnUnknown(entry, keys, where, section, warnings);
   if (typeof entry.block !== 'string' || !BLOCK_ID.test(entry.block)) fail(where + '.block', 'must be your block id, such as mypack:stone');
   const vanillaStates = statesOf(api, vanilla);
   if (!vanillaStates) fail(where, vanilla + ' is not a block this game knows');
@@ -90,9 +102,9 @@ function compileBlock(api, vanilla, entry, where) {
 const CONNECT_STATES = { north: 'bct:n', south: 'bct:s', west: 'bct:w', east: 'bct:e', up: 'bct:u', down: 'bct:d' };
 
 /** One `connected` entry: the pack's block, which draws its own borders from six neighbour states the engine keeps up to date. */
-function compileConnected(api, vanilla, entry, where) {
+function compileConnected(api, vanilla, entry, where, warnings) {
   if (entry?.pattern !== undefined) fail(where + '.pattern', 'a connected block has no pattern');
-  const compiled = compileBlock(api, vanilla, entry, where);
+  const compiled = compileBlock(api, vanilla, entry, where, warnings, CONNECTED_KEYS, 'connected');
   const connect = entry.connect ?? 'same';
   let joins;
   if (connect === 'same') joins = [vanilla];
@@ -114,9 +126,10 @@ function checkWeights(weights, where) {
 }
 
 /** One `leaves` entry: the pack's leaf block, its weighted models and, optionally, other models far from logs. */
-function compileLeaf(api, vanilla, entry, where) {
+function compileLeaf(api, vanilla, entry, where, warnings) {
   if (!VANILLA_LEAVES.includes(vanilla)) fail(where, vanilla + ' is not a vanilla leaf block');
   if (!entry || typeof entry !== 'object') fail(where, 'must be an object such as { block: "mypack:oak_leaves", models: [2, 1, 1] }');
+  warnUnknown(entry, LEAF_KEYS, where, 'leaves', warnings);
   if (typeof entry.block !== 'string' || !BLOCK_ID.test(entry.block)) fail(where + '.block', 'must be your block id, such as mypack:oak_leaves');
   const compiled = { vanilla, block: entry.block, mirror: { persistent_bit: 'bct:persistent_bit', update_bit: 'bct:update_bit' },
     bools: ['persistent_bit', 'update_bit'] };
@@ -198,6 +211,7 @@ function compileEdges(api, pack, edges) {
  * api: @minecraft/server (BlockPermutation).
  */
 export function compileAuthored(api, data) {
+  const warnings = [];
   if (!data || typeof data !== 'object') fail('bct.js', 'must export an object');
   if (data.format !== 1) fail('format', 'must be 1');
   if (typeof data.pack !== 'string' || !PACK_ID.test(data.pack)) fail('pack', 'must be a short id of letters, digits, - and _');
@@ -206,19 +220,19 @@ export function compileAuthored(api, data) {
   const blocks = [];
   if (data.blocks !== undefined) {
     if (!data.blocks || typeof data.blocks !== 'object' || Array.isArray(data.blocks)) fail('blocks', 'must be an object keyed by vanilla block id');
-    for (const [vanilla, entry] of Object.entries(data.blocks)) blocks.push(compileBlock(api, vanilla, entry, 'blocks["' + vanilla + '"]'));
+    for (const [vanilla, entry] of Object.entries(data.blocks)) blocks.push(compileBlock(api, vanilla, entry, 'blocks["' + vanilla + '"]', warnings));
   }
   if (data.connected !== undefined) {
     if (!data.connected || typeof data.connected !== 'object' || Array.isArray(data.connected)) fail('connected', 'must be an object keyed by vanilla block id');
     for (const [vanilla, entry] of Object.entries(data.connected)) {
       if (data.blocks?.[vanilla] !== undefined) fail('connected["' + vanilla + '"]', vanilla + ' is in blocks too: a block is either patterned or connected');
-      blocks.push(compileConnected(api, vanilla, entry, 'connected["' + vanilla + '"]'));
+      blocks.push(compileConnected(api, vanilla, entry, 'connected["' + vanilla + '"]', warnings));
     }
   }
   const replace = { format_version: 1, blocks, open: [...VANILLA_OPEN], solid: [...VANILLA_SOLID] };
   if (data.leaves !== undefined) {
     if (!data.leaves || typeof data.leaves !== 'object' || Array.isArray(data.leaves)) fail('leaves', 'must be an object keyed by vanilla leaf id');
-    const leafBlocks = Object.entries(data.leaves).map(([vanilla, entry]) => compileLeaf(api, vanilla, entry, 'leaves["' + vanilla + '"]'));
+    const leafBlocks = Object.entries(data.leaves).map(([vanilla, entry]) => compileLeaf(api, vanilla, entry, 'leaves["' + vanilla + '"]', warnings));
     if (leafBlocks.length) replace.leaves = { blocks: leafBlocks, leaves: [...VANILLA_LEAVES], logs: [...VANILLA_LOGS], decay: { ...LEAF_DECAY } };
   }
   const terrain = data.edges === undefined ? [] : compileEdges(api, data.pack, data.edges);
@@ -239,5 +253,5 @@ export function compileAuthored(api, data) {
       fail('carriers', 'changed since they were built: run python bct.py carriers again');
     connected = built.data;
   }
-  return { provider: data.pack, priority: data.priority ?? 0, replace, terrain, connected };
+  return { provider: data.pack, priority: data.priority ?? 0, replace, terrain, connected, warnings };
 }

@@ -25,6 +25,7 @@ export function publishSources({system,world,sources}) {
     if(event.id!=='bct:source_request'&&event.id!=='bct:source_ack')return;
     let message;
     try {message=JSON.parse(event.message);} catch {return;}
+    if(!message||typeof message!=='object')return;
     for(const state of states) {
       if(event.id==='bct:source_ack'&&state.engine===message.engine&&state.provider===message.provider&&state.digest===message.digest) {
         state.acknowledged=true;state.nonce=message.nonce;

@@ -197,3 +197,13 @@ test('reporting failures cannot roll back successfully applied heights', async (
   assert.deepEqual(settings.heights, TUNED);
   assert.deepEqual(host.applied, [TUNED]);
 });
+
+test('the reset toggle restores the defaults even when a height field is not a number', async () => {
+  const host = fixture();
+  await host.submit(responseValues());
+  const values = responseValues(TUNED, true);
+  values[0] = 'abc';
+  assert.equal(await host.submit(values), true);
+  assert.deepEqual(host.settings.heights, DEFAULT_HEIGHTS);
+  assert.deepEqual(host.applied.at(-1), DEFAULT_HEIGHTS);
+});

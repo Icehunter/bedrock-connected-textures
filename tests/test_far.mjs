@@ -3,17 +3,21 @@ import assert from 'node:assert/strict';
 import { createFar } from '../engine/far.mjs';
 
 /** A world with a ticking area manager whose areas load when `loadAll` is called, and one player. */
-function setup({ maxChunkCount = 100, idle = () => true, settle = 0, key = 'aaaa1111' } = {}) {
-  const properties = new Map(), areas = new Map(), pending = [], messages = [];
+function setup({ maxChunkCount = 100, idle = () => true, settle = 0, key = 'aaaa1111', lateCreate = false } = {}) {
+  const properties = new Map(), areas = new Map(), pending = [], messages = [], chat = [];
   const system = { currentTick: 0 };
   const dimension = { id: 'minecraft:overworld', heightRange: { min: -64, max: 320 }, getTopmostBlock: ({ x, z }) => ({ location: { x, y: 70, z } }) };
   const world = {
     getDimension: () => dimension,
+    sendMessage: text => chat.push(text),
     getDynamicProperty: name => properties.get(name), setDynamicProperty: (name, value) => { if (value === undefined) properties.delete(name); else properties.set(name, value); },
     tickingAreaManager: {
       maxChunkCount,
       hasCapacity: ({ from, to }) => ((to.x - from.x + 1) / 16) * ((to.z - from.z + 1) / 16) <= maxChunkCount,
-      createTickingArea(identifier, options) { areas.set(identifier, options); return new Promise(resolve => pending.push(resolve)); },
+      createTickingArea(identifier, options) {
+        if (!lateCreate) areas.set(identifier, options);
+        return new Promise(resolve => pending.push(() => { if (lateCreate) areas.set(identifier, options); resolve(); }));
+      },
       removeTickingArea(identifier) { areas.delete(identifier); },
     },
     getDynamicPropertyIds: () => [...properties.keys()],
@@ -22,7 +26,7 @@ function setup({ maxChunkCount = 100, idle = () => true, settle = 0, key = 'aaaa
   const far = createFar({ api: { world, system }, limits: () => ({ chunkRadius: 16, holdTicks: 400, status: 1 }), idle, packKey: () => key, settle });
   const loadAll = async () => { while (pending.length) pending.shift()(); await Promise.resolve(); };
   const step = (ticks = 1) => { for (let t = 0; t < ticks; t++) { system.currentTick++; far.tick([player]); } };
-  return { far, areas, properties, messages, player, system, step, loadAll, setKey: value => { key = value; } };
+  return { far, areas, properties, messages, chat, player, system, step, loadAll, setKey: value => { key = value; } };
 }
 
 test('loads the nearest area, converts it through a virtual player, then moves on and remembers it', async () => {
@@ -231,4 +235,67 @@ test('the done list of an earlier version, kept for no pack in particular, is dr
   env.step(1);
   assert.equal(env.properties.has('bct:far:done:0'), false, 'the old unkeyed list is gone');
   assert.equal(env.far.status.done, 0);
+});
+
+test('an area released before its ticking area finished creating does not stay registered', async () => {
+  const env = setup({ lateCreate: true });
+  const left = [{ dimension: 'minecraft:overworld', cx: 200, cz: 3 }];
+  env.far.setTargets(() => left);
+  env.step(1);
+  env.far.setTargets(() => []);
+  await env.loadAll();
+  assert.equal(env.areas.size, 0, 'a late-created area is removed again, not leaked');
+});
+
+test('an area released and replaced within one tick is not removed by the old one finishing late', async () => {
+  const env = setup({ lateCreate: true });
+  const left = [{ dimension: 'minecraft:overworld', cx: 200, cz: 3 }];
+  env.far.setTargets(() => left);
+  env.step(1);
+  env.far.setTargets(() => left);
+  env.far.tick([env.player]);
+  await env.loadAll();
+  assert.equal(env.areas.size, 1, 'the replacement area stays registered');
+});
+
+test('restoring, an area the game never finishes loading is given up on after three tries', async () => {
+  const env = setup();
+  const left = [{ dimension: 'minecraft:overworld', cx: 200, cz: 3 }];
+  env.far.setTargets(() => left);
+  env.step(1);
+  assert.equal(env.areas.size, 1, 'loading');
+  env.step(600);
+  assert.equal(env.areas.size, 1, 'retried after first timeout');
+  env.step(600);
+  assert.equal(env.areas.size, 1, 'retried after second timeout');
+  env.step(600);
+  assert.equal(env.areas.size, 0, 'given up after three timeouts');
+  env.step(1200);
+  assert.equal(env.areas.size, 0, 'left alone afterwards');
+  assert.equal(env.far.status.failures, 3, 'three failed attempts recorded');
+});
+
+test('restoring, when every area left was given up on, the players are told once what is left', () => {
+  const env = setup();
+  const left = [
+    { dimension: 'minecraft:overworld', cx: 200, cz: 3 },
+    { dimension: 'minecraft:overworld', cx: 201, cz: 3 },
+  ];
+  env.far.setTargets(() => left, 'Restoring the world');
+  env.step(1);
+  env.step(600);
+  env.step(600);
+  assert.equal(env.chat.length, 0, 'still trying');
+  env.step(600);
+  assert.equal(env.chat.length, 1, 'told once the last area was given up');
+  assert.match(env.chat[0], /2 chunks/);
+  assert.match(env.chat[0], /rejoin/i);
+  env.step(1200);
+  assert.equal(env.chat.length, 1, 'not repeated');
+  env.far.setTargets(() => [{ dimension: 'minecraft:overworld', cx: 200, cz: 3 }]);
+  env.step(1);
+  env.step(600);
+  env.step(600);
+  env.step(600);
+  assert.equal(env.chat.length, 2, 'a new target list is reported again');
 });

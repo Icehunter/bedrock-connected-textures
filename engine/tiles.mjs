@@ -369,8 +369,14 @@ export function overlayRuleTiles(rule, block, face, textureOf, texture, provider
 
 /** Layers an overlay rule adds to a visible face, or a {known: false} result. */
 function overlayLayers(rule, block, face, textureOf, texture, providers) {
-  const tiles = overlayRuleTiles(rule, block, face, textureOf, texture, providers), orientation = 0;
+  const tiles = overlayRuleTiles(rule, block, face, textureOf, texture, providers);
   if (!Array.isArray(tiles)) return tiles;
+  let orientation = 0;
+  if (providers.dialect === 'continuity' && rule.method !== 'overlay' && rule.orient && rule.orient !== 'none') {
+    const turned = ruleOrientation(rule, block, face, providers);
+    if (typeof turned !== 'number') return turned;
+    orientation = turned;
+  }
   let tint;
   if ('tintIndex' in rule || 'tintBlock' in rule) {
     tint = providers.tintOf?.(block, rule.tintBlock ?? logicalOf(providers)(block), rule.tintIndex ?? -1);

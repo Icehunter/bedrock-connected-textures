@@ -238,3 +238,5 @@ test('block-specific states remain alternatives and constrain tile matching',()=
   assert.equal(resolve(b,'up',()=> 'different_face_texture').visible,false);
   assert.equal(resolve({...log,permutation:{getState:()=> 'z'}},'up',()=> 'endgrain').visible,false);
 });
+
+test('overlay_repeat with orient state_axis keeps the face orientation, in continuity only',()=>{ const rule={method:'overlay_repeat',blocks:['minecraft:oak_log'],matchTiles:['shared'],faces:['north'],width:1,height:1,tiles:['ring'],orient:'state_axis'}; const b=block([[0,0,0]]); const log={...b,typeId:'minecraft:oak_log',permutation:{getState:()=> 'x'}}; const layers=(r,providers)=>ruleResolver([r],providers)(log,'north',()=> 'shared').overlays; assert.equal(layers(rule,{dialect:'continuity'})[0].orientation,1); assert.equal(layers(rule,{dialect:'optifine'})[0].orientation,0,'packs built before keep their rendering'); assert.equal(layers(rule,{})[0].orientation,0); const plain={...rule}; delete plain.orient; assert.equal(layers(plain,{dialect:'continuity'})[0].orientation,0); });

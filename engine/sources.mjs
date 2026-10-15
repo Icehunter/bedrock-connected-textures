@@ -13,7 +13,7 @@ export function checksum(text) {
 }
 
 export function listenSources({ system, onSource, log = () => {} }) {
-  const pending = new Map(), loaded = new Map();
+  const pending = new Map(), loaded = new Map(), reported = new Set();
   const nonce = Math.random().toString(36).slice(2);
   let stopped = false;
   const ack = packet => system.sendScriptEvent('bct:source_ack', JSON.stringify({ engine: packet.engine, provider: packet.provider, digest: packet.digest, nonce }));
@@ -39,7 +39,10 @@ export function listenSources({ system, onSource, log = () => {} }) {
     if (transfer.received !== count) return;
     const text = transfer.parts.join('');
     pending.delete(id);
-    if (text.length > 8 * 1024 * 1024 || checksum(text) !== digest) return;
+    if (text.length > 8 * 1024 * 1024 || checksum(text) !== digest) {
+      if (!reported.has(id + '/' + digest)) { reported.add(id + '/' + digest); log('source ' + id + ' dropped: ' + (text.length > 8 * 1024 * 1024 ? 'larger than 8 MiB' : 'checksum mismatch')); }
+      return;
+    }
     try {
       onSource(engine, provider, JSON.parse(text), digest);
       loaded.set(id, digest);

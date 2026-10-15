@@ -75,7 +75,8 @@ const stateValue=(block,name)=>{
     return undefined;
   }
   if(name==='bct:snowy') {
-    const above=block.offset({x:0,y:1,z:0});
+    let above;
+    try {above=block.offset({x:0,y:1,z:0});} catch {return false;}
     return above?['minecraft:snow','minecraft:snow_layer'].includes(above.typeId):undefined;
   }
   return block.permutation.getState(name);
@@ -399,13 +400,25 @@ return {providerId,dispose,clear,maintain,despawn,refreshOwnership,invalidate(){
 /** Every converted pack's connected-texture data, drawn under one carrier allowance. */
 export function createConnected({ api, carriers, inReach, log, vanillaType, aliasesOf, vanillaStates }) {
   const sources = new Map(), instances = new Map(), owners = new Map();
-  function setSource(provider, data) {
-    if (!Array.isArray(data?.rules)) throw new Error('Invalid connected texture data');
-    sources.set(provider, data);
+  function rebuildOwners() {
     owners.clear();
     const order = [...sources].sort((a, b) => (a[1].sourcePriority ?? 0) - (b[1].sourcePriority ?? 0) || a[0].localeCompare(b[0]));
     for (const [id, config] of order) for (const block of new Set([...config.rules.flatMap(rule => rule.blocks ?? []),
       ...(config.sourceBlocks ?? []), ...(config.modelRenderBlocks ?? []), ...(config.modelPartBlocks ?? [])])) owners.set(block, id);
+  }
+  function removeSource(provider) {
+    const instance = instances.get(provider);
+    if (!instance) return;
+    instance.dispose();
+    instances.delete(provider);
+    sources.delete(provider);
+    rebuildOwners();
+    for (const other of instances.values()) other.refreshOwnership();
+  }
+  function setSource(provider, data) {
+    if (!Array.isArray(data?.rules)) throw new Error('Invalid connected texture data');
+    sources.set(provider, data);
+    rebuildOwners();
     instances.get(provider)?.dispose();
     instances.set(provider, createConnectedSource(data, { api, providerId: provider, ownsBlock: block => owners.get(block) === provider, carriers, inReach, log,
       vanillaType, aliasesOf, vanillaStates }));
@@ -413,7 +426,7 @@ export function createConnected({ api, carriers, inReach, log, vanillaType, alia
   }
   const each = method => (...args) => { for (const instance of instances.values()) instance[method](...args); };
   return {
-    setSource, instances,
+    setSource, removeSource, instances,
     blockTypes: () => [...new Set([...instances.values()].flatMap(instance => instance.blockTypes()))],
     update: each('update'), recover: each('recover'), invalidate: each('invalidate'), maintain: each('maintain'), despawn: each('despawn'), clear: each('clear'),
     setEnabled: each('setEnabled'),

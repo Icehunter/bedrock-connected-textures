@@ -80,13 +80,14 @@ export function createHeightSettings({ModalFormData, applyHeights, report = () =
           notify(player, 'Invalid height form. Settings unchanged.');
           return false;
         }
+        if (values[5]) return apply(DEFAULT_HEIGHTS, player);
         let parsed;
         try { parsed = parseHeights(values.slice(0, 5)); }
         catch (error) {
           notify(player, error.message + ' Settings unchanged.');
           return false;
         }
-        return apply(values[5] ? DEFAULT_HEIGHTS : parsed, player);
+        return apply(parsed, player);
       } catch (error) {
         notify(player, 'Height settings could not be opened: ' + String(error));
         return false;

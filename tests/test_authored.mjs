@@ -261,3 +261,12 @@ test('built carriers become the pack connected-texture data; carriers changed si
     error => error instanceof AuthoredError && /^carriers: changed since they were built: run python bct.py carriers again$/.test(error.message));
   assert.equal(compileAuthored(fakeApi, { format: 1, pack: 'mypack', carrierSurfaces: null }).connected, undefined);
 });
+
+test('keys an entry does not know are warned about, and the pack still loads', () => {
+  const data = { format: 1, pack: 'mypack', blocks: { 'minecraft:stone': { block: 'mypack:stone', patern: { repeat: [3, 2] } } }, leaves: { 'minecraft:oak_leaves': { block: 'mypack:oak_leaves', modles: [2, 1, 1] } } };
+  const { replace, warnings } = compileAuthored(fakeApi, data);
+  assert.equal(replace.blocks.length, 1);
+  assert.deepEqual(warnings, ['blocks["minecraft:stone"].patern: is not a key of a blocks entry', 'leaves["minecraft:oak_leaves"].modles: is not a key of a leaves entry']);
+  const known = { format: 1, pack: 'mypack', blocks: { 'minecraft:stone': { block: 'mypack:stone', pattern: { repeat: [3, 2] }, tool: 'pickaxe', cost: 2 } }, leaves: { 'minecraft:oak_leaves': { block: 'mypack:oak_leaves', models: [2, 1, 1] } } };
+  assert.deepEqual(compileAuthored(fakeApi, known).warnings, []);
+});

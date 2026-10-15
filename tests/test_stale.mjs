@@ -153,6 +153,28 @@ test('chunks that never load are given up on after a while', () => {
   assert.equal(env.targets.at(-1).list, undefined, 'it gave up');
 });
 
+test('giving up on chunks that never load does not mark the world clean; the next session sweeps them again', () => {
+  const env = setup({ blocks: swapped });
+  env.go(1);
+  env.types = NEW;
+  env.chunks = [{ dimension: 'minecraft:overworld', cx: 90, cz: 90 }];
+  env.go(1);
+  env.fake.system.currentTick += 7000;
+  env.stale.tick();
+  assert.equal(env.stale.status.active, false, 'it gave up');
+  assert.equal(env.player.messages.filter(message => /could not be updated/.test(message)).length, 1, 'the players are told once');
+  assert.match(env.player.messages.at(-1), /rejoin/i);
+  assert.match(env.fake.world.getDynamicProperty('bct:made:0') ?? '', /bct_old:r_oak_log/, 'the removed pack is still remembered');
+  env.stale.tick();
+  env.stale.tick();
+  assert.equal(env.stale.status.active, false, 'it does not start over in the same session');
+  assert.equal(env.player.messages.filter(message => /could not be updated/.test(message)).length, 1, 'and does not tell them again');
+  const next = env.make();
+  next.tick();
+  assert.equal(next.status.active, true, 'a later session sweeps the chunks again');
+  assert.ok(next.status.pending >= 1, 'the chunks that never loaded are pending again');
+});
+
 test('a chunk that is not loaded is skipped without stopping the others', () => {
   const env = setup({ blocks: [['3,70,3', 'bct_old:r_oak_log'], ['35,70,3', 'bct_old:r_oak_log']] });
   env.go(1);
@@ -186,4 +208,28 @@ test('the world is not rewritten every tick while chunks are pending', () => {
   for (let i = 0; i < 20; i++) env.stale.tick();
   assert.ok(before !== undefined);
   assert.equal(writes, 0, 'nothing new to save: ' + writes + ' writes');
+});
+
+test('a sweep that gave up starts over, with a fresh look at the registered types, when it is needed again', () => {
+  const env = setup({ blocks: swapped });
+  const api = env.fake.api;
+  env.go(1);
+  let lookups = 0, clock = 0;
+  const getAll = api.BlockTypes.getAll;
+  api.BlockTypes.getAll = () => { lookups++; return getAll(); };
+  const stale = createStale({ api, log: () => {}, now: () => clock++, types: () => env.types, chunks: () => env.chunks,
+    players: () => env.fake.world.players, far: { setTargets() {} }, ready: () => true, stall: 6000 });
+  env.types = NEW;
+  env.chunks = [{ dimension: 'minecraft:overworld', cx: 0, cz: 0 }];
+  stale.tick();
+  assert.equal(stale.run(clock + 2), true, 'the walk is suspended with chunks left');
+  assert.equal(lookups, 1);
+  env.fake.system.currentTick += 7000;
+  stale.tick();
+  assert.equal(stale.status.active, false, 'it gave up');
+  env.types = [];
+  stale.tick();
+  assert.equal(stale.status.active, true, 'a removed pack needs the sweep again');
+  stale.run(clock + 2);
+  assert.equal(lookups, 2, 'a new walk looked at the registered types again');
 });

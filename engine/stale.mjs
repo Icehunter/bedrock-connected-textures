@@ -18,6 +18,7 @@ export function createStale({ api, log = () => {}, now, types, chunks, players, 
   let targetsSet = false;
   let currentTypes = new Set();
   let signature;
+  let gaveUp;
   let dirty = false;
   let savedTick = -Infinity;
 
@@ -64,6 +65,7 @@ export function createStale({ api, log = () => {}, now, types, chunks, players, 
   function chunkKey(chunk) { return chunk.dimension + '|' + chunk.cx + '|' + chunk.cz; }
 
   function activate() {
+    runner = undefined;
     active = true;
     for (const chunk of chunks()) pending.set(chunkKey(chunk), { dimension: chunk.dimension, cx: chunk.cx, cz: chunk.cz });
     swept.clear();
@@ -74,6 +76,7 @@ export function createStale({ api, log = () => {}, now, types, chunks, players, 
   }
 
   function finish() {
+    runner = undefined;
     world.setDynamicProperty('bct:legacy', true);
     for (const type of stale.keys()) made.delete(type);
     save();
@@ -181,6 +184,8 @@ export function createStale({ api, log = () => {}, now, types, chunks, players, 
       stale = new Map([...made].filter(([type]) => !currentTypes.has(type)));
       if (stale.size === 0 && !legacy) { if (active) finish(); return; }
       const next = [...stale.keys()].sort().join(';');
+      if (gaveUp === next) return;
+      gaveUp = undefined;
       if (!active || next !== signature) activate();
       signature = next;
       for (const player of players()) {
@@ -193,7 +198,18 @@ export function createStale({ api, log = () => {}, now, types, chunks, players, 
       if (pending.size === 0) { finish(); return; }
       if (!targetsSet) { far.setTargets(() => [...pending.values()], 'Updating the world to the new pack'); targetsSet = true; }
       const tick = system.currentTick;
-      if (tick - lastProgress > stall) { log('stale: gave up on ' + pending.size + ' chunks that did not load'); pending.clear(); finish(); return; }
+      if (tick - lastProgress > stall) {
+        const left = pending.size;
+        log('stale: gave up on ' + left + ' chunks that did not load; they are tried again next session');
+        try { world.sendMessage('§e[BCT] ' + left.toLocaleString('en-US') + ' chunks could not be updated to the new pack yet. Leave and rejoin the world to try again.'); }
+        catch { /* nobody to tell */ }
+        gaveUp = next;
+        pending.clear(); swept.clear(); lastProgress = -1; runner = undefined;
+        writeParts('bct:stale', '');
+        if (targetsSet) { far.setTargets(undefined); targetsSet = false; }
+        active = false;
+        return;
+      }
       if (dirty && tick - savedTick >= 100) { savePending(); savedTick = tick; dirty = false; }
     },
     run(until) {

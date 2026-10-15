@@ -305,7 +305,7 @@ def write_block(bp, rp, vanilla, identifier, pattern, *, samples, grid=None, tex
     textures = built['textures']
     if grid:
         cut_grid(grid, pattern, rp / texture_dir, textures)
-    present = [path for texture in textures for path in [rp / texture_dir / (texture + '.png')] if path.exists()]
+    present = [path for texture in textures for extension in ('.png', '.tga') for path in [rp / texture_dir / (texture + extension)] if path.exists()]
     if built['files'] and present:
         built = build_block(vanilla, identifier, pattern, samples=samples, see_through=see_through_method(present))
     definition, entry = built['definition'], built['entry']
@@ -348,7 +348,7 @@ def _write_data(script, data):
     script = Path(script)
     text = json.dumps(data, indent=2)
     # Lists of plain values on one line, as people write them: "repeat": [3, 3].
-    text = re.sub(r'\[[^\[\]{}]*\]', lambda found: json.dumps(json.loads(found.group(0))), text)
+    text = re.sub(r'"(?:[^"\\]|\\.)*"|\[(?:[^\[\]{}"]|"(?:[^"\\]|\\.)*")*\]', lambda found: found.group(0) if found.group(0).startswith('"') else json.dumps(json.loads(found.group(0))), text)
     script.parent.mkdir(parents=True, exist_ok=True)
     script.write_text('export default ' + text + ';\n', encoding='utf-8')
 

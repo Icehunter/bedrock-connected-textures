@@ -42,7 +42,7 @@ const areaKey = (dimensionId, size, ax, az) => dimensionId + '|' + size + '|' + 
 export function createFar({ api, limits, log = () => {}, idle = () => true, packKey = () => undefined, settle = 200 }) {
   const { world, system } = api;
   const done = new Set();
-  let current, activeKey, seenKey, seenTick = 0, enabled = true, statusTick = 0, failures = 0, size;
+  let current, activeKey, seenKey, seenTick = 0, enabled = true, statusTick = 0, failures = 0, size, serial = 0, toldStuck = false;
   // While restoring: () => the chunks still to bring back [{ dimension (id), cx, cz }], and how often each area was loaded.
   let targets, targetLabel = 'Restoring the world';
   const tries = new Map();
@@ -169,11 +169,14 @@ export function createFar({ api, limits, log = () => {}, idle = () => true, pack
     const to = { x: ((area.ax + 1) * side + 1) * 16 - 1, y: range.max - 1, z: ((area.az + 1) * side + 1) * 16 - 1 };
     const options = { dimension: area.dimension, from, to };
     if (!tickingAreas.hasCapacity(options)) { log('far: no ticking area capacity'); return; }
-    const identifier = IDENTIFIER + '_' + system.currentTick;
+    const identifier = IDENTIFIER + '_' + system.currentTick + '_' + serial++;
     current = { ...area, identifier, ready: false, startTick: system.currentTick };
     const mine = current;
     tickingAreas.createTickingArea(identifier, options).then(() => {
-      if (current !== mine) return;
+      if (current !== mine) {
+        try { tickingAreas.removeTickingArea(identifier); } catch (error) { log('far area ' + String(error)); }
+        return;
+      }
       const x = (area.ax * side + side / 2) * 16, z = (area.az * side + side / 2) * 16;
       let y = 64;
       try { y = area.dimension.getTopmostBlock({ x, z })?.location.y ?? y; } catch { /* keep sea level */ }
@@ -183,7 +186,7 @@ export function createFar({ api, limits, log = () => {}, idle = () => true, pack
     }, error => {
       log('far area ' + String(error));
       failures++;
-      if (current === mine) { release(); done.add(mine.name); }
+      if (current === mine) { tries.set(mine.name, (tries.get(mine.name) ?? 0) + 1); release(); done.add(mine.name); }
     });
   }
 
@@ -215,6 +218,7 @@ export function createFar({ api, limits, log = () => {}, idle = () => true, pack
           // An area the game never finishes loading is skipped rather than holding up the rest.
           if (system.currentTick - current.startTick < LOAD_TIMEOUT_TICKS) return;
           failures++;
+          tries.set(current.name, (tries.get(current.name) ?? 0) + 1);
           done.add(current.name);
           release();
         } else {
@@ -234,6 +238,14 @@ export function createFar({ api, limits, log = () => {}, idle = () => true, pack
       if (targets) {
         const [next] = restoreAreas(players);
         if (next) start(next);
+        else if (!current && !toldStuck) {
+          const left = targets().length;
+          if (left) {
+            toldStuck = true;
+            try { world.sendMessage('§e[BCT] ' + left.toLocaleString('en-US') + ' chunks could not be loaded (' + targetLabel + '). Leave and rejoin the world to try again.'); }
+            catch { /* nobody to tell */ }
+          }
+        }
         return;
       }
       let next;
@@ -254,7 +266,7 @@ export function createFar({ api, limits, log = () => {}, idle = () => true, pack
     /** Restoring: load the areas holding these chunks (a function giving the chunks still to bring back) until none
      * are left, ignoring chunkRadius and the areas already done. Without one the worker converts again.
      * label is what the action bar line says. */
-    setTargets(list, label = 'Restoring the world') { targets = list; targetLabel = label; tries.clear(); release(); },
+    setTargets(list, label = 'Restoring the world') { targets = list; targetLabel = label; tries.clear(); toldStuck = false; release(); },
     get status() {
       return { areaChunks: size ?? null, done: done.size, loading: current ? current.name : null, ready: Boolean(current?.ready), failures };
     },

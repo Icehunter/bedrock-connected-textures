@@ -141,10 +141,15 @@ export function startEngine(api) {
         }
         throw error;
       }
+      for (const warning of compiled.warnings) {
+        log('authored ' + provider + ': ' + warning);
+        try { world.sendMessage('§e[BCT] ' + provider + ' (scripts/bct.js): ' + warning); } catch { /* no players yet */ }
+      }
       replacements.setSource(provider, compiled.replace); leaves.setSource(provider, compiled.replace); replaceScanner.reset();
       // Its edges join the converted packs' terrain data, under a name of their own.
       if (compiled.terrain.length || terrainSources.has('authored:' + provider)) setTerrain('authored:' + provider, compiled.terrain);
       if (compiled.connected) connected.setSource('authored:' + provider, compiled.connected);
+      else connected.removeSource('authored:' + provider);
     }
     else if (part === 'connected') connected.setSource(provider, data);
     // Replacements first: the leaves count the replacement logs as logs, so they must exist when the leaves read them.
@@ -343,6 +348,7 @@ export function startEngine(api) {
       try {
         const overrides = JSON.parse(event.message || '{}');
         settings = resolveSettings(overrides);
+        scheduleTick();
         world.setDynamicProperty('bct:settings', JSON.stringify(overrides));
         scanner.reset();
         reply('[BCT] settings ' + JSON.stringify(settings));
@@ -364,6 +370,7 @@ export function startEngine(api) {
     started = true;
     try { settings = resolveSettings(JSON.parse(world.getDynamicProperty('bct:settings') ?? '{}')); }
     catch (error) { log('saved settings ignored: ' + String(error)); }
+    scheduleTick();
     if (world.getDynamicProperty('bct:enabled') === false) setEnabled(false);
     if (world.getDynamicProperty('bct:restore') === true) setRestoring(true, false);
   }
@@ -437,7 +444,14 @@ export function startEngine(api) {
     scanner.poll(drawn);
     if (++passes % 25 === 0) { connected.despawn(); terrain.despawn(); }
   }
-  system.runInterval(tick, settings.intervalTicks);
+  let tickHandle, tickPeriod;
+  function scheduleTick() {
+    if (tickHandle !== undefined && tickPeriod === settings.intervalTicks) return;
+    if (tickHandle !== undefined) system.clearRun(tickHandle);
+    tickPeriod = settings.intervalTicks;
+    tickHandle = system.runInterval(tick, tickPeriod);
+  }
+  scheduleTick();
   // The parts that share each tick's budget, each up to its own cap.
   const parts = [
     // Swaps and the scans of chunks next to players go first: they are what players see change.

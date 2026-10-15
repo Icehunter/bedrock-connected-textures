@@ -246,3 +246,18 @@ test('carriers are still drawn with debug on, when scans see a timed copy of the
   fake.step(5);
   assert.equal(fake.entities.filter(entity => entity.isValid).length, 6);
 });
+
+test('intervalTicks set later moves the main poll to the new period', () => {
+  const fake = fakeBedrock({ blocks: new Map() });
+  const periods = new Map();
+  const system = fake.api.system, run = system.runInterval.bind(system), clear = system.clearRun.bind(system);
+  system.runInterval = (fn, period) => { const id = run(fn, period); periods.set(id, period); return id; };
+  system.clearRun = id => { periods.delete(id); clear(id); };
+  startEngine(fake.api);
+  const count = period => [...periods.values()].filter(value => value === period).length;
+  const fours = count(4);
+  assert.ok(fours >= 1, 'the poll starts at the default period');
+  fake.system.sendScriptEvent('bct:config', JSON.stringify({ intervalTicks: 20 }));
+  assert.equal(count(20), 1, 'a poll runs at the new period');
+  assert.equal(count(4), fours - 1, 'the old one is cleared');
+});

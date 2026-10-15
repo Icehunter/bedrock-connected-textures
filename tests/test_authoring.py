@@ -99,6 +99,17 @@ class PatternBlockTest(unittest.TestCase):
                 self.assertTrue(all(rule['condition'] == 'same_block'
                                     for rule in culling['minecraft:block_culling_rules']['rules']))
 
+    def test_see_through_tiles_in_tga_form_pick_the_method_their_pixels_need(self):
+        with tempfile.TemporaryDirectory() as folder:
+            bp, rp = Path(folder) / 'BP', Path(folder) / 'RP'
+            (rp / 'textures/blocks').mkdir(parents=True)
+            for index in range(2):
+                Image.new('RGBA', (16, 16), (10, 20, 30, 255)).save(rp / f'textures/blocks/mypack_glass_{index}.tga')
+            write_block(bp, rp, 'minecraft:glass', 'mypack:glass', {'random': [1, 1]}, samples=SAMPLES)
+            block = json.loads((bp / 'blocks/glass.json').read_text())['minecraft:block']
+            instances = block['permutations'][0]['components']['minecraft:material_instances']
+            self.assertEqual(instances['up']['render_method'], 'alpha_test')
+
     def test_a_slab_takes_the_pattern_on_half_a_block(self):
         with tempfile.TemporaryDirectory() as folder:
             bp, rp = Path(folder) / 'BP', Path(folder) / 'RP'
@@ -148,6 +159,16 @@ class PatternBlockTest(unittest.TestCase):
         refused('minecraft:stone', 'stone', {'repeat': [2, 2]}, 'must look like mypack:stone')
         refused('minecraft:stone', 'mypack:stone', {'repeat': [7, 5]}, 'more than 4096 block permutations')
         refused('minecraft:stone', 'mypack:stone', {'random': [1]}, '2 to 16 weights')
+
+    def test_strings_with_brackets_are_written_back_unchanged(self):
+        with tempfile.TemporaryDirectory() as folder:
+            script = Path(folder) / 'scripts/bct.js'
+            entry = {'block': 'p:stone', 'note': 'a[foo]', 'other': 'x[ 1 , 2 ]', 'pattern': {'repeat': [3, 2]}}
+            self.assertTrue(add_to_data(script, 'minecraft:stone', entry, 'p'))
+            text = script.read_text(encoding='utf-8')
+            written = json.loads(text[len('export default '):].strip().rstrip(';'))
+            self.assertEqual(written['blocks']['minecraft:stone'], entry)
+            self.assertIn('"repeat": [3, 2]', text)
 
     def test_a_hand_edited_data_file_is_left_alone(self):
         with tempfile.TemporaryDirectory() as folder:

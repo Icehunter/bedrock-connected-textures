@@ -22,6 +22,10 @@ not have the world open.
 """
 from collections import Counter
 import json
+try:
+    import fcntl
+except ImportError:
+    fcntl = None
 from pathlib import Path
 import re
 import shutil
@@ -172,13 +176,17 @@ def _manifest_sequence(folder):
     return last
 
 
+def _log_files(folder):
+    return sorted((path for path in Path(folder).glob('*.log') if path.stem.isdecimal()), key=lambda path: int(path.stem))
+
+
 def read_database(folder):
     """({key: latest value}, last sequence number) of a LevelDB folder: its tables, then its logs on top."""
     folder = Path(folder)
     entries = []
     for path in sorted(folder.glob('*.ldb')):
         entries += list(_table_entries(path.read_bytes()))
-    for path in sorted(folder.glob('*.log')):
+    for path in _log_files(folder):
         for record in _log_records(path.read_bytes()):
             entries += list(_batch_entries(record))
     latest, last = {}, _manifest_sequence(folder)
@@ -190,7 +198,7 @@ def read_database(folder):
 
 def append_batch(folder, puts, sequence):
     """Adds one write batch {key: value} to the newest log, as LevelDB writes it; the game replays it on load."""
-    logs = sorted(Path(folder).glob('*.log'), key=lambda path: int(path.stem))
+    logs = _log_files(folder)
     if not logs:
         raise WorldRestoreError('the world has no LevelDB log to add to')
     batch = bytearray(struct.pack('<QI', sequence, len(puts)))
@@ -416,6 +424,23 @@ def count_bct_blocks(latest, known=None):
     return found
 
 
+def _world_is_open(lock):
+    if fcntl is not None:
+        with lock.open('r+b') as handle:
+            try:
+                fcntl.lockf(handle, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            except OSError:
+                return True
+            return False
+    else:
+        try:
+            lock.rename(lock.with_name('LOCK.bct'))
+            (lock.with_name('LOCK.bct')).rename(lock)
+        except OSError:
+            return True
+        return False
+
+
 def restore_world(world, samples, backup=True):
     """Puts every BCT block in a world back to vanilla. Returns a report dict."""
     world = Path(world)
@@ -423,12 +448,8 @@ def restore_world(world, samples, backup=True):
     if not folder.is_dir():
         raise WorldRestoreError(f'{world} is not a Bedrock world folder (no db folder)')
     lock = folder / 'LOCK'
-    if lock.exists():
-        try:
-            lock.rename(folder / 'LOCK.bct')
-            (folder / 'LOCK.bct').rename(lock)
-        except OSError:
-            raise WorldRestoreError('the world is open in the game; close it first') from None
+    if lock.exists() and _world_is_open(lock):
+        raise WorldRestoreError('the world is open in the game; close it first')
     archive = None
     if backup:
         archive = shutil.make_archive(str(world) + '.bct-backup', 'zip', world)

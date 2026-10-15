@@ -35,3 +35,22 @@ shuffled.dispose();
   assert.ok((sent.get('small')??0)>=1,'the second source is sent once the first has gone out in full');
   quiet.dispose();
 }
+{
+  const logs=[];
+  const watched=listenSources({system,onSource:()=>{},log:message=>logs.push(message)});
+  const bad=(index,payload)=>system.sendScriptEvent('bct:source_data',JSON.stringify({engine:'terrain',provider:'source-c',digest:'00000000',index,count:2,payload}));
+  bad(0,'[5,');
+  bad(1,'6]');
+  assert.equal(logs.length,1,'a transfer dropped for a bad checksum is logged');
+  assert.match(logs[0],/source-c/);
+  assert.match(logs[0],/checksum/);
+  watched.dispose();
+}
+{
+  const sturdy=publishSources({system,world,sources:[packet]});
+  for(const body of ['null','7','"text"','[1]']){
+    assert.doesNotThrow(()=>system.sendScriptEvent('bct:source_request',body),'a payload that is not an object is ignored: '+body);
+    assert.doesNotThrow(()=>system.sendScriptEvent('bct:source_ack',body),'a payload that is not an object is ignored: '+body);
+  }
+  sturdy.dispose();
+}
