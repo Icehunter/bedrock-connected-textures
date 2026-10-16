@@ -1,8 +1,9 @@
 # Changelog
 
-## Unreleased
+## 1.3.0
 
 World:
+- Distant areas now swap blocks and draw overlay surfaces too, not only leaves (`far.blocks` defaults to 1). Set `far.blocks` to 0 to go back to leaves only.
 - The distant loading pass is remembered per pack. Switching to another pack, or updating a pack, runs it again, and the earlier pack's list is deleted. Worlds from 1.2.2 run it once more.
 - `/scriptevent bct:control rescan` starts the distant pass over and has the engine look at the chunks around players again.
 
